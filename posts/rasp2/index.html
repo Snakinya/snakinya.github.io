@@ -7,10 +7,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Snakinya" />
-  <meta property="og:url" content="http://localhost:1313/posts/rasp2/" />
-  <link rel="canonical" href="http://localhost:1313/posts/rasp2/" /><link rel="apple-touch-icon" href="favicon.ico" />
+  <meta property="og:url" content="http://snakin.top/posts/rasp2/" />
+  <link rel="canonical" href="http://snakin.top/posts/rasp2/" /><link rel="apple-touch-icon" href="favicon.ico" />
   <link rel="icon" href="favicon.ico" />
-  <link rel="shortcut" href="favicon.ico" /><link rel="alternate" type="application/atom+xml" href="http://localhost:1313index.xml" title="Snakinya">
+  <link rel="shortcut" href="favicon.ico" /><link rel="alternate" type="application/atom+xml" href="http://snakin.topindex.xml" title="Snakinya">
 
   <script type="application/ld+json">
   {
@@ -18,7 +18,7 @@
       "@type" : "BlogPosting",
       "mainEntityOfPage": {
            "@type": "WebPage",
-           "@id": "http:\/\/localhost:1313"
+           "@id": "http:\/\/snakin.top"
       },
       "articleSection" : "posts",
       "name" : "RASP技术学习入门篇(2)",
@@ -33,7 +33,7 @@
       "copyrightYear" : "2023",
       "datePublished": "2023-03-21 00:00:00 \u002b0000 UTC",
       "dateModified" : "2023-03-21 00:00:00 \u002b0000 UTC",
-      "url" : "http:\/\/localhost:1313\/posts\/rasp2\/",
+      "url" : "http:\/\/snakin.top\/posts\/rasp2\/",
       "keywords" : [  ]
   }
 </script>
@@ -151,7 +151,7 @@ ClassReader reader = new ClassReader(classfileBuffer); ClassWriter writer = new 
             <div class="col-xs-6">
               
               <div class="post-author">
-                <a target="_blank" href="http://localhost:1313">@Snakinya</a>
+                <a target="_blank" href="http://snakin.top">@Snakinya</a>
               </div>
               
             </div>
@@ -301,7 +301,7 @@ ClassReader reader = new ClassReader(classfileBuffer); ClassWriter writer = new 
 </span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
 </span></span></code></pre></div><p>其他模块的原理相似这里不做过多介绍，在这个过程中我也发现利用asm去hook函数需要对字节码操作有较强理解，本次分析之后应该会去补一补相关知识。</p>
 <p>参考：</p>
-<p><a href="https://zhuanlan.zhihu.com/p/138911654#:~:text=%E6%9F%A5%E7%9C%8B%E5%AD%97%E8%8A%82%E7%A0%81%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E5%BC%8F%20%E6%88%91%E4%BB%AC%E7%9F%A5%E9%81%93%EF%BC%8C%E9%80%9A%E8%BF%87%20javac%20%E5%91%BD%E4%BB%A4%EF%BC%8C%E5%8F%AF%E4%BB%A5%E6%8A%8A%20java%20%E6%96%87%E4%BB%B6%E7%BC%96%E8%AF%91%E6%88%90,class%20%E6%96%87%E4%BB%B6%E3%80%82%20%E7%84%B6%E5%90%8E%EF%BC%8C%E6%83%B3%E7%9C%8B%E5%AE%83%E7%9A%84%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%EF%BC%8C%E9%9C%80%E8%A6%81%E7%94%A8%E5%88%B0%20javap%20-c%20%E5%8F%8D%E7%BC%96%E8%AF%91%E4%B8%80%E4%B8%8B%E3%80%82">https://zhuanlan.zhihu.com/p/138911654#:~:text=%E6%9F%A5%E7%9C%8B%E5%AD%97%E8%8A%82%E7%A0%81%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E5%BC%8F%20%E6%88%91%E4%BB%AC%E7%9F%A5%E9%81%93%EF%BC%8C%E9%80%9A%E8%BF%87%20javac%20%E5%91%BD%E4%BB%A4%EF%BC%8C%E5%8F%AF%E4%BB%A5%E6%8A%8A%20java%20%E6%96%87%E4%BB%B6%E7%BC%96%E8%AF%91%E6%88%90,class%20%E6%96%87%E4%BB%B6%E3%80%82%20%E7%84%B6%E5%90%8E%EF%BC%8C%E6%83%B3%E7%9C%8B%E5%AE%83%E7%9A%84%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%EF%BC%8C%E9%9C%80%E8%A6%81%E7%94%A8%E5%88%B0%20javap%20-c%20%E5%8F%8D%E7%BC%96%E8%AF%91%E4%B8%80%E4%B8%8B%E3%80%82</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/138911654">https://zhuanlan.zhihu.com/p/138911654</a></p>
 <p><a href="https://www.cnblogs.com/tr1ple/p/12709504.html#ndsWNnRa">https://www.cnblogs.com/tr1ple/p/12709504.html#ndsWNnRa</a></p>
 <p><a href="https://t.zsxq.com/0boOLJ6rO">https://t.zsxq.com/0boOLJ6rO</a></p>
 

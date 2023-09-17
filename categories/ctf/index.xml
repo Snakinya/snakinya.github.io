@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>CTF on Snakinya</title>
-    <link>http://localhost:1313/categories/ctf/</link>
+    <link>http://snakin.top/categories/ctf/</link>
     <description>Recent content in CTF on Snakinya</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>cn</language>
-    <lastBuildDate>Tue, 31 Jan 2023 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/categories/ctf/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 31 Jan 2023 00:00:00 +0000</lastBuildDate><atom:link href="http://snakin.top/categories/ctf/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>CTF | 2022HFCTF ezchain</title>
-      <link>http://localhost:1313/posts/2022hfctf-ezchain/</link>
+      <link>http://snakin.top/posts/2022hfctf-ezchain/</link>
       <pubDate>Tue, 31 Jan 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/posts/2022hfctf-ezchain/</guid>
+      <guid>http://snakin.top/posts/2022hfctf-ezchain/</guid>
       <description>关键词 hession	rome	二次反序列化	handler内存马
 题目浅析 首先根据dockerfile可知题目环境不出网，看一下依赖：
 也就是：
@@ -23,10 +23,10 @@ package com.ctf.ezchain; import com.caucho.hessian.io.Hessian2Input; import com.
     
     <item>
       <title>CTF | 2020羊城杯 a_piece_of_java</title>
-      <link>http://localhost:1313/posts/2020%E7%BE%8A%E5%9F%8E%E6%9D%AF/</link>
+      <link>http://snakin.top/posts/2020%E7%BE%8A%E5%9F%8E%E6%9D%AF/</link>
       <pubDate>Sat, 14 Jan 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/posts/2020%E7%BE%8A%E5%9F%8E%E6%9D%AF/</guid>
+      <guid>http://snakin.top/posts/2020%E7%BE%8A%E5%9F%8E%E6%9D%AF/</guid>
       <description>a_piece_of_java 考点：
 ​ 1.序列化入口构造
 ​ 2.Mysql JDBC反序列化
@@ -36,10 +36,10 @@ package gdufs.challenge.web.controller; import gdufs.challenge.web.model.Info; i
     
     <item>
       <title>CTF | 2022NCTF ezjava</title>
-      <link>http://localhost:1313/posts/2022nctf-ezjava/</link>
+      <link>http://snakin.top/posts/2022nctf-ezjava/</link>
       <pubDate>Sat, 14 Jan 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/posts/2022nctf-ezjava/</guid>
+      <guid>http://snakin.top/posts/2022nctf-ezjava/</guid>
       <description>题目浅析 题目直接给出反序列化点
 熟悉的hession反序列化，看一下依赖
 &amp;lt;dependencies&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;spring-boot-starter&amp;lt;/artifactId&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;spring-boot-starter-test&amp;lt;/artifactId&amp;gt; &amp;lt;scope&amp;gt;test&amp;lt;/scope&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.apache.dubbo&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;dubbo&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;2.7.16&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;spring-boot-starter-web&amp;lt;/artifactId&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;/dependencies&amp;gt; 很明显需要我们在dubbo环境下找一条利用链
@@ -53,10 +53,10 @@ package exp; import com.alibaba.com.caucho.hessian.io.Hessian2Input; import com.
     
     <item>
       <title>CTF | 2022安洵杯 ezjaba</title>
-      <link>http://localhost:1313/posts/2022%E5%AE%89%E6%B4%B5%E6%9D%AFezjaba/</link>
+      <link>http://snakin.top/posts/2022%E5%AE%89%E6%B4%B5%E6%9D%AFezjaba/</link>
       <pubDate>Sat, 14 Jan 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/posts/2022%E5%AE%89%E6%B4%B5%E6%9D%AFezjaba/</guid>
+      <guid>http://snakin.top/posts/2022%E5%AE%89%E6%B4%B5%E6%9D%AFezjaba/</guid>
       <description>题目简析 首先看到com.example.ezjaba.controller.IndexController.java,题目给了一个反序列化入口
 而在Database中存在一个getConnection()方法
 结合JdbcUtils
@@ -73,10 +73,10 @@ package exp; import com.example.ezjaba.Connection.Database; import com.rometools
     
     <item>
       <title>CTF | 2022网鼎杯青龙组 BadBean-2.0</title>
-      <link>http://localhost:1313/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF%E9%9D%92%E9%BE%99/</link>
+      <link>http://snakin.top/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF%E9%9D%92%E9%BE%99/</link>
       <pubDate>Sat, 14 Jan 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF%E9%9D%92%E9%BE%99/</guid>
+      <guid>http://snakin.top/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF%E9%9D%92%E9%BE%99/</guid>
       <description>题目浅析 题目内容：this time i use hessian2, hack me
 题目给了/api接口进行反序列化
 在com.ctf.badbean.bean.MyBean#toString中可以触发getter方法
@@ -88,19 +88,19 @@ POC构造 import com.alibaba.com.caucho.hessian.io.Hessian2Input; import com.ctf
     
     <item>
       <title>CTF | 2021陇原战疫 ezjaba</title>
-      <link>http://localhost:1313/posts/2021ezjaba/</link>
+      <link>http://snakin.top/posts/2021ezjaba/</link>
       <pubDate>Wed, 14 Sep 2022 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/posts/2021ezjaba/</guid>
+      <guid>http://snakin.top/posts/2021ezjaba/</guid>
       <description>考点： rome反序列化 不出网回显 解题 public class IndexController { public IndexController() { } @ResponseBody @RequestMapping({&amp;#34;/&amp;#34;}) public String index() { return &amp;#34;Give you a cup of java, calm down&amp;#34;; } @ResponseBody @RequestMapping({&amp;#34;/BackDoor&amp;#34;}) public String BackDoor(@RequestParam(name = &amp;#34;ctf&amp;#34;,required = true) String data) throws Exception { Set blacklist = new HashSet() { { this.add(&amp;#34;java.util.HashMap&amp;#34;); this.add(&amp;#34;javax.management.BadAttributeValueExpException&amp;#34;); } }; Object object = null; byte[] b = Tool.base64Decode(data); InputStream inputStream = new ByteArrayInputStream(b); BlacklistObjectInputStream ois = new BlacklistObjectInputStream(inputStream, blacklist); try { object = ois.</description>
     </item>
     
     <item>
       <title>CTF | 2022羊城杯 simple_json</title>
-      <link>http://localhost:1313/posts/2022%E7%BE%8A%E5%9F%8E%E6%9D%AF/</link>
+      <link>http://snakin.top/posts/2022%E7%BE%8A%E5%9F%8E%E6%9D%AF/</link>
       <pubDate>Wed, 14 Sep 2022 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/posts/2022%E7%BE%8A%E5%9F%8E%E6%9D%AF/</guid>
+      <guid>http://snakin.top/posts/2022%E7%BE%8A%E5%9F%8E%E6%9D%AF/</guid>
       <description>simple_json 考点： snakeyaml绕过高版本jndi
 解题 给了一个jar包，看一下controller
 package ycb.simple_json.controller; import com.alibaba.fastjson.JSON; import java.io.IOException; import javax.servlet.ServletInputStream; import javax.servlet.http.HttpServletRequest; import org.springframework.beans.factory.annotation.Autowired; import org.springframework.web.bind.annotation.GetMapping; import org.springframework.web.bind.annotation.PostMapping; import org.springframework.web.bind.annotation.RequestMapping; import org.springframework.web.bind.annotation.RestController; import ycb.simple_json.message.Message; import ycb.simple_json.service.ApiTestService; @RestController @RequestMapping({&amp;#34;/ApiTest&amp;#34;}) public class JsonApiTestController { @Autowired private ApiTestService apiTestService; public JsonApiTestController() { } @GetMapping({&amp;#34;/get&amp;#34;}) public String getApiTest() { return this.apiTestService.getMsg().toString(); } @PostMapping({&amp;#34;/post&amp;#34;}) public String postApiTest(HttpServletRequest request) { ServletInputStream inputStream = null; String jsonStr = null; try { inputStream = request.getInputStream(); StringBuffer stringBuffer = new StringBuffer(); byte[] buf = new byte[1024]; int len = false; int len; while((len = inputStream.</description>
@@ -108,20 +108,20 @@ package ycb.simple_json.controller; import com.alibaba.fastjson.JSON; import jav
     
     <item>
       <title>CTF | 2022ciscn决赛 Backdoor</title>
-      <link>http://localhost:1313/posts/2022ciscn%E5%86%B3%E8%B5%9B/</link>
+      <link>http://snakin.top/posts/2022ciscn%E5%86%B3%E8%B5%9B/</link>
       <pubDate>Fri, 09 Sep 2022 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/posts/2022ciscn%E5%86%B3%E8%B5%9B/</guid>
+      <guid>http://snakin.top/posts/2022ciscn%E5%86%B3%E8%B5%9B/</guid>
       <description>Backdoor 首页给了源码
 &amp;lt;?php error_reporting(E_ERROR); class backdoor { public $path = null; public $argv = null; public $class = &amp;#34;stdclass&amp;#34;; public $do_exec_func = true; public function __sleep() { if (file_exists($this-&amp;gt;path)) { return include $this-&amp;gt;path; } else { throw new Exception(&amp;#34;__sleep failed...&amp;#34;); } } public function __wakeup() { if ( $this-&amp;gt;do_exec_func &amp;amp;&amp;amp; in_array($this-&amp;gt;class, get_defined_functions()[&amp;#34;internal&amp;#34;]) ) { call_user_func($this-&amp;gt;class); } else { $argv = $this-&amp;gt;argv; $class = $this-&amp;gt;class; new $class($argv); // 没有echo } } } $cmd = $_REQUEST[&amp;#39;cmd&amp;#39;]; $data = $_REQUEST[&amp;#39;data&amp;#39;]; switch ($cmd) { case &amp;#39;unserialze&amp;#39;: unserialize($data); break; case &amp;#39;rm&amp;#39;: system(&amp;#34;rm -rf /tmp&amp;#34;); break; default: highlight_file(__FILE__); break; } 阅读代码，存在两个魔法函数：</description>
     </item>
     
     <item>
       <title>CTF | 2022网鼎杯青龙组	easyrar</title>
-      <link>http://localhost:1313/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF/</link>
+      <link>http://snakin.top/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF/</link>
       <pubDate>Fri, 09 Sep 2022 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF/</guid>
+      <guid>http://snakin.top/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF/</guid>
       <description>easyrar import os import re import yaml import time import socket import subprocess from hashlib import md5 from flask import Flask, render_template, make_response, send_file, request, redirect, session app = Flask(__name__) app.config[&amp;#39;SECRET_KEY&amp;#39;] = socket.gethostname() def response(content, status): resp = make_response(content, status) return resp @app.before_request def is_login(): if request.path == &amp;#34;/upload&amp;#34;: if session.get(&amp;#39;user&amp;#39;) != &amp;#34;Administrator&amp;#34;: return f&amp;#34;&amp;lt;script&amp;gt;alert(&amp;#39;Access Denied&amp;#39;);window.location.href=&amp;#39;/&amp;#39;&amp;lt;/script&amp;gt;&amp;#34; else: return None @app.route(&amp;#39;/&amp;#39;, methods=[&amp;#39;GET&amp;#39;]) def main(): if not session.get(&amp;#39;user&amp;#39;): session[&amp;#39;user&amp;#39;] = &amp;#39;Guest&amp;#39; try: return render_template(&amp;#39;index.</description>
     </item>
     
