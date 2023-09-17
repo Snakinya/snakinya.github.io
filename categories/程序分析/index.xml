@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>程序分析 on Snakinya</title>
-    <link>http://www.snakin.top/categories/%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90/</link>
+    <link>https://www.snakin.top/categories/%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90/</link>
     <description>Recent content in 程序分析 on Snakinya</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>cn</language>
-    <lastBuildDate>Thu, 23 Feb 2023 00:00:00 +0000</lastBuildDate><atom:link href="http://www.snakin.top/categories/%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 23 Feb 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.snakin.top/categories/%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>南大软分笔记 ｜ 02 Intermediate Representation（IR）</title>
-      <link>http://www.snakin.top/posts/02-intermediate-representation/</link>
+      <link>https://www.snakin.top/posts/02-intermediate-representation/</link>
       <pubDate>Thu, 23 Feb 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/02-intermediate-representation/</guid>
+      <guid>https://www.snakin.top/posts/02-intermediate-representation/</guid>
       <description>Intermediate Representation（IR） Compliers and static analyzers 编译过程:
 source code ↓↓↓ scanner(lexical analysis 词法分析)---&amp;gt;regular expression ↓↓↓ ---&amp;gt;Tokens Parser(Syntax Analysis 语法分析)---&amp;gt;context-free grammar上下文不敏感语法 ↓↓↓ ---&amp;gt;AST 抽象语法树 Type Checker 类型检查(Semantic Analysis 语义分析)---&amp;gt;attribute grammar ↓↓↓ ---&amp;gt; Decorated AST Translator ↓↓↓ ---&amp;gt;IR ---&amp;gt;Static Analysis Code Generator ↓↓↓ machine code 编译器将源代码（Source code） 转换为机器代码（Machine Code）。其中的流程框架是：
 词法分析器（Scanner），结合正则表达式，通过词法分析（Lexical Analysis）将 source code 翻译为 token。 语法分析器（Parser），结合上下文无关文法（Context-Free Grammar），通过语法分析（Syntax Analysis），将 token 解析为抽象语法树（Abstract Syntax Tree, AST） 语义分析器（Type Checker），结合属性文法（Attribute Grammar），通过语义分析（Semantic Analysis），将 AST 解析为 decorated AST Translator，将 decorated AST 翻译为生成三地址码这样的中间表示形式（Intermediate Representation, IR），并基于 IR 做静态分析（例如代码优化这样的工作）。 Code Generator，将 IR 转换为机器代码。 AST vs.</description>
@@ -20,10 +20,10 @@ source code ↓↓↓ scanner(lexical analysis 词法分析)---&amp;gt;regular e
     
     <item>
       <title>南大软分笔记 ｜ 01 Course Introduction</title>
-      <link>http://www.snakin.top/posts/01-introduction/</link>
+      <link>https://www.snakin.top/posts/01-introduction/</link>
       <pubDate>Mon, 20 Feb 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/01-introduction/</guid>
+      <guid>https://www.snakin.top/posts/01-introduction/</guid>
       <description>Introduction Why we need static analysis reliability security compiler optimization(编译优化) program understanding Static Analysis Static analysis analyzes a program P to reason about its behaviors and determines whether it satisfies some properties before runnning P.
 ps.静态+运行前分析
 Useful static analysis mostly compromising completensee:Sound(overapproximate) but not fully-precise static analysis.

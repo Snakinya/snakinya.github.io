@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Snakinya</title>
-    <link>http://www.snakin.top/</link>
+    <link>https://www.snakin.top/</link>
     <description>Recent content on Snakinya</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>cn</language>
-    <lastBuildDate>Tue, 22 Aug 2023 00:00:00 +0000</lastBuildDate><atom:link href="http://www.snakin.top/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 22 Aug 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.snakin.top/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Weblogic | CVE-2016-0638分析</title>
-      <link>http://www.snakin.top/posts/cve-2016-0638bypass-cve-2015-4852/</link>
+      <link>https://www.snakin.top/posts/cve-2016-0638bypass-cve-2015-4852/</link>
       <pubDate>Tue, 22 Aug 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/cve-2016-0638bypass-cve-2015-4852/</guid>
+      <guid>https://www.snakin.top/posts/cve-2016-0638bypass-cve-2015-4852/</guid>
       <description>引言 这个漏洞是对于CVE-2015-4852的绕过，在了解具体防御措施之前我们先学习一下Java原生类反序列化的内部调用
 对于CVE-2015-4852漏洞，官方的做法是在resolveClass处添加了黑名单，resolveClass方法的作用是将类的序列化描述符加工成该类的Class对象。
 如果在resolveClass中增加一个检查，检查一下该类的序列化描述符中记录的类名是否在黑名单上，如果在黑名单上，直接抛出错误，不允许获取恶意的类的Class对象。这样一来，恶意类无法生成Class，从而能够一定程度上防御反序列化攻击。
@@ -28,19 +28,19 @@ private static final String DEFAULT_BLACK_LIST = &amp;#34;+org.apache.commons.co
     
     <item>
       <title>DNS | DNS Zone Transfers (AXFR) Vulnerability</title>
-      <link>http://www.snakin.top/posts/dns%E5%9F%9F%E4%BC%A0%E8%BE%93%E6%BC%8F%E6%B4%9E/</link>
+      <link>https://www.snakin.top/posts/dns%E5%9F%9F%E4%BC%A0%E8%BE%93%E6%BC%8F%E6%B4%9E/</link>
       <pubDate>Mon, 21 Aug 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/dns%E5%9F%9F%E4%BC%A0%E8%BE%93%E6%BC%8F%E6%B4%9E/</guid>
+      <guid>https://www.snakin.top/posts/dns%E5%9F%9F%E4%BC%A0%E8%BE%93%E6%BC%8F%E6%B4%9E/</guid>
       <description>DNS Zone Transfers (AXFR) Vulnerability DNS zone transfers using the AXFR protocol are the simplest mechanism to replicate DNS records across DNS servers. To avoid the need to edit information on multiple DNS servers, you can edit information on one server and use AXFR to copy information to other servers. However, if you do not protect your servers, malicious parties may use AXFR to get information about all your hosts.</description>
     </item>
     
     <item>
       <title>Weblogic | CVE-2015-4852分析</title>
-      <link>http://www.snakin.top/posts/cve-2015-4852/</link>
+      <link>https://www.snakin.top/posts/cve-2015-4852/</link>
       <pubDate>Mon, 21 Aug 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/cve-2015-4852/</guid>
+      <guid>https://www.snakin.top/posts/cve-2015-4852/</guid>
       <description>环境配置 工具：https://github.com/QAX-A-Team/WeblogicEnvironment
 jdk地址：https://www.oracle.com/java/technologies/javase/javase7-archive-downloads.html
 weblogic下载地址：https://www.oracle.com/middleware/technologies/weblogic-server-downloads.html
@@ -54,10 +54,10 @@ Java RMI 的基础通信协议是 JRMP ，但是也支持开发其他的协议�
     
     <item>
       <title>DNS | Reproduction of SADDNS</title>
-      <link>http://www.snakin.top/posts/reproduction-of-sad-dns/</link>
+      <link>https://www.snakin.top/posts/reproduction-of-sad-dns/</link>
       <pubDate>Mon, 19 Jun 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/reproduction-of-sad-dns/</guid>
+      <guid>https://www.snakin.top/posts/reproduction-of-sad-dns/</guid>
       <description>Paper address： DNS Cache Poisoning Attack Reloaded: Revolutions with Side Channels
 Background Knowledge DNS Infrastructure Paper Overview Experiment Setup I use three virtual machines to set the environment:
 ┌──────────────────┐ │ │ DNS query │ dns_forwarder │ ubuntu18+dnsmasq(linux 4.15) │ │ └──────────────────┘ | 192.168.111.17 | | | | | ┌──────────────────┐ │ │ DNS query │ dns_resolver │ ubuntu20+dnsmasq │ │ └──────────────────┘ | 192.168.111.14 | | | | | ┌──────────────────────────────┐ │ │ DNS query │ auth_name_server │ ubuntu20+bind9(test.</description>
@@ -65,10 +65,10 @@ Background Knowledge DNS Infrastructure Paper Overview Experiment Setup I use th
     
     <item>
       <title>RASP技术学习入门篇(1)</title>
-      <link>http://www.snakin.top/posts/rasp1/</link>
+      <link>https://www.snakin.top/posts/rasp1/</link>
       <pubDate>Tue, 21 Mar 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/rasp1/</guid>
+      <guid>https://www.snakin.top/posts/rasp1/</guid>
       <description>Java RASP技术 运行时应用程序自我保护（Runtime application self-protection，简称RASP）使用Java Agent技术在应用程序运行时候动态编辑类字节码，将自身防御逻辑注入到Java底层API和Web应用程序当中，从而与应用程序融为一体，能实时分析和检测Web攻击，使应用程序具备自我保护能力。
 RASP技术作为新兴的WEB防御方案，不但能够有效的防御传统WAF无法实现的攻击类型，更能够大幅提升对攻击者攻击行为的检测精准度。RASP是传统WAF的坚实后盾，能够弥补WAF无法获取Web应用运行时环境的缺陷，同时也是传统Web应用服务最重要的不可或缺的一道安全防线。
 RASP通过注入自身到开发语言底层API中，从而完全的融入于Web服务中，拥有了得天独厚的漏洞检测和防御条件，RASP技术相较于传统的WAF拥有了更加精准、深层次的防御。RASP采用基于攻击行为分析的主动防御机制，严防文件读写、数据访问、命令执行等Web应用系统命脉，为Web应用安全筑建出“万丈高墙”。
@@ -83,10 +83,10 @@ package cn.org.javaweb.agent; import java.lang.instrument.ClassFileTransformer; 
     
     <item>
       <title>RASP技术学习入门篇(2)</title>
-      <link>http://www.snakin.top/posts/rasp2/</link>
+      <link>https://www.snakin.top/posts/rasp2/</link>
       <pubDate>Tue, 21 Mar 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/rasp2/</guid>
+      <guid>https://www.snakin.top/posts/rasp2/</guid>
       <description>项目地址 https://github.com/xbeark/javaopenrasp
 简介 该rasp相比于上一篇文章的项目复杂许多，这次希望能够更深入了解rasp的实现思路
 该项目实现的保护点：
@@ -103,10 +103,10 @@ ClassReader reader = new ClassReader(classfileBuffer); ClassWriter writer = new 
     
     <item>
       <title>南大软分笔记 ｜ 02 Intermediate Representation（IR）</title>
-      <link>http://www.snakin.top/posts/02-intermediate-representation/</link>
+      <link>https://www.snakin.top/posts/02-intermediate-representation/</link>
       <pubDate>Thu, 23 Feb 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/02-intermediate-representation/</guid>
+      <guid>https://www.snakin.top/posts/02-intermediate-representation/</guid>
       <description>Intermediate Representation（IR） Compliers and static analyzers 编译过程:
 source code ↓↓↓ scanner(lexical analysis 词法分析)---&amp;gt;regular expression ↓↓↓ ---&amp;gt;Tokens Parser(Syntax Analysis 语法分析)---&amp;gt;context-free grammar上下文不敏感语法 ↓↓↓ ---&amp;gt;AST 抽象语法树 Type Checker 类型检查(Semantic Analysis 语义分析)---&amp;gt;attribute grammar ↓↓↓ ---&amp;gt; Decorated AST Translator ↓↓↓ ---&amp;gt;IR ---&amp;gt;Static Analysis Code Generator ↓↓↓ machine code 编译器将源代码（Source code） 转换为机器代码（Machine Code）。其中的流程框架是：
 词法分析器（Scanner），结合正则表达式，通过词法分析（Lexical Analysis）将 source code 翻译为 token。 语法分析器（Parser），结合上下文无关文法（Context-Free Grammar），通过语法分析（Syntax Analysis），将 token 解析为抽象语法树（Abstract Syntax Tree, AST） 语义分析器（Type Checker），结合属性文法（Attribute Grammar），通过语义分析（Semantic Analysis），将 AST 解析为 decorated AST Translator，将 decorated AST 翻译为生成三地址码这样的中间表示形式（Intermediate Representation, IR），并基于 IR 做静态分析（例如代码优化这样的工作）。 Code Generator，将 IR 转换为机器代码。 AST vs.</description>
@@ -114,10 +114,10 @@ source code ↓↓↓ scanner(lexical analysis 词法分析)---&amp;gt;regular e
     
     <item>
       <title>南大软分笔记 ｜ 01 Course Introduction</title>
-      <link>http://www.snakin.top/posts/01-introduction/</link>
+      <link>https://www.snakin.top/posts/01-introduction/</link>
       <pubDate>Mon, 20 Feb 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/01-introduction/</guid>
+      <guid>https://www.snakin.top/posts/01-introduction/</guid>
       <description>Introduction Why we need static analysis reliability security compiler optimization(编译优化) program understanding Static Analysis Static analysis analyzes a program P to reason about its behaviors and determines whether it satisfies some properties before runnning P.
 ps.静态+运行前分析
 Useful static analysis mostly compromising completensee:Sound(overapproximate) but not fully-precise static analysis.
@@ -128,10 +128,10 @@ Soundness is also preferable to other(static-analysis) applications for which so
     
     <item>
       <title>CTF | 2022HFCTF ezchain</title>
-      <link>http://www.snakin.top/posts/2022hfctf-ezchain/</link>
+      <link>https://www.snakin.top/posts/2022hfctf-ezchain/</link>
       <pubDate>Tue, 31 Jan 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/2022hfctf-ezchain/</guid>
+      <guid>https://www.snakin.top/posts/2022hfctf-ezchain/</guid>
       <description>关键词 hession	rome	二次反序列化	handler内存马
 题目浅析 首先根据dockerfile可知题目环境不出网，看一下依赖：
 也就是：
@@ -142,10 +142,10 @@ package com.ctf.ezchain; import com.caucho.hessian.io.Hessian2Input; import com.
     
     <item>
       <title>漏洞分析 | Apache Commons Text RCE(CVE-2022-42889)分析</title>
-      <link>http://www.snakin.top/posts/apache-commons-text-rcecve-2022-42889/</link>
+      <link>https://www.snakin.top/posts/apache-commons-text-rcecve-2022-42889/</link>
       <pubDate>Sun, 29 Jan 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/apache-commons-text-rcecve-2022-42889/</guid>
+      <guid>https://www.snakin.top/posts/apache-commons-text-rcecve-2022-42889/</guid>
       <description>漏洞信息 https://lists.apache.org/thread/n2bd4vdsgkqh2tm14l1wyc3jyol7s1om
 漏洞复现 添加依赖
 &amp;lt;!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text --&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.apache.commons&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;commons-text&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;1.9&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; 复现代码
@@ -169,10 +169,10 @@ ${file:utf-8:d:/test.txt} url读文件/ssrf</description>
     
     <item>
       <title>CTF | 2020羊城杯 a_piece_of_java</title>
-      <link>http://www.snakin.top/posts/2020%E7%BE%8A%E5%9F%8E%E6%9D%AF/</link>
+      <link>https://www.snakin.top/posts/2020%E7%BE%8A%E5%9F%8E%E6%9D%AF/</link>
       <pubDate>Sat, 14 Jan 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/2020%E7%BE%8A%E5%9F%8E%E6%9D%AF/</guid>
+      <guid>https://www.snakin.top/posts/2020%E7%BE%8A%E5%9F%8E%E6%9D%AF/</guid>
       <description>a_piece_of_java 考点：
 ​ 1.序列化入口构造
 ​ 2.Mysql JDBC反序列化
@@ -182,10 +182,10 @@ package gdufs.challenge.web.controller; import gdufs.challenge.web.model.Info; i
     
     <item>
       <title>CTF | 2022NCTF ezjava</title>
-      <link>http://www.snakin.top/posts/2022nctf-ezjava/</link>
+      <link>https://www.snakin.top/posts/2022nctf-ezjava/</link>
       <pubDate>Sat, 14 Jan 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/2022nctf-ezjava/</guid>
+      <guid>https://www.snakin.top/posts/2022nctf-ezjava/</guid>
       <description>题目浅析 题目直接给出反序列化点
 熟悉的hession反序列化，看一下依赖
 &amp;lt;dependencies&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;spring-boot-starter&amp;lt;/artifactId&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;spring-boot-starter-test&amp;lt;/artifactId&amp;gt; &amp;lt;scope&amp;gt;test&amp;lt;/scope&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.apache.dubbo&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;dubbo&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;2.7.16&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;spring-boot-starter-web&amp;lt;/artifactId&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;/dependencies&amp;gt; 很明显需要我们在dubbo环境下找一条利用链
@@ -199,10 +199,10 @@ package exp; import com.alibaba.com.caucho.hessian.io.Hessian2Input; import com.
     
     <item>
       <title>CTF | 2022安洵杯 ezjaba</title>
-      <link>http://www.snakin.top/posts/2022%E5%AE%89%E6%B4%B5%E6%9D%AFezjaba/</link>
+      <link>https://www.snakin.top/posts/2022%E5%AE%89%E6%B4%B5%E6%9D%AFezjaba/</link>
       <pubDate>Sat, 14 Jan 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/2022%E5%AE%89%E6%B4%B5%E6%9D%AFezjaba/</guid>
+      <guid>https://www.snakin.top/posts/2022%E5%AE%89%E6%B4%B5%E6%9D%AFezjaba/</guid>
       <description>题目简析 首先看到com.example.ezjaba.controller.IndexController.java,题目给了一个反序列化入口
 而在Database中存在一个getConnection()方法
 结合JdbcUtils
@@ -219,10 +219,10 @@ package exp; import com.example.ezjaba.Connection.Database; import com.rometools
     
     <item>
       <title>CTF | 2022网鼎杯青龙组 BadBean-2.0</title>
-      <link>http://www.snakin.top/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF%E9%9D%92%E9%BE%99/</link>
+      <link>https://www.snakin.top/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF%E9%9D%92%E9%BE%99/</link>
       <pubDate>Sat, 14 Jan 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF%E9%9D%92%E9%BE%99/</guid>
+      <guid>https://www.snakin.top/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF%E9%9D%92%E9%BE%99/</guid>
       <description>题目浅析 题目内容：this time i use hessian2, hack me
 题目给了/api接口进行反序列化
 在com.ctf.badbean.bean.MyBean#toString中可以触发getter方法
@@ -234,19 +234,19 @@ POC构造 import com.alibaba.com.caucho.hessian.io.Hessian2Input; import com.ctf
     
     <item>
       <title>CTF | 2021陇原战疫 ezjaba</title>
-      <link>http://www.snakin.top/posts/2021ezjaba/</link>
+      <link>https://www.snakin.top/posts/2021ezjaba/</link>
       <pubDate>Wed, 14 Sep 2022 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/2021ezjaba/</guid>
+      <guid>https://www.snakin.top/posts/2021ezjaba/</guid>
       <description>考点： rome反序列化 不出网回显 解题 public class IndexController { public IndexController() { } @ResponseBody @RequestMapping({&amp;#34;/&amp;#34;}) public String index() { return &amp;#34;Give you a cup of java, calm down&amp;#34;; } @ResponseBody @RequestMapping({&amp;#34;/BackDoor&amp;#34;}) public String BackDoor(@RequestParam(name = &amp;#34;ctf&amp;#34;,required = true) String data) throws Exception { Set blacklist = new HashSet() { { this.add(&amp;#34;java.util.HashMap&amp;#34;); this.add(&amp;#34;javax.management.BadAttributeValueExpException&amp;#34;); } }; Object object = null; byte[] b = Tool.base64Decode(data); InputStream inputStream = new ByteArrayInputStream(b); BlacklistObjectInputStream ois = new BlacklistObjectInputStream(inputStream, blacklist); try { object = ois.</description>
     </item>
     
     <item>
       <title>CTF | 2022羊城杯 simple_json</title>
-      <link>http://www.snakin.top/posts/2022%E7%BE%8A%E5%9F%8E%E6%9D%AF/</link>
+      <link>https://www.snakin.top/posts/2022%E7%BE%8A%E5%9F%8E%E6%9D%AF/</link>
       <pubDate>Wed, 14 Sep 2022 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/2022%E7%BE%8A%E5%9F%8E%E6%9D%AF/</guid>
+      <guid>https://www.snakin.top/posts/2022%E7%BE%8A%E5%9F%8E%E6%9D%AF/</guid>
       <description>simple_json 考点： snakeyaml绕过高版本jndi
 解题 给了一个jar包，看一下controller
 package ycb.simple_json.controller; import com.alibaba.fastjson.JSON; import java.io.IOException; import javax.servlet.ServletInputStream; import javax.servlet.http.HttpServletRequest; import org.springframework.beans.factory.annotation.Autowired; import org.springframework.web.bind.annotation.GetMapping; import org.springframework.web.bind.annotation.PostMapping; import org.springframework.web.bind.annotation.RequestMapping; import org.springframework.web.bind.annotation.RestController; import ycb.simple_json.message.Message; import ycb.simple_json.service.ApiTestService; @RestController @RequestMapping({&amp;#34;/ApiTest&amp;#34;}) public class JsonApiTestController { @Autowired private ApiTestService apiTestService; public JsonApiTestController() { } @GetMapping({&amp;#34;/get&amp;#34;}) public String getApiTest() { return this.apiTestService.getMsg().toString(); } @PostMapping({&amp;#34;/post&amp;#34;}) public String postApiTest(HttpServletRequest request) { ServletInputStream inputStream = null; String jsonStr = null; try { inputStream = request.getInputStream(); StringBuffer stringBuffer = new StringBuffer(); byte[] buf = new byte[1024]; int len = false; int len; while((len = inputStream.</description>
@@ -254,29 +254,29 @@ package ycb.simple_json.controller; import com.alibaba.fastjson.JSON; import jav
     
     <item>
       <title>CTF | 2022ciscn决赛 Backdoor</title>
-      <link>http://www.snakin.top/posts/2022ciscn%E5%86%B3%E8%B5%9B/</link>
+      <link>https://www.snakin.top/posts/2022ciscn%E5%86%B3%E8%B5%9B/</link>
       <pubDate>Fri, 09 Sep 2022 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/2022ciscn%E5%86%B3%E8%B5%9B/</guid>
+      <guid>https://www.snakin.top/posts/2022ciscn%E5%86%B3%E8%B5%9B/</guid>
       <description>Backdoor 首页给了源码
 &amp;lt;?php error_reporting(E_ERROR); class backdoor { public $path = null; public $argv = null; public $class = &amp;#34;stdclass&amp;#34;; public $do_exec_func = true; public function __sleep() { if (file_exists($this-&amp;gt;path)) { return include $this-&amp;gt;path; } else { throw new Exception(&amp;#34;__sleep failed...&amp;#34;); } } public function __wakeup() { if ( $this-&amp;gt;do_exec_func &amp;amp;&amp;amp; in_array($this-&amp;gt;class, get_defined_functions()[&amp;#34;internal&amp;#34;]) ) { call_user_func($this-&amp;gt;class); } else { $argv = $this-&amp;gt;argv; $class = $this-&amp;gt;class; new $class($argv); // 没有echo } } } $cmd = $_REQUEST[&amp;#39;cmd&amp;#39;]; $data = $_REQUEST[&amp;#39;data&amp;#39;]; switch ($cmd) { case &amp;#39;unserialze&amp;#39;: unserialize($data); break; case &amp;#39;rm&amp;#39;: system(&amp;#34;rm -rf /tmp&amp;#34;); break; default: highlight_file(__FILE__); break; } 阅读代码，存在两个魔法函数：</description>
     </item>
     
     <item>
       <title>CTF | 2022网鼎杯青龙组	easyrar</title>
-      <link>http://www.snakin.top/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF/</link>
+      <link>https://www.snakin.top/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF/</link>
       <pubDate>Fri, 09 Sep 2022 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF/</guid>
+      <guid>https://www.snakin.top/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF/</guid>
       <description>easyrar import os import re import yaml import time import socket import subprocess from hashlib import md5 from flask import Flask, render_template, make_response, send_file, request, redirect, session app = Flask(__name__) app.config[&amp;#39;SECRET_KEY&amp;#39;] = socket.gethostname() def response(content, status): resp = make_response(content, status) return resp @app.before_request def is_login(): if request.path == &amp;#34;/upload&amp;#34;: if session.get(&amp;#39;user&amp;#39;) != &amp;#34;Administrator&amp;#34;: return f&amp;#34;&amp;lt;script&amp;gt;alert(&amp;#39;Access Denied&amp;#39;);window.location.href=&amp;#39;/&amp;#39;&amp;lt;/script&amp;gt;&amp;#34; else: return None @app.route(&amp;#39;/&amp;#39;, methods=[&amp;#39;GET&amp;#39;]) def main(): if not session.get(&amp;#39;user&amp;#39;): session[&amp;#39;user&amp;#39;] = &amp;#39;Guest&amp;#39; try: return render_template(&amp;#39;index.</description>
     </item>
     
     <item>
       <title>About</title>
-      <link>http://www.snakin.top/about/</link>
+      <link>https://www.snakin.top/about/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/about/</guid>
+      <guid>https://www.snakin.top/about/</guid>
       <description>这里是Snakinya，一名想学习二进制的Web安全研究员，目前大四在读。我主要研究方向为Java安全，协议安全，欢迎与我交流！
 How to contact me: snakinya@gmail.com | Wechat:Snakinya
 Some of my CVEs: CVE-2023-41578(Jeecg-boot Arbitrary File Read) CVE-2023-42268(Jeecg-boot SQL Injection) Experiences: 2020.9 ~ Present - 四川大学网络空间安全专业（本科） 2022.7 ~ 2022.11 - 中科院软件所 系统安全研究员（实习） 2023.5 ~ 2023.6 - 成都无糖信息技术有限公司 安全研发工程师（实习） 2023.8 ~ Present - 奇安信观星实验室 Web安全研究员（实习） </description>

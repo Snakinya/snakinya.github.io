@@ -7,10 +7,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Snakinya" />
-  <meta property="og:url" content="http://www.snakin.top/posts/2022%E7%BE%8A%E5%9F%8E%E6%9D%AF/" />
-  <link rel="canonical" href="http://www.snakin.top/posts/2022%E7%BE%8A%E5%9F%8E%E6%9D%AF/" /><link rel="apple-touch-icon" href="http://www.snakin.top/favicon.ico" />
-  <link rel="icon" href="http://www.snakin.top/favicon.ico" />
-  <link rel="shortcut" href="http://www.snakin.top/favicon.ico" /><link rel="alternate" type="application/atom+xml" href="http://www.snakin.top/index.xml" title="Snakinya">
+  <meta property="og:url" content="https://www.snakin.top/posts/2022%E7%BE%8A%E5%9F%8E%E6%9D%AF/" />
+  <link rel="canonical" href="https://www.snakin.top/posts/2022%E7%BE%8A%E5%9F%8E%E6%9D%AF/" /><link rel="apple-touch-icon" href="https://www.snakin.top/favicon.ico" />
+  <link rel="icon" href="https://www.snakin.top/favicon.ico" />
+  <link rel="shortcut" href="https://www.snakin.top/favicon.ico" /><link rel="alternate" type="application/atom+xml" href="https://www.snakin.top/index.xml" title="Snakinya">
 
   <script type="application/ld+json">
   {
@@ -18,7 +18,7 @@
       "@type" : "BlogPosting",
       "mainEntityOfPage": {
            "@type": "WebPage",
-           "@id": "http:\/\/www.snakin.top\/"
+           "@id": "https:\/\/www.snakin.top\/"
       },
       "articleSection" : "posts",
       "name" : "CTF | 2022羊城杯 simple_json",
@@ -33,7 +33,7 @@
       "copyrightYear" : "2022",
       "datePublished": "2022-09-14 00:00:00 \u002b0000 UTC",
       "dateModified" : "2022-09-14 00:00:00 \u002b0000 UTC",
-      "url" : "http:\/\/www.snakin.top\/posts\/2022%E7%BE%8A%E5%9F%8E%E6%9D%AF\/",
+      "url" : "https:\/\/www.snakin.top\/posts\/2022%E7%BE%8A%E5%9F%8E%E6%9D%AF\/",
       "keywords" : [  ]
   }
 </script>
@@ -46,7 +46,7 @@ package ycb.simple_json.controller; import com.alibaba.fastjson.JSON; import jav
   <meta name="description" content="simple_json 考点： snakeyaml绕过高版本jndi
 解题 给了一个jar包，看一下controller
 package ycb.simple_json.controller; import com.alibaba.fastjson.JSON; import java.io.IOException; import javax.servlet.ServletInputStream; import javax.servlet.http.HttpServletRequest; import org.springframework.beans.factory.annotation.Autowired; import org.springframework.web.bind.annotation.GetMapping; import org.springframework.web.bind.annotation.PostMapping; import org.springframework.web.bind.annotation.RequestMapping; import org.springframework.web.bind.annotation.RestController; import ycb.simple_json.message.Message; import ycb.simple_json.service.ApiTestService; @RestController @RequestMapping({&amp;#34;/ApiTest&amp;#34;}) public class JsonApiTestController { @Autowired private ApiTestService apiTestService; public JsonApiTestController() { } @GetMapping({&amp;#34;/get&amp;#34;}) public String getApiTest() { return this.apiTestService.getMsg().toString(); } @PostMapping({&amp;#34;/post&amp;#34;}) public String postApiTest(HttpServletRequest request) { ServletInputStream inputStream = null; String jsonStr = null; try { inputStream = request.getInputStream(); StringBuffer stringBuffer = new StringBuffer(); byte[] buf = new byte[1024]; int len = false; int len; while((len = inputStream." />
-  <meta property="og:locale" content="cn" /><meta property="og:image" content="http://www.snakin.top/favicon.ico" />
+  <meta property="og:locale" content="cn" /><meta property="og:image" content="https://www.snakin.top/favicon.ico" />
   
 
   
@@ -133,7 +133,7 @@ package ycb.simple_json.controller; import com.alibaba.fastjson.JSON; import jav
             <div class="col-xs-6">
               
               <div class="post-author">
-                <a target="_blank" href="http://www.snakin.top">@Snakinya</a>
+                <a target="_blank" href="https://www.snakin.top">@Snakinya</a>
               </div>
               
             </div>

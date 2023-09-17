@@ -2,44 +2,44 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on Snakinya</title>
-    <link>http://www.snakin.top/categories/</link>
+    <link>https://www.snakin.top/categories/</link>
     <description>Recent content in Categories on Snakinya</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>cn</language>
-    <lastBuildDate>Tue, 22 Aug 2023 00:00:00 +0000</lastBuildDate><atom:link href="http://www.snakin.top/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 22 Aug 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.snakin.top/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>JavaSec</title>
-      <link>http://www.snakin.top/categories/javasec/</link>
+      <link>https://www.snakin.top/categories/javasec/</link>
       <pubDate>Tue, 22 Aug 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/categories/javasec/</guid>
+      <guid>https://www.snakin.top/categories/javasec/</guid>
       <description></description>
     </item>
     
     <item>
       <title>协议安全</title>
-      <link>http://www.snakin.top/categories/%E5%8D%8F%E8%AE%AE%E5%AE%89%E5%85%A8/</link>
+      <link>https://www.snakin.top/categories/%E5%8D%8F%E8%AE%AE%E5%AE%89%E5%85%A8/</link>
       <pubDate>Mon, 21 Aug 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/categories/%E5%8D%8F%E8%AE%AE%E5%AE%89%E5%85%A8/</guid>
+      <guid>https://www.snakin.top/categories/%E5%8D%8F%E8%AE%AE%E5%AE%89%E5%85%A8/</guid>
       <description></description>
     </item>
     
     <item>
       <title>程序分析</title>
-      <link>http://www.snakin.top/categories/%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90/</link>
+      <link>https://www.snakin.top/categories/%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90/</link>
       <pubDate>Thu, 23 Feb 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/categories/%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90/</guid>
+      <guid>https://www.snakin.top/categories/%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90/</guid>
       <description></description>
     </item>
     
     <item>
       <title>CTF</title>
-      <link>http://www.snakin.top/categories/ctf/</link>
+      <link>https://www.snakin.top/categories/ctf/</link>
       <pubDate>Tue, 31 Jan 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/categories/ctf/</guid>
+      <guid>https://www.snakin.top/categories/ctf/</guid>
       <description></description>
     </item>
     

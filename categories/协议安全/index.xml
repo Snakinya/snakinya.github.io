@@ -2,26 +2,26 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>协议安全 on Snakinya</title>
-    <link>http://www.snakin.top/categories/%E5%8D%8F%E8%AE%AE%E5%AE%89%E5%85%A8/</link>
+    <link>https://www.snakin.top/categories/%E5%8D%8F%E8%AE%AE%E5%AE%89%E5%85%A8/</link>
     <description>Recent content in 协议安全 on Snakinya</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>cn</language>
-    <lastBuildDate>Mon, 21 Aug 2023 00:00:00 +0000</lastBuildDate><atom:link href="http://www.snakin.top/categories/%E5%8D%8F%E8%AE%AE%E5%AE%89%E5%85%A8/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 21 Aug 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.snakin.top/categories/%E5%8D%8F%E8%AE%AE%E5%AE%89%E5%85%A8/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>DNS | DNS Zone Transfers (AXFR) Vulnerability</title>
-      <link>http://www.snakin.top/posts/dns%E5%9F%9F%E4%BC%A0%E8%BE%93%E6%BC%8F%E6%B4%9E/</link>
+      <link>https://www.snakin.top/posts/dns%E5%9F%9F%E4%BC%A0%E8%BE%93%E6%BC%8F%E6%B4%9E/</link>
       <pubDate>Mon, 21 Aug 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/dns%E5%9F%9F%E4%BC%A0%E8%BE%93%E6%BC%8F%E6%B4%9E/</guid>
+      <guid>https://www.snakin.top/posts/dns%E5%9F%9F%E4%BC%A0%E8%BE%93%E6%BC%8F%E6%B4%9E/</guid>
       <description>DNS Zone Transfers (AXFR) Vulnerability DNS zone transfers using the AXFR protocol are the simplest mechanism to replicate DNS records across DNS servers. To avoid the need to edit information on multiple DNS servers, you can edit information on one server and use AXFR to copy information to other servers. However, if you do not protect your servers, malicious parties may use AXFR to get information about all your hosts.</description>
     </item>
     
     <item>
       <title>DNS | Reproduction of SADDNS</title>
-      <link>http://www.snakin.top/posts/reproduction-of-sad-dns/</link>
+      <link>https://www.snakin.top/posts/reproduction-of-sad-dns/</link>
       <pubDate>Mon, 19 Jun 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://www.snakin.top/posts/reproduction-of-sad-dns/</guid>
+      <guid>https://www.snakin.top/posts/reproduction-of-sad-dns/</guid>
       <description>Paper address： DNS Cache Poisoning Attack Reloaded: Revolutions with Side Channels
 Background Knowledge DNS Infrastructure Paper Overview Experiment Setup I use three virtual machines to set the environment:
 ┌──────────────────┐ │ │ DNS query │ dns_forwarder │ ubuntu18+dnsmasq(linux 4.15) │ │ └──────────────────┘ | 192.168.111.17 | | | | | ┌──────────────────┐ │ │ DNS query │ dns_resolver │ ubuntu20+dnsmasq │ │ └──────────────────┘ | 192.168.111.14 | | | | | ┌──────────────────────────────┐ │ │ DNS query │ auth_name_server │ ubuntu20+bind9(test.</description>
