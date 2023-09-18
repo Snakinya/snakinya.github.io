@@ -6,7 +6,21 @@
     <description>Recent content on Snakinya</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>cn</language>
-    <lastBuildDate>Tue, 22 Aug 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.snakin.top/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 18 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.snakin.top/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Weblogic | CVE-2016-3510分析</title>
+      <link>https://www.snakin.top/posts/cve-2016-3510bypass-cve-2015-4852/</link>
+      <pubDate>Mon, 18 Sep 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.snakin.top/posts/cve-2016-3510bypass-cve-2015-4852/</guid>
+      <description>引言 该漏洞是对CVE-2015-4852的另一种绕过方式， 使用weblogic.corba.utils.MarshalledObject，其中的 readResolve 会读取 objBytes 的值赋给新 new 的 ois，然后将其进行反序列化。也就是说先将恶意对象封装到weblogic.corba.utils.MarshalledObject之后再对该对象进行序列化生成payload，于是在反序列化过程中可以绕过黑名单进行恶意利用。
+漏洞分析 同样先在resolveClass下断点
+可以发现此时传入的是MarshalledObject对象，可以绕过黑名单，接下来在weblogic.corba.utils.MarshalledObject#readResolve断点
+可以发现在readResolve内部new了一个ObjectInputStream对象并对其进行反序列化，完成后续利用链
+完整的调用栈：
+transform:123, InvokerTransformer (org.apache.commons.collections.functors) transform:122, ChainedTransformer (org.apache.commons.collections.functors) get:157, LazyMap (org.apache.commons.collections.map) invoke:69, AnnotationInvocationHandler (sun.reflect.annotation) entrySet:-1, $Proxy57 (com.sun.proxy) readObject:346, AnnotationInvocationHandler (sun.reflect.annotation) invoke0:-1, NativeMethodAccessorImpl (sun.reflect) invoke:57, NativeMethodAccessorImpl (sun.reflect) invoke:43, DelegatingMethodAccessorImpl (sun.reflect) invoke:601, Method (java.lang.reflect) invokeReadObject:1004, ObjectStreamClass (java.io) readSerialData:1891, ObjectInputStream (java.io) readOrdinaryObject:1796, ObjectInputStream (java.io) readObject0:1348, ObjectInputStream (java.io) readObject:370, ObjectInputStream (java.io) readResolve:58, MarshalledObject (weblogic.corba.utils) invoke0:-1, NativeMethodAccessorImpl (sun.reflect) invoke:57, NativeMethodAccessorImpl (sun.reflect) invoke:43, DelegatingMethodAccessorImpl (sun.</description>
+    </item>
+    
     <item>
       <title>Weblogic | CVE-2016-0638分析</title>
       <link>https://www.snakin.top/posts/cve-2016-0638bypass-cve-2015-4852/</link>
