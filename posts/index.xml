@@ -6,7 +6,31 @@
     <description>Recent content in Posts on Snakinya</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>cn</language>
-    <lastBuildDate>Mon, 18 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.snakin.top/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 24 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.snakin.top/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>漏洞分析 | Spring-Kafka反序列化漏洞(CVE-2023-34040)分析</title>
+      <link>https://www.snakin.top/posts/cve-2023-34040/</link>
+      <pubDate>Sun, 24 Sep 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.snakin.top/posts/cve-2023-34040/</guid>
+      <description>描述 Spring Kafka 是 Spring Framework 生态系统中的一个模块，用于简化在 Spring 应用程序中集成 Apache Kafka 的过程，记录(record)指 Kafka 消息中的一条记录。
+受影响版本中默认未对记录配置 ErrorHandlingDeserializer，当用户将容器属性 checkDeserExWhenKeyNull 或 checkDeserExWhenValueNull 设置为 true(默认为false)，并且允许不受信任的源发布到 Kafka 主题中时，攻击者可将恶意 payload 注入到 Kafka 主题中，当反序列化记录头时远程执行任意代码。
+受影响的 Spring 产品和版本 Apache Kafka 的 Spring 2.8.1至2.9.10 3.0.0 至 3.0.9 Spring-Kafka模型 在此之前，先了解一下spring-kafka的生产者和消费者模型
+漏洞分析 根据CVE描述，我们可以知道漏洞与两个属性有关：
+这两个属性的作用分别是：
+如果设置为true，当接收到的key为null时检查DeserializationException header 如果设置为true，当接收到的value为null时检查DeserializationException header 这一部分的源码在KafkaMessageListenerContainer：
+跟进checkDeser
+跟进getExceptionFromHeader
+漏洞点在byteArrayToDeserializationException
+该方法首先将传入的value数组作为输入流创建一个ObjectInputStream对象，之后重写了resolveClass方法验证传入数据的类名是否为DeserializationException，最后通过调用ois.readObject()执行反序列化
+payload构造 这里使用漏洞报送者的POC：https://github.com/Contrast-Security-OSS/Spring-Kafka-POC-CVE-2023-34040
+创建消费者，配置好参数后进行监听
+spring.kafka.consumer.checkDeserExWhenKeyNull=true spring.kafka.consumer.checkDeserExWhenValueNull=true 之后创建一个生产者发布消息，在将header替换为我们的恶意payload并包装为DeserializationException以绕过resolveClass的检测
+最终发送消息，完成反序列化
+消费者完整调用栈如下：
+byteArrayToDeserializationException:129, ListenerUtils (org.springframework.kafka.listener) getExceptionFromHeader:107, ListenerUtils (org.springframework.kafka.listener) checkDeser:2766, KafkaMessageListenerContainer$ListenerConsumer (org.springframework.kafka.listener) invokeOnMessage:2648, KafkaMessageListenerContainer$ListenerConsumer (org.</description>
+    </item>
+    
     <item>
       <title>Weblogic | CVE-2016-3510分析</title>
       <link>https://www.snakin.top/posts/cve-2016-3510bypass-cve-2015-4852/</link>
