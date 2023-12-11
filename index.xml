@@ -8,6 +8,16 @@
     <language>cn</language>
     <lastBuildDate>Sun, 24 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.snakin.top/index.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>Friends</title>
+      <link>https://www.snakin.top/friends/</link>
+      <pubDate>Mon, 11 Dec 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.snakin.top/friends/</guid>
+      <description>我的朋友们：
+Y4tacker: GOD &amp;amp; Hacking The World! </description>
+    </item>
+    
+    <item>
       <title>漏洞分析 | Spring-Kafka反序列化漏洞(CVE-2023-34040)分析</title>
       <link>https://www.snakin.top/posts/cve-2023-34040/</link>
       <pubDate>Sun, 24 Sep 2023 00:00:00 +0000</pubDate>
