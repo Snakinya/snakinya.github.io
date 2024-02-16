@@ -344,9 +344,9 @@ package ycb.simple_json.controller; import com.alibaba.fastjson.JSON; import jav
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://www.snakin.top/about/</guid>
-      <description>这里是Snakinya，一名想学习二进制的Web安全研究员，目前大四在读。我主要研究方向为Java安全，协议安全，欢迎与我交流！
+      <description>这里是Snakinya，目前大四在读，我主要研究方向为协议安全，Java安全，Web安全，欢迎与我交流！
 How to contact me: snakinya@gmail.com | Wechat:Snakinya
-Some of my CVEs: CVE-2023-46227(Apache Inlong Arbitrary File Read) CVE-2023-41578(Jeecg-boot Arbitrary File Read) CVE-2023-42268(Jeecg-boot SQL Injection) Experiences: 2020.9 ~ Present - 四川大学 网络空间安全专业（本科） 2022.7 ~ 2022.11 - 中科院软件所 系统安全研究员（实习） 2023.5 ~ 2023.6 - 成都无糖信息技术有限公司 安全研发工程师（实习） 2023.8 ~ 2023.10 - 奇安信观星实验室 Web安全研究员（实习） </description>
+ACADEMIC BACKGROUND: 2020.9 ~ Present - 四川大学 网络空间安全（本科） 2024.1 ~ Present - 新加坡国立大学 Visiting Scholar </description>
     </item>
     
   </channel>
