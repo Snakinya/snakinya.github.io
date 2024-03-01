@@ -54,3 +54,4 @@ His research pursuits revolve around network security, with a primary focus on C
 - CVE-2023-46227
 - CVE-2023-41578
 - CVE-2023-42268
+- ...
