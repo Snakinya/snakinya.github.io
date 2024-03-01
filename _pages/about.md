@@ -30,10 +30,6 @@ My research pursuits revolve around network security, with a primary focus on Co
   - This paper is about exploiting CDN Back-to-Origin strategies to launch a new class of amplification attacks.
 
 
-# 🎖 Honors and Awards
-- *2021.10* Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet. 
-- *2021.09* Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet. 
-
 # 📖 Educations
 - *2024.01 - Present*, National University of Singapore, Visiting Student
 - *2020.09 - Present*, Sichuan University, Undergraduate
@@ -45,3 +41,15 @@ My research pursuits revolve around network security, with a primary focus on Co
 # 💻 Internships
 - *2023.08 - 2023.10*, QI-ANXIN Technology Company, Security Research Intern.
 - *2023.03 - 2023.10*, NISL at Tsinghua University, Research Intern.
+
+# 🎖 Honors and Awards
+- **1st Prize**, 2023 National College Student Information Security Contest (National Finals CTF)
+- **1st Prize**, 2023 National College Student Information Security Contest (Southwest Division CTF)
+- **3rd Prize**, 2022 "Qiangwang Cup" National Cyber Security Contest (National Online Finals)
+- **3rd Prize**, 2022 D^3CTF (International Finals)
+
+# 📚 CVEs
+- CVE-2023-51770
+- CVE-2023-46227
+- CVE-2023-41578
+- CVE-2023-42268
