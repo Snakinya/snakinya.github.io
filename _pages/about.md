@@ -24,9 +24,10 @@ My research pursuits revolve around network security, with a primary focus on Co
 - 2024.03:  🎉🎉 Our paper “CDN Cannon: Exploiting CDN Back-to-Origin Strategies for Amplification Attacks” was accepted by Usenix Security, Philadelphia, PA, 2024.
 
 # 📝 Publications 
-- CDN Cannon: Exploiting CDN Back-to-Origin Strategies for Amplification Attacks ![](https://img.shields.io/badge/CCF-A-red?style=flat-square) 
+- CDN Cannon: Exploiting CDN Back-to-Origin Strategies for Amplification Attacks ![](https://img.shields.io/badge/CCF-A-red?style=flat-square) ![](https://img.shields.io/badge/USENIX-2024-blue?style=flat-square)]()
   - Ziyu Lin, **Zhiwei Lin**, Ximeng Liu, Jianjun Chen, Run Guo, Cheng Chen, Shaodong Xiao
   - The 33rd USENIX Security Symposium
+  - This paper is about exploiting CDN Back-to-Origin strategies to launch a new class of amplification attacks.
 
 
 # 🎖 Honors and Awards
