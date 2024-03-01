@@ -25,7 +25,7 @@ My research pursuits revolve around network security, with a primary focus on Co
 
 # 📝 Publications 
 - CDN Cannon: Exploiting CDN Back-to-Origin Strategies for Amplification Attacks ![](https://img.shields.io/badge/CCF-A-red?style=flat-square) 
-  - Ziyu Lin, *Zhiwei Lin*, Ximeng Liu, Jianjun Chen, Run Guo, Cheng Chen, Shaodong Xiao
+  - Ziyu Lin, **Zhiwei Lin**, Ximeng Liu, Jianjun Chen, Run Guo, Cheng Chen, Shaodong Xiao
   - The 33rd USENIX Security Symposium
 
 
