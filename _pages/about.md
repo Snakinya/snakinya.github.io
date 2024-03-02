@@ -16,9 +16,9 @@ redirect_from:
 {% assign url = gsDataBaseUrl | append: "google-scholar-stats/gs_data_shieldsio.json" %}
 
 <span class='anchor' id='about-me'></span>
-Zhiwei Lin is now a visiting student at National University of Singapore, advised by [Prof.Zhenkai Liang](https://www.comp.nus.edu.sg/~liangzk/). He originates from Sichuan University and is a core member of the CTF team 0x401.
+I am currently a visiting student at National University of Singapore, advised by Prof.[Zhenkai Liang](https://www.comp.nus.edu.sg/~liangzk/). I am a core member of the CTF team 0x401.
 
-His research pursuits revolve around network security, with a primary focus on Content Delivery Network (CDN) security and protocol security. His current work aims to discover and solve the security risks posed by CDN forwarding request inconsistencies to build safer, better CDNs. His research results have received acknowledgements from well-known CDN vendors such as Cloudflare, Azure, Aliyun, Cachefly, Qiniu, and Upyun.
+My research pursuits revolve around network security, with a primary focus on Content Delivery Network (CDN) security and protocol security. My current work aims to discover and solve the security risks posed by CDN forwarding request inconsistencies to build safer, better CDNs. My research results have received acknowledgements from well-known CDN vendors such as Cloudflare, Azure, Aliyun, Cachefly, Qiniu, and Upyun.
 
 <font color=red>I am currently looking for a PhD position in 25 Fall.</font>
 
