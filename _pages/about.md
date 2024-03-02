@@ -20,6 +20,7 @@ Zhiwei Lin is now a visiting student at National University of Singapore, advise
 
 His research pursuits revolve around network security, with a primary focus on Content Delivery Network (CDN) security and protocol security. His current work aims to discover and solve the security risks posed by CDN forwarding request inconsistencies to build safer, better CDNs. His research results have received acknowledgements from well-known CDN vendors such as Cloudflare, Azure, Aliyun, Cachefly, Qiniu, and Upyun.
 
+<font color=red>I am currently looking for a PhD position in 25 Fall.</font>
 
 # 🔥 News
 - 2024.03:  🎉🎉 Our paper “CDN Cannon: Exploiting CDN Back-to-Origin Strategies for Amplification Attacks” was accepted by Usenix Security, Philadelphia, PA, 2024.
@@ -32,7 +33,7 @@ His research pursuits revolve around network security, with a primary focus on C
 
 
 # 📖 Educations
-- *2024.01 - Present*, National University of Singapore, Visiting Student
+- *2024.01 - Present*, National University of Singapore, Visiting scholar
 - *2020.09 - Present*, Sichuan University, Undergraduate
 
 
