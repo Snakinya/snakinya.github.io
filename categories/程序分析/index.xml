@@ -6,18 +6,7 @@
     <description>Recent content in 程序分析 on Snakinya</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>cn</language>
-    <lastBuildDate>Mon, 01 Jan 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://www.snakin.top/categories/%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>南大软分笔记 ｜ 03 Data Flow Analysis I</title>
-      <link>https://www.snakin.top/posts/03-data-flow-analysis-i/</link>
-      <pubDate>Mon, 01 Jan 2024 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.snakin.top/posts/03-data-flow-analysis-i/</guid>
-      <description>Data Flow Analysis I Overview of Data Flow Analysis 核心：how data flows on CFG? 展开： how application-specific data &amp;ndash;&amp;gt; abstraction flows through the &amp;ndash;&amp;gt;safe approximation nodes(BBs/statements) and &amp;ndash;&amp;gt;transfer function edges(control flows) of &amp;ndash;&amp;gt;control-flow handling CFG(a program)? 对于大多数静态分析来讲都是may analysis： may analysis:
-outputs information that may be true(over-approximation) must analysis:
-outputs information that must be true(under-approximation) Over-and under-approximations are both for safety of analysis about safe approximation ： may analysis：safe = over must analysis: safe = under 不同的数据流分析，有着不同的data abstraction, flow safe-approximation策略，transfer functions&amp;amp;control-flow handlings。</description>
-    </item>
-    
+    <lastBuildDate>Thu, 23 Feb 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.snakin.top/categories/%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>南大软分笔记 ｜ 02 Intermediate Representation（IR）</title>
       <link>https://www.snakin.top/posts/02-intermediate-representation/</link>
