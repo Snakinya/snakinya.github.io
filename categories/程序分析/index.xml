@@ -6,7 +6,21 @@
     <description>Recent content in 程序分析 on Snakinya</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>cn</language>
-    <lastBuildDate>Thu, 23 Feb 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.snakin.top/categories/%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 01 Jan 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://www.snakin.top/categories/%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>南大软分实验 ｜ 01 活跃变量分析和迭代求解器</title>
+      <link>https://www.snakin.top/posts/01-assignment1/</link>
+      <pubDate>Mon, 01 Jan 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.snakin.top/posts/01-assignment1/</guid>
+      <description>活跃变量分析与迭代求解器 在此之前我们先回顾理解一下概念
+也就是说，判断一个变量是否存活，我们关注两个点：
+变量在OUT[B]已经存活，并且在B中没有被重定义 变量在OUT[B]已经存活，在B中被重定义之前使用 由于算法是backward分析，可能不太好理解。我们转换思维，如果正向来看，我们的目标是判断v=3中的变量3是否还会在后续被使用，那么前面所提到的两个点就很好理解了。
+实现 Solver.java
+protected void initializeBackward(CFG&amp;lt;Node&amp;gt; cfg, DataflowResult&amp;lt;Node, Fact&amp;gt; result) { // 初始化EXIT节点 result.setInFact(cfg.getExit(), analysis.newBoundaryFact(cfg)); // 遍历节点，初始化INFACT和OUTFACT for (Node node : cfg) { if (!node.equals(cfg.getExit())) { result.setInFact(node, analysis.newInitialFact()); result.setOutFact(node, analysis.newInitialFact()); } } } IterativeSolver.java
+protected void doSolveBackward(CFG&amp;lt;Node&amp;gt; cfg, DataflowResult&amp;lt;Node, Fact&amp;gt; result) { boolean N0change = true; while (N0change) { N0change = false; for (Node node : cfg) { if (!node.equals(cfg.getExit())) { // 将node的每个后继节点的INFACT并入node的OUTFACT for (Node successor : cfg.</description>
+    </item>
+    
     <item>
       <title>南大软分笔记 ｜ 02 Intermediate Representation（IR）</title>
       <link>https://www.snakin.top/posts/02-intermediate-representation/</link>
@@ -16,6 +30,17 @@
       <description>Intermediate Representation（IR） Compliers and static analyzers 编译过程:
 source code ↓↓↓ scanner(lexical analysis 词法分析)---&amp;gt;regular expression ↓↓↓ ---&amp;gt;Tokens Parser(Syntax Analysis 语法分析)---&amp;gt;context-free grammar上下文不敏感语法 ↓↓↓ ---&amp;gt;AST 抽象语法树 Type Checker 类型检查(Semantic Analysis 语义分析)---&amp;gt;attribute grammar ↓↓↓ ---&amp;gt; Decorated AST Translator ↓↓↓ ---&amp;gt;IR ---&amp;gt;Static Analysis Code Generator ↓↓↓ machine code 编译器将源代码（Source code） 转换为机器代码（Machine Code）。其中的流程框架是：
 词法分析器（Scanner），结合正则表达式，通过词法分析（Lexical Analysis）将 source code 翻译为 token。 语法分析器（Parser），结合上下文无关文法（Context-Free Grammar），通过语法分析（Syntax Analysis），将 token 解析为抽象语法树（Abstract Syntax Tree, AST） 语义分析器（Type Checker），结合属性文法（Attribute Grammar），通过语义分析（Semantic Analysis），将 AST 解析为 decorated AST Translator，将 decorated AST 翻译为生成三地址码这样的中间表示形式（Intermediate Representation, IR），并基于 IR 做静态分析（例如代码优化这样的工作）。 Code Generator，将 IR 转换为机器代码。 AST vs.</description>
+    </item>
+    
+    <item>
+      <title>南大软分笔记 ｜ 03 Data Flow Analysis I</title>
+      <link>https://www.snakin.top/posts/03-data-flow-analysis-i/</link>
+      <pubDate>Thu, 23 Feb 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.snakin.top/posts/03-data-flow-analysis-i/</guid>
+      <description>Data Flow Analysis I Overview of Data Flow Analysis 核心：how data flows on CFG? 展开： how application-specific data &amp;ndash;&amp;gt; abstraction flows through the &amp;ndash;&amp;gt;safe approximation nodes(BBs/statements) and &amp;ndash;&amp;gt;transfer function edges(control flows) of &amp;ndash;&amp;gt;control-flow handling CFG(a program)? 对于大多数静态分析来讲都是may analysis： may analysis:
+outputs information that may be true(over-approximation) must analysis:
+outputs information that must be true(under-approximation) Over-and under-approximations are both for safety of analysis about safe approximation ： may analysis：safe = over must analysis: safe = under 不同的数据流分析，有着不同的data abstraction, flow safe-approximation策略，transfer functions&amp;amp;control-flow handlings。</description>
     </item>
     
     <item>

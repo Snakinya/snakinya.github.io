@@ -6,7 +6,21 @@
     <description>Recent content on Snakinya</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>cn</language>
-    <lastBuildDate>Sun, 24 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.snakin.top/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 01 Jan 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://www.snakin.top/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>南大软分实验 ｜ 01 活跃变量分析和迭代求解器</title>
+      <link>https://www.snakin.top/posts/01-assignment1/</link>
+      <pubDate>Mon, 01 Jan 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.snakin.top/posts/01-assignment1/</guid>
+      <description>活跃变量分析与迭代求解器 在此之前我们先回顾理解一下概念
+也就是说，判断一个变量是否存活，我们关注两个点：
+变量在OUT[B]已经存活，并且在B中没有被重定义 变量在OUT[B]已经存活，在B中被重定义之前使用 由于算法是backward分析，可能不太好理解。我们转换思维，如果正向来看，我们的目标是判断v=3中的变量3是否还会在后续被使用，那么前面所提到的两个点就很好理解了。
+实现 Solver.java
+protected void initializeBackward(CFG&amp;lt;Node&amp;gt; cfg, DataflowResult&amp;lt;Node, Fact&amp;gt; result) { // 初始化EXIT节点 result.setInFact(cfg.getExit(), analysis.newBoundaryFact(cfg)); // 遍历节点，初始化INFACT和OUTFACT for (Node node : cfg) { if (!node.equals(cfg.getExit())) { result.setInFact(node, analysis.newInitialFact()); result.setOutFact(node, analysis.newInitialFact()); } } } IterativeSolver.java
+protected void doSolveBackward(CFG&amp;lt;Node&amp;gt; cfg, DataflowResult&amp;lt;Node, Fact&amp;gt; result) { boolean N0change = true; while (N0change) { N0change = false; for (Node node : cfg) { if (!node.equals(cfg.getExit())) { // 将node的每个后继节点的INFACT并入node的OUTFACT for (Node successor : cfg.</description>
+    </item>
+    
     <item>
       <title>Friends</title>
       <link>https://www.snakin.top/friends/</link>
@@ -180,6 +194,17 @@ source code ↓↓↓ scanner(lexical analysis 词法分析)---&amp;gt;regular e
     </item>
     
     <item>
+      <title>南大软分笔记 ｜ 03 Data Flow Analysis I</title>
+      <link>https://www.snakin.top/posts/03-data-flow-analysis-i/</link>
+      <pubDate>Thu, 23 Feb 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.snakin.top/posts/03-data-flow-analysis-i/</guid>
+      <description>Data Flow Analysis I Overview of Data Flow Analysis 核心：how data flows on CFG? 展开： how application-specific data &amp;ndash;&amp;gt; abstraction flows through the &amp;ndash;&amp;gt;safe approximation nodes(BBs/statements) and &amp;ndash;&amp;gt;transfer function edges(control flows) of &amp;ndash;&amp;gt;control-flow handling CFG(a program)? 对于大多数静态分析来讲都是may analysis： may analysis:
+outputs information that may be true(over-approximation) must analysis:
+outputs information that must be true(under-approximation) Over-and under-approximations are both for safety of analysis about safe approximation ： may analysis：safe = over must analysis: safe = under 不同的数据流分析，有着不同的data abstraction, flow safe-approximation策略，transfer functions&amp;amp;control-flow handlings。</description>
+    </item>
+    
+    <item>
       <title>南大软分笔记 ｜ 01 Course Introduction</title>
       <link>https://www.snakin.top/posts/01-introduction/</link>
       <pubDate>Mon, 20 Feb 2023 00:00:00 +0000</pubDate>
@@ -336,17 +361,6 @@ package ycb.simple_json.controller; import com.alibaba.fastjson.JSON; import jav
       
       <guid>https://www.snakin.top/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF/</guid>
       <description>easyrar import os import re import yaml import time import socket import subprocess from hashlib import md5 from flask import Flask, render_template, make_response, send_file, request, redirect, session app = Flask(__name__) app.config[&amp;#39;SECRET_KEY&amp;#39;] = socket.gethostname() def response(content, status): resp = make_response(content, status) return resp @app.before_request def is_login(): if request.path == &amp;#34;/upload&amp;#34;: if session.get(&amp;#39;user&amp;#39;) != &amp;#34;Administrator&amp;#34;: return f&amp;#34;&amp;lt;script&amp;gt;alert(&amp;#39;Access Denied&amp;#39;);window.location.href=&amp;#39;/&amp;#39;&amp;lt;/script&amp;gt;&amp;#34; else: return None @app.route(&amp;#39;/&amp;#39;, methods=[&amp;#39;GET&amp;#39;]) def main(): if not session.get(&amp;#39;user&amp;#39;): session[&amp;#39;user&amp;#39;] = &amp;#39;Guest&amp;#39; try: return render_template(&amp;#39;index.</description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>https://www.snakin.top/posts/03-data-flow-analysis-i/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.snakin.top/posts/03-data-flow-analysis-i/</guid>
-      <description>Data Flow Analysis I Overview of Data Flow Analysis 核心：how data flows on CFG? 展开： how application-specific data &amp;ndash;&amp;gt; abstraction flows through the &amp;ndash;&amp;gt;safe approximation nodes(BBs/statements) and &amp;ndash;&amp;gt;transfer function edges(control flows) of &amp;ndash;&amp;gt;control-flow handling CFG(a program)? 对于大多数静态分析来讲都是may analysis： may analysis:
-outputs information that may be true(over-approximation) must analysis:
-outputs information that must be true(under-approximation) Over-and under-approximations are both for safety of analysis about safe approximation ： may analysis：safe = over must analysis: safe = under 不同的数据流分析，有着不同的data abstraction, flow safe-approximation策略，transfer functions&amp;amp;control-flow handlings。</description>
     </item>
     
     <item>
