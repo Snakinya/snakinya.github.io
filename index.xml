@@ -389,8 +389,7 @@ package ycb.simple_json.controller; import com.alibaba.fastjson.JSON; import jav
       <guid>https://www.snakin.top/about/</guid>
       <description>这里是Snakinya，目前大四在读，我主要研究方向为LLM安全，协议安全，Java安全，Web安全，欢迎与我交流！
 我的个人学术主页为：profile.snakin.top
-How to contact me: snakinya@gmail.com | Wechat: Snakinya
-ACADEMIC BACKGROUND: 2020.9 ~ Present - 四川大学 网络空间安全（本科） 2024.1 ~ Present - 新加坡国立大学 Visiting Scholar </description>
+How to contact me: snakinya@gmail.com | Wechat: Snakinya</description>
     </item>
     
     <item>

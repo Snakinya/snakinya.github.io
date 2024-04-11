@@ -6,8 +6,9 @@ const svgCheck =
 // add button function
 const addCopyButtons = (clipboard) => {
   // 1. Look for pre > code elements in the DOM
-  document.querySelectorAll("pre > code").forEach((codeBlock) => {
-
+  document.querySelectorAll('.highlight').forEach((highlightBlock) => {
+    const preBlock = highlightBlock.querySelector('pre');
+    const codeBlock = preBlock.querySelector('code') || preBlock; // 保留对<code>的检查以防万一
 
     const button = document.createElement("button");
     button.className = "clipboard-button";
@@ -15,11 +16,12 @@ const addCopyButtons = (clipboard) => {
     button.title = "Copy";
     button.innerHTML = svgCopy;
     button.addEventListener("click", () => {
-      clipboard.writeText(codeBlock.innerText).then(
+      clipboard.writeText(codeBlock.textContent).then(
         () => {
           button.blur();
           button.innerHTML = svgCheck;
           setTimeout(() => (button.innerHTML = svgCopy), 2000);
+
         },
         (error) => (button.innerHTML = "Error")
       );
