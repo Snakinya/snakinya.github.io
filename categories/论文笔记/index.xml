@@ -9,10 +9,10 @@
     <lastBuildDate>Wed, 10 Jan 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://www.snakin.top/categories/%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Paper | A Comprehensive Study of DNS-over-HTTPS Downgrade Attack</title>
-      <link>https://www.snakin.top/posts/test/</link>
+      <link>https://www.snakin.top/posts/a-comprehensive-study-of-dns-over-https-downgrade-attack/</link>
       <pubDate>Wed, 10 Jan 2024 00:00:00 +0000</pubDate>
       
-      <guid>https://www.snakin.top/posts/test/</guid>
+      <guid>https://www.snakin.top/posts/a-comprehensive-study-of-dns-over-https-downgrade-attack/</guid>
       <description>00 摘要 DNS-over-HTTPS (DoH)是保护 DNS 机密性和完整性的主要措施之一，已被大多数流行的浏览器部署。然而，这种措施可能会受到降级攻击的影响，该攻击会将 DNS 通信的内容暴露给攻击者。具体来说，作者使用了4个与攻击模型相关的攻击向量来检测了6个浏览器，发现了所有能够导致成功攻击的组合。其根本原因是，所有浏览器默认启用Opportunistic Privacy profile，当DoH不可用时，允许DoH退回到 DNS 时，然而，当发生这种变化时，没有一个浏览器会通知用户，而一些浏览器需要很长时间才能恢复到 DoH。在本文的最后，作者提出了一些对策，并呼吁互联网社区进行讨论，重新审视有关 DoH 和使用配置文件的标准和实现。
 01 背景介绍 Domain name system (DNS) DNS将域名转换为相应的IP地址。更具体地说，客户端软件存根解析器收集用户应用程序请求的域名。然后将DNS查询发送给递归解析器( RR )。RR在DNS解析中充当代理。如果查询域不在其缓存中，它将递归地向权威域服务器发送查询。RR收到响应后，会将响应发回客户端。到目前为止，大部分的DNS查询和响应都是以明文的形式进行传输的，这使得DNS容易被篡改。存根解析器和递归解析器之间的DNS数据包是攻击者的主要攻击目标，已有研究表明用户的DNS查询可以用来追踪或者审查。
 DNS-over-HTTPS (DoH) 为了缓解DNS的隐私问题，DoH被提出来保护终端用户和递归解析器之间的连接。它使用HTTPS加密DNS查询。DoH与普通HTTPS一样，运行在TCP端口443上。DNS请求以URI模板(例如, https://dns.google/dns-query {?dns}是Google公共DNS)的格式发送。URI中的域名不仅用于查找DoH解析器(通过明文DNS解析)的IP地址，还用于验证其身份(通过SSL证书验证)。DoH常作为一个集成模块由浏览器提供。因此，DoH通信对操作系统是不透明的。
