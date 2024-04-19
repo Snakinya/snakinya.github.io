@@ -7,8 +7,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Snakinya" />
-  <meta property="og:url" content="https://www.snakin.top/categories/javasec/" />
-  <link rel="canonical" href="https://www.snakin.top/categories/javasec/" /><link rel="apple-touch-icon" href="https://www.snakin.top/favicon.ico" />
+  <meta property="og:url" content="https://www.snakin.top/posts/smartbi%E6%9D%83%E9%99%90%E7%BB%95%E8%BF%87%E6%BC%8F%E6%B4%9Ev11/" />
+  <link rel="canonical" href="https://www.snakin.top/posts/smartbi%E6%9D%83%E9%99%90%E7%BB%95%E8%BF%87%E6%BC%8F%E6%B4%9Ev11/" /><link rel="apple-touch-icon" href="https://www.snakin.top/favicon.ico" />
   <link rel="icon" href="https://www.snakin.top/favicon.ico" />
   <link rel="shortcut" href="https://www.snakin.top/favicon.ico" /><link rel="alternate" type="application/atom+xml" href="https://www.snakin.top/index.xml" title="Snakinya">
 
@@ -20,10 +20,10 @@
            "@type": "WebPage",
            "@id": "https:\/\/www.snakin.top\/"
       },
-      "articleSection" : "categories",
-      "name" : "JavaSec",
-      "headline" : "JavaSec",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "漏洞分析 | SmartBi V11权限绕过",
+      "headline" : "漏洞分析 | SmartBi V11权限绕过",
+      "description" : "简介 去年护网时期审出来的漏洞，最近看到学长说补丁发布了就公布出来供大家参考。\n前台权限绕过 众所周知SmartBi盛产权限绕过漏洞，最新的V11版也不例外。这次的问题还是出在CheckIsLoggedFilter和RMIServlet的参数获取上，先看看CheckIsLoggedFilter\n这是smartbi对于RMIServlet的防护，先获取 className、methodName、params，再判断上述参数是否在白名单内\n那么该部分对于参数的获取分为四种：\n通过 request.getParameter 进行解析 通过 windowUnloading 进行解析 通过 encode 参数解析 通过 request body 解析 四种解析依次进行，一旦解析到参数就会进行下一个阶段\n那么我们再看看RMIServlet是怎么解析参数的\n他有两个处理，分别针对get和post请求\ndoget判断是否含有jsonpCallback参数，如果有且不为空就会调用dopost方法 dopost有三种获取参数的方法 通过 request.getAttribute 解析 通过文件上传的格式去解析 通过 request.getParameter 解析 这两者结合很容易想到我们可以先利用getParameter和jsonpCallback来绕过第一层的检测（通过getParameter获得的参数并未setAttribute），而由于RMIServlet没有获取到属性，于是会从表单中获取参数，由此绕过。\n将以上带入执行流程做个简单梳理：\n—–Filter——\n请求方法为GET、获取参数className(白名单)\\methodName(白名单)\\params([])\\jsonpCallback(不为空) 通过request.getParameter获取参数，并没有setAttribute 判断类与方法名在白名单中，Filter校验通过 —–Servlet——\ndogGet判断含有jsonpCallback参数且不为空，调用doPost\n通过request.getAttribute未获取到类、方法以及参数\n判断Header的Content-Type头存在multipart\/form-data;\n解析Body，获取到真实执行的类、方法以及参数，最终完成调用",
       "inLanguage" : "en-US",
       "author" : "Snakinya",
       "creator" : "Snakinya",
@@ -33,15 +33,43 @@
       "copyrightYear" : "2024",
       "datePublished": "2024-04-19 00:00:00 \u002b0000 UTC",
       "dateModified" : "2024-04-19 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/www.snakin.top\/categories\/javasec\/",
+      "url" : "https:\/\/www.snakin.top\/posts\/smartbi%E6%9D%83%E9%99%90%E7%BB%95%E8%BF%87%E6%BC%8F%E6%B4%9Ev11\/",
       "keywords" : [  ]
   }
 </script>
-<title>JavaSec</title>
-  <meta property="og:title" content="JavaSec" />
+<title>漏洞分析 | SmartBi V11权限绕过</title>
+  <meta property="og:title" content="漏洞分析 | SmartBi V11权限绕过" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="简介 去年护网时期审出来的漏洞，最近看到学长说补丁发布了就公布出来供大家参考。
+前台权限绕过 众所周知SmartBi盛产权限绕过漏洞，最新的V11版也不例外。这次的问题还是出在CheckIsLoggedFilter和RMIServlet的参数获取上，先看看CheckIsLoggedFilter
+这是smartbi对于RMIServlet的防护，先获取 className、methodName、params，再判断上述参数是否在白名单内
+那么该部分对于参数的获取分为四种：
+通过 request.getParameter 进行解析 通过 windowUnloading 进行解析 通过 encode 参数解析 通过 request body 解析 四种解析依次进行，一旦解析到参数就会进行下一个阶段
+那么我们再看看RMIServlet是怎么解析参数的
+他有两个处理，分别针对get和post请求
+doget判断是否含有jsonpCallback参数，如果有且不为空就会调用dopost方法 dopost有三种获取参数的方法 通过 request.getAttribute 解析 通过文件上传的格式去解析 通过 request.getParameter 解析 这两者结合很容易想到我们可以先利用getParameter和jsonpCallback来绕过第一层的检测（通过getParameter获得的参数并未setAttribute），而由于RMIServlet没有获取到属性，于是会从表单中获取参数，由此绕过。
+将以上带入执行流程做个简单梳理：
+—–Filter——
+请求方法为GET、获取参数className(白名单)\methodName(白名单)\params([])\jsonpCallback(不为空) 通过request.getParameter获取参数，并没有setAttribute 判断类与方法名在白名单中，Filter校验通过 —–Servlet——
+dogGet判断含有jsonpCallback参数且不为空，调用doPost
+通过request.getAttribute未获取到类、方法以及参数
+判断Header的Content-Type头存在multipart/form-data;
+解析Body，获取到真实执行的类、方法以及参数，最终完成调用" />
+  <meta name="description" content="简介 去年护网时期审出来的漏洞，最近看到学长说补丁发布了就公布出来供大家参考。
+前台权限绕过 众所周知SmartBi盛产权限绕过漏洞，最新的V11版也不例外。这次的问题还是出在CheckIsLoggedFilter和RMIServlet的参数获取上，先看看CheckIsLoggedFilter
+这是smartbi对于RMIServlet的防护，先获取 className、methodName、params，再判断上述参数是否在白名单内
+那么该部分对于参数的获取分为四种：
+通过 request.getParameter 进行解析 通过 windowUnloading 进行解析 通过 encode 参数解析 通过 request body 解析 四种解析依次进行，一旦解析到参数就会进行下一个阶段
+那么我们再看看RMIServlet是怎么解析参数的
+他有两个处理，分别针对get和post请求
+doget判断是否含有jsonpCallback参数，如果有且不为空就会调用dopost方法 dopost有三种获取参数的方法 通过 request.getAttribute 解析 通过文件上传的格式去解析 通过 request.getParameter 解析 这两者结合很容易想到我们可以先利用getParameter和jsonpCallback来绕过第一层的检测（通过getParameter获得的参数并未setAttribute），而由于RMIServlet没有获取到属性，于是会从表单中获取参数，由此绕过。
+将以上带入执行流程做个简单梳理：
+—–Filter——
+请求方法为GET、获取参数className(白名单)\methodName(白名单)\params([])\jsonpCallback(不为空) 通过request.getParameter获取参数，并没有setAttribute 判断类与方法名在白名单中，Filter校验通过 —–Servlet——
+dogGet判断含有jsonpCallback参数且不为空，调用doPost
+通过request.getAttribute未获取到类、方法以及参数
+判断Header的Content-Type头存在multipart/form-data;
+解析Body，获取到真实执行的类、方法以及参数，最终完成调用" />
   <meta property="og:locale" content="cn" /><meta property="og:image" content="https://www.snakin.top/favicon.ico" />
   
 
@@ -78,10 +106,11 @@
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   
   <div class="header-title">
@@ -122,150 +151,135 @@
 
 <div class="header-line"></div>
 
-
-        
-        <div id="posts-list">
-          
-                    <h1>
-                        分类
-                        <span class="keyword">JavaSec</span>
-                        中的文章
-                    </h1>
-
-          
-          <section>
-            <h1 class="site-date-catalog" style="color:blueviolet;">2024</h1>
-
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2024-04-19 00:00:00 UTC">Apr 19</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/smartbi%E6%9D%83%E9%99%90%E7%BB%95%E8%BF%87%E6%BC%8F%E6%B4%9Ev11/">漏洞分析 | SmartBi V11权限绕过</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </section>
-          <section>
-            <h1 class="site-date-catalog" style="color:blueviolet;">2023</h1>
-
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2023-09-24 00:00:00 UTC">Sep 24</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/cve-2023-34040/">漏洞分析 | Spring-Kafka反序列化漏洞(CVE-2023-34040)分析</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2023-09-18 00:00:00 UTC">Sep 18</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/cve-2016-3510bypass-cve-2015-4852/">Weblogic | CVE-2016-3510分析</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2023-08-22 00:00:00 UTC">Aug 22</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/cve-2016-0638bypass-cve-2015-4852/">Weblogic | CVE-2016-0638分析</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2023-08-21 00:00:00 UTC">Aug 21</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/cve-2015-4852/">Weblogic | CVE-2015-4852分析</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2023-08-19 00:00:00 UTC">Aug 19</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/yongyounc65/">漏洞分析 | 用友NC65 jsinvoke 任意文件上传</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2023-03-21 00:00:00 UTC">Mar 21</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/rasp2/">RASP技术学习入门篇(2)</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2023-03-21 00:00:00 UTC">Mar 21</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/rasp1/">RASP技术学习入门篇(1)</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2023-01-29 00:00:00 UTC">Jan 29</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/apache-commons-text-rcecve-2022-42889/">漏洞分析 | Apache Commons Text RCE(CVE-2022-42889)分析</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </section>
-          
         </div>
 
+        <header class="post-header">
+          <h1 class="post-title">漏洞分析 | SmartBi V11权限绕过</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2024-04-19 00:00:00 UTC">
+                19 Apr 2024
+              </time>
+              
+            </div>
+            
+            <div class="col-xs-6">
+
+              
+              <div class="post-author">
+              <span id="busuanzi_container_page_pv">@本文阅读量<span id="busuanzi_value_page_pv"></span>次</span>
+                
+            </div>
+          </div>
+          
+        </header>
+        
+
+        <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#%e7%ae%80%e4%bb%8b" aria-label="简介">简介</a></li>
+                <li>
+                    <a href="#%e5%89%8d%e5%8f%b0%e6%9d%83%e9%99%90%e7%bb%95%e8%bf%87" aria-label="前台权限绕过">前台权限绕过</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+        
+
+
+
+        <div class="post-content markdown-body">
+          
+          <h2 id="简介">简介</h2>
+<p>去年护网时期审出来的漏洞，最近看到学长说补丁发布了就公布出来供大家参考。</p>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/%E6%88%AA%E5%B1%8F2023-08-11%2014.38.21.png" alt="截屏2023-08-11 14.38.21"></p>
+<h2 id="前台权限绕过">前台权限绕过</h2>
+<p>众所周知SmartBi盛产权限绕过漏洞，最新的V11版也不例外。这次的问题还是出在<code>CheckIsLoggedFilter</code>和<code>RMIServlet</code>的参数获取上，先看看<code>CheckIsLoggedFilter</code></p>
+<p>这是smartbi对于RMIServlet的防护，先获取 className、methodName、params，再判断上述参数是否在<strong>白名单</strong>内</p>
+<p>那么该部分对于参数的获取分为四种：</p>
+<ul>
+<li>通过 request.getParameter 进行解析</li>
+<li>通过 windowUnloading 进行解析</li>
+<li>通过 encode 参数解析</li>
+<li>通过 request body 解析</li>
+</ul>
+<p>四种解析依次进行，一旦解析到参数就会进行下一个阶段</p>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/%E6%88%AA%E5%B1%8F2023-08-10%2023.10.19.png" alt="截屏2023-08-10 23.10.19"></p>
+<p>那么我们再看看<code>RMIServlet</code>是怎么解析参数的</p>
+<p>他有两个处理，分别针对get和post请求</p>
+<ul>
+<li>doget判断是否含有jsonpCallback参数，如果有且不为空就会调用dopost方法</li>
+<li>dopost有三种获取参数的方法
+<ul>
+<li>通过 request.getAttribute 解析</li>
+<li>通过文件上传的格式去解析</li>
+<li>通过 request.getParameter 解析</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/%E6%88%AA%E5%B1%8F2023-08-10%2023.20.44.png" alt="截屏2023-08-10 23.20.44"></p>
+<p>这两者结合很容易想到我们可以先利用getParameter和jsonpCallback来绕过第一层的检测（通过getParameter获得的参数并未setAttribute），而由于RMIServlet没有获取到属性，于是会从表单中获取参数，由此绕过。</p>
+<p>将以上带入执行流程做个简单梳理：</p>
+<p>—–Filter——</p>
+<ol>
+<li>请求方法为GET、获取参数className(白名单)\methodName(白名单)\params([])\jsonpCallback(不为空)</li>
+<li>通过<code>request.getParameter</code>获取参数，并没有<code>setAttribute</code></li>
+<li>判断类与方法名在白名单中，Filter校验通过</li>
+</ol>
+<p>—–Servlet——</p>
+<ol>
+<li>
+<p>dogGet判断含有jsonpCallback参数且不为空，调用doPost</p>
+</li>
+<li>
+<p>通过<code>request.getAttribute</code>未获取到类、方法以及参数</p>
+</li>
+<li>
+<p>判断Header的Content-Type头存在<code>multipart/form-data;</code></p>
+</li>
+<li>
+<p>解析Body，获取到真实执行的类、方法以及参数，最终完成调用</p>
+</li>
+</ol>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/%E6%88%AA%E5%B1%8F2023-08-11%2011_mosaic.png" alt="截屏2023-08-11 11_mosaic"></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+        
         <div class="site-footer">
   
   
+    
+      <script src="/js/clipboard.js"></script>
     
     
 
@@ -293,6 +307,8 @@
     
   
 </script>
+
+  
 
 </body>
 
