@@ -6,7 +6,16 @@
     <description>Recent content in Categories on Snakinya</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>cn</language>
-    <lastBuildDate>Fri, 19 Apr 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://www.snakin.top/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 25 Jun 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://www.snakin.top/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>LLM</title>
+      <link>https://www.snakin.top/categories/llm/</link>
+      <pubDate>Tue, 25 Jun 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.snakin.top/categories/llm/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>JavaSec</title>
       <link>https://www.snakin.top/categories/javasec/</link>
