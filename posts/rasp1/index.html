@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.134.0">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Snakinya" />
+  <meta property="og:url" content="https://www.snakin.top/posts/rasp1/" />
+  <link rel="canonical" href="https://www.snakin.top/posts/rasp1/" /><link rel="apple-touch-icon" href="https://www.snakin.top/favicon.ico" />
+  <link rel="icon" href="https://www.snakin.top/favicon.ico" />
+  <link rel="shortcut" href="https://www.snakin.top/favicon.ico" /><link rel="alternate" type="application/atom+xml" href="https://www.snakin.top/index.xml" title="Snakinya-明烛天南">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/www.snakin.top\/"
+      },
+      "articleSection" : "posts",
+      "name" : "RASP技术学习入门篇(1)",
+      "headline" : "RASP技术学习入门篇(1)",
+      "description" : "Java RASP技术 运行时应用程序自我保护（Runtime application self-protection，简称RASP）使用Java Agent技术在应用程序运行时候动态编辑类字节码，将自身防御逻辑注入到Java底层API和Web应用程序当中，从而与应用程序融为一体，能实时分析和检测Web攻击，使应用程序具备自我保护能力。\nRASP技术作为新兴的WEB防御方案，不但能够有效的防御传统WAF无法实现的攻击类型，更能够大幅提升对攻击者攻击行为的检测精准度。RASP是传统WAF的坚实后盾，能够弥补WAF无法获取Web应用运行时环境的缺陷，同时也是传统Web应用服务最重要的不可或缺的一道安全防线。\nRASP通过注入自身到开发语言底层API中，从而完全的融入于Web服务中，拥有了得天独厚的漏洞检测和防御条件，RASP技术相较于传统的WAF拥有了更加精准、深层次的防御。RASP采用基于攻击行为分析的主动防御机制，严防文件读写、数据访问、命令执行等Web应用系统命脉，为Web应用安全筑建出“万丈高墙”。\nRASP技术原理 JDK1.5开始，Java新增了Instrumentation（Java Agent API）和JVMTI（JVM Tool Interface）功能，允许JVM在加载某个class文件之前对其字节码进行修改，同时也支持对已加载的class（类字节码）进行重新加载（Retransform）。\n利用Java Agent这一特性衍生出了APM（Application Performance Management，应用性能管理）、RASP（Runtime application self-protection，运行时应用自我保护）、IAST（Interactive Application Security Testing，交互式应用程序安全测试）等相关产品，它们都无一例外的使用了Instrumentation\/JVMTI的API来实现动态修改Java类字节码并插入监控或检测代码。\nRASP防御的核心就是在Web应用程序执行关键的Java API之前插入防御逻辑，从而控制原类方法执行的业务逻辑。如果没有RASP的防御，攻击者可以利用Web容器\/应用的漏洞攻击应用服务器。\n项目地址 https:\/\/github.com\/iiiusky\/java_rasp_example\n实现一个简易的RASP 创建入口类 在cn.org.javaweb.agent包下新建一个类。\npackage cn.org.javaweb.agent; import java.lang.instrument.Instrumentation; public class Agent { public static void premain(String agentArgs, Instrumentation inst) { inst.addTransformer(new AgentTransform()); } } ",
+      "inLanguage" : "en-US",
+      "author" : "Snakinya",
+      "creator" : "Snakinya",
+      "publisher": "Snakinya",
+      "accountablePerson" : "Snakinya",
+      "copyrightHolder" : "Snakinya",
+      "copyrightYear" : "2023",
+      "datePublished": "2023-03-21 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2023-03-21 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/www.snakin.top\/posts\/rasp1\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>RASP技术学习入门篇(1)</title>
+  <meta property="og:title" content="RASP技术学习入门篇(1)" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="Java RASP技术 运行时应用程序自我保护（Runtime application self-protection，简称RASP）使用Java Agent技术在应用程序运行时候动态编辑类字节码，将自身防御逻辑注入到Java底层API和Web应用程序当中，从而与应用程序融为一体，能实时分析和检测Web攻击，使应用程序具备自我保护能力。
+RASP技术作为新兴的WEB防御方案，不但能够有效的防御传统WAF无法实现的攻击类型，更能够大幅提升对攻击者攻击行为的检测精准度。RASP是传统WAF的坚实后盾，能够弥补WAF无法获取Web应用运行时环境的缺陷，同时也是传统Web应用服务最重要的不可或缺的一道安全防线。
+RASP通过注入自身到开发语言底层API中，从而完全的融入于Web服务中，拥有了得天独厚的漏洞检测和防御条件，RASP技术相较于传统的WAF拥有了更加精准、深层次的防御。RASP采用基于攻击行为分析的主动防御机制，严防文件读写、数据访问、命令执行等Web应用系统命脉，为Web应用安全筑建出“万丈高墙”。
+RASP技术原理 JDK1.5开始，Java新增了Instrumentation（Java Agent API）和JVMTI（JVM Tool Interface）功能，允许JVM在加载某个class文件之前对其字节码进行修改，同时也支持对已加载的class（类字节码）进行重新加载（Retransform）。
+利用Java Agent这一特性衍生出了APM（Application Performance Management，应用性能管理）、RASP（Runtime application self-protection，运行时应用自我保护）、IAST（Interactive Application Security Testing，交互式应用程序安全测试）等相关产品，它们都无一例外的使用了Instrumentation/JVMTI的API来实现动态修改Java类字节码并插入监控或检测代码。
+RASP防御的核心就是在Web应用程序执行关键的Java API之前插入防御逻辑，从而控制原类方法执行的业务逻辑。如果没有RASP的防御，攻击者可以利用Web容器/应用的漏洞攻击应用服务器。
+项目地址 https://github.com/iiiusky/java_rasp_example
+实现一个简易的RASP 创建入口类 在cn.org.javaweb.agent包下新建一个类。
+package cn.org.javaweb.agent; import java.lang.instrument.Instrumentation; public class Agent { public static void premain(String agentArgs, Instrumentation inst) { inst.addTransformer(new AgentTransform()); } } " />
+  <meta name="description" content="Java RASP技术 运行时应用程序自我保护（Runtime application self-protection，简称RASP）使用Java Agent技术在应用程序运行时候动态编辑类字节码，将自身防御逻辑注入到Java底层API和Web应用程序当中，从而与应用程序融为一体，能实时分析和检测Web攻击，使应用程序具备自我保护能力。
+RASP技术作为新兴的WEB防御方案，不但能够有效的防御传统WAF无法实现的攻击类型，更能够大幅提升对攻击者攻击行为的检测精准度。RASP是传统WAF的坚实后盾，能够弥补WAF无法获取Web应用运行时环境的缺陷，同时也是传统Web应用服务最重要的不可或缺的一道安全防线。
+RASP通过注入自身到开发语言底层API中，从而完全的融入于Web服务中，拥有了得天独厚的漏洞检测和防御条件，RASP技术相较于传统的WAF拥有了更加精准、深层次的防御。RASP采用基于攻击行为分析的主动防御机制，严防文件读写、数据访问、命令执行等Web应用系统命脉，为Web应用安全筑建出“万丈高墙”。
+RASP技术原理 JDK1.5开始，Java新增了Instrumentation（Java Agent API）和JVMTI（JVM Tool Interface）功能，允许JVM在加载某个class文件之前对其字节码进行修改，同时也支持对已加载的class（类字节码）进行重新加载（Retransform）。
+利用Java Agent这一特性衍生出了APM（Application Performance Management，应用性能管理）、RASP（Runtime application self-protection，运行时应用自我保护）、IAST（Interactive Application Security Testing，交互式应用程序安全测试）等相关产品，它们都无一例外的使用了Instrumentation/JVMTI的API来实现动态修改Java类字节码并插入监控或检测代码。
+RASP防御的核心就是在Web应用程序执行关键的Java API之前插入防御逻辑，从而控制原类方法执行的业务逻辑。如果没有RASP的防御，攻击者可以利用Web容器/应用的漏洞攻击应用服务器。
+项目地址 https://github.com/iiiusky/java_rasp_example
+实现一个简易的RASP 创建入口类 在cn.org.javaweb.agent包下新建一个类。
+package cn.org.javaweb.agent; import java.lang.instrument.Instrumentation; public class Agent { public static void premain(String agentArgs, Instrumentation inst) { inst.addTransformer(new AgentTransform()); } } " />
+  <meta property="og:locale" content="cn" /><meta property="og:image" content="https://www.snakin.top/favicon.ico" />
+  
+
+  
+    <style>.highlight{position:relative}.clipboard-button{color:var(--white);background-color:rgba(255,255,255,.786);border:none;border-radius:6px;padding:3px 5px 2px;font-size:1rem;position:absolute;z-index:1;right:0;top:0;margin:10px;transition:.1s;opacity:.5}.clipboard-button>svg{fill:var(--white)}.clipboard-button:hover,.clipboard-button:focus,pre:active~.clipboard-button,pre:focus~.clipboard-button,div.highlight:active>.clipboard-button,div.highlight:focus>.clipboard-button{cursor:pointer;opacity:1}</style>
+  
+  
+    <style>@import "https://cdnjs.cloudflare.com/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/lxgwwenkaiscreenr.css";.busuanzi-footer{font-size:14px;color:#666;display:inline-block;gap:10px;align-items:center}.busuanzi-footer .separator{margin:0 5px;color:#999}.footer-beian{font-size:12px;color:#999;margin-top:5px;text-align:center}.footer-beian a{color:#0073e6;text-decoration:none}.footer-beian a:hover{text-decoration:underline}body{font-family:lxgw wenkai screen r,bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:40%;min-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none;word-break:break-all}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body blockquote{margin:0;padding:0 1em;color:#57606a;border-left:.25em solid #d0d7de}.markdown-body pre{padding:1px;font-size:16px;font-weight:550;font-family:Consolas,Monaco,Menlo,Consolas,monospace;word-break:break-all;word-wrap:break-word;overflow-y:auto;max-height:300px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px;text-size-adjust:100%;-ms-text-size-adjust:100%;-moz-text-size-adjust:100%;-webkit-text-size-adjust:100%}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:150%}.site-date-catalog{font-size:2rem}.header-title{font-size:1.5rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px;font-weight:700}.header-item a:hover{font-weight:700;color:#8a2be2}.header-item a:visited{font-weight:700}.header-item a:active{font-weight:700}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px;text-align:center}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){article{max-width:100%;min-width:300px}.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}table{width:100%;color:#333;border-width:1px;border-color:#666;border-collapse:collapse}table th{border-width:1px;padding:8px;border-style:solid;border-color:#666;background-color:#dedede}table td{border-width:1px;padding:8px;border-style:solid;border-color:#666;background-color:#fff}.post-content a{color:#0969da;box-shadow:none;text-decoration:none}a:hover{font-weight:400}.post-content a:hover{text-decoration:underline}.footnotes{> hr { display: none; }}.footnotes ol{line-height:1.4;margin-bottom:20px}.footnotes li{margin-bottom:5px}.footnotes ol li p{margin:0;padding:0;line-height:1.4}.donation{display:block;margin-left:auto;margin-right:auto}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+  
+    <style>.toc{background-color:#f5f5f5;margin:0 auto;width:90%;border-radius:8px;padding:20px;box-shadow:0 4px 6px rgba(0,0,0,.1)}.toc ul{padding-left:20px}.toc li{line-height:1.6;margin-bottom:0}.toc li a{color:#333}.toc li a:hover{color:#000}.toc details{cursor:pointer}.toc summary{font-weight:700}.toc .inner{margin:0 0 0 20px;padding:0 15px 15px 20px;padding-bottom:0;font-size:16px;max-height:83vh;overflow-y:auto}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="Snakinya-明烛天南">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+
+
+
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  
+  <div class="header-title">
+    <a href="/"
+      >Snakinya</a
+    >
+  </div>
+  <div class="header-subtitle" style="color:blueviolet;">苍山负雪，明烛天南</div>
+</header>
+
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="https://github.com/Snakinya" target="_self">Github</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/categories" target="_self">Categories</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/about/" target="_self">About</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/books/" target="_self">Books</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/friends/" target="_self">Friends</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/posts/" target="_self">Posts</a>
+  </div>
+  
+</div>
+
+<div class="header-line"></div>
+
+        </div>
+
+        <header class="post-header">
+          <h1 class="post-title">RASP技术学习入门篇(1)</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2023-03-21 00:00:00 UTC">
+                21 Mar 2023
+              </time>
+              
+            </div>
+            
+            <div class="col-xs-6">
+
+              
+              <div class="post-author">
+              <span id="busuanzi_container_page_pv">@本文阅读量<span id="busuanzi_value_page_pv"></span>次</span>
+                
+            </div>
+          </div>
+          
+        </header>
+        
+
+        <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#java-rasp%e6%8a%80%e6%9c%af" aria-label="Java RASP技术">Java RASP技术</a><ul>
+                        
+                <li>
+                    <a href="#rasp%e6%8a%80%e6%9c%af%e5%8e%9f%e7%90%86" aria-label="RASP技术原理">RASP技术原理</a></li>
+                <li>
+                    <a href="#%e9%a1%b9%e7%9b%ae%e5%9c%b0%e5%9d%80" aria-label="项目地址">项目地址</a></li>
+                <li>
+                    <a href="#%e5%ae%9e%e7%8e%b0%e4%b8%80%e4%b8%aa%e7%ae%80%e6%98%93%e7%9a%84rasp" aria-label="实现一个简易的RASP">实现一个简易的RASP</a><ul>
+                        
+                <li>
+                    <a href="#%e5%88%9b%e5%bb%ba%e5%85%a5%e5%8f%a3%e7%b1%bb" aria-label="创建入口类">创建入口类</a></li>
+                <li>
+                    <a href="#%e5%88%9b%e5%bb%batransform" aria-label="创建Transform">创建Transform</a></li>
+                <li>
+                    <a href="#build-agent%e9%85%8d%e7%bd%ae" aria-label="build Agent配置">build Agent配置</a></li>
+                <li>
+                    <a href="#%e5%88%9b%e5%bb%baclassvisitor%e7%b1%bb" aria-label="创建ClassVisitor类">创建ClassVisitor类</a></li>
+                <li>
+                    <a href="#%e5%af%b9processbuilder%e5%91%bd%e4%bb%a4%e6%89%a7%e8%a1%8c%e7%b1%bb%e8%bf%9b%e8%a1%8chook%e7%94%a8%e6%88%b7%e6%89%a7%e8%a1%8c%e7%9a%84%e5%91%bd%e4%bb%a4" aria-label="对ProcessBuilder（命令执行）类进行hook用户执行的命令">对ProcessBuilder（命令执行）类进行hook用户执行的命令</a><ul>
+                        
+                <li>
+                    <a href="#%e4%bd%bf%e7%94%a8transform%e5%af%b9%e7%b1%bb%e5%90%8d%e8%bf%9b%e8%a1%8c%e8%bf%87%e6%bb%a4" aria-label="使用transform对类名进行过滤">使用transform对类名进行过滤</a></li>
+                <li>
+                    <a href="#%e5%88%9b%e5%bb%ba%e6%b5%8b%e8%af%95%e7%8e%af%e5%a2%83" aria-label="创建测试环境">创建测试环境</a></li>
+                <li>
+                    <a href="#%e6%8b%bf%e5%88%b0%e7%94%a8%e6%88%b7%e6%89%80%e6%89%a7%e8%a1%8c%e7%9a%84%e5%91%bd%e4%bb%a4" aria-label="拿到用户所执行的命令">拿到用户所执行的命令</a></li>
+                <li>
+                    <a href="#%e5%a4%8d%e5%86%99visitmethod%e6%96%b9%e6%b3%95" aria-label="复写visitMethod方法">复写visitMethod方法</a></li>
+                <li>
+                    <a href="#%e6%b5%8b%e8%af%95hook%e7%94%a8%e6%88%b7%e6%89%a7%e8%a1%8c%e7%9a%84%e5%91%bd%e4%bb%a4%e5%8f%82%e6%95%b0%e6%98%af%e5%90%a6%e6%8b%bf%e5%88%b0" aria-label="测试hook用户执行的命令参数是否拿到">测试hook用户执行的命令参数是否拿到</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e9%98%b2%e5%be%a1%e6%96%b9%e5%bc%8f" aria-label="防御方式">防御方式</a><ul>
+                        
+                <li>
+                    <a href="#%e7%ae%80%e5%8d%95%e7%b2%97%e6%9a%b4---%e6%8a%9b%e5%87%ba%e5%bc%82%e5%b8%b8" aria-label="简单粗暴 - 抛出异常">简单粗暴 - 抛出异常</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+            </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+        
+
+
+
+        <div class="post-content markdown-body">
+          
+          <h1 id="java-rasp技术">Java RASP技术</h1>
+<p>运行时应用程序自我保护（<code>Runtime application self-protection</code>，简称<code>RASP</code>）使用Java Agent技术在应用程序运行时候动态编辑类字节码，将自身防御逻辑注入到Java底层API和Web应用程序当中，从而与应用程序融为一体，能实时分析和检测Web攻击，使应用程序具备自我保护能力。</p>
+<p>RASP技术作为新兴的WEB防御方案，不但能够有效的防御传统WAF无法实现的攻击类型，更能够大幅提升对攻击者攻击行为的检测精准度。RASP是传统WAF的坚实后盾，能够弥补WAF无法获取Web应用<code>运行时</code>环境的缺陷，同时也是传统Web应用服务最重要的不可或缺的一道安全防线。</p>
+<p>RASP通过注入自身到开发语言底层API中，从而完全的融入于Web服务中，拥有了得天独厚的漏洞检测和防御条件，RASP技术相较于传统的WAF拥有了更加精准、深层次的防御。RASP采用<code>基于攻击行为分析</code>的<code>主动防御</code>机制，严防<code>文件读写</code>、<code>数据访问</code>、<code>命令执行</code>等Web应用系统命脉，为Web应用安全筑建出“万丈高墙”。</p>
+<h2 id="rasp技术原理">RASP技术原理</h2>
+<p><code>JDK1.5</code>开始，<code>Java</code>新增了<code>Instrumentation（Java Agent API）</code>和<code>JVMTI（JVM Tool Interface）</code>功能，允许<code>JVM</code>在加载某个<code>class文件</code>之前对其字节码进行修改，同时也支持对已加载的<code>class（类字节码）</code>进行重新加载（<code>Retransform</code>）。</p>
+<p>利用<code>Java Agent</code>这一特性衍生出了<code>APM（Application Performance Management，应用性能管理）</code>、<code>RASP（Runtime application self-protection，运行时应用自我保护）</code>、<code>IAST（Interactive Application Security Testing，交互式应用程序安全测试）</code>等相关产品，它们都无一例外的使用了<code>Instrumentation/JVMTI</code>的<code>API</code>来实现动态修改<code>Java类字节码</code>并插入监控或检测代码。</p>
+<p>RASP防御的核心就是在Web应用程序执行关键的Java API之前插入防御逻辑，从而控制原类方法执行的业务逻辑。如果没有RASP的防御，攻击者可以利用Web容器/应用的漏洞攻击应用服务器。</p>
+<h2 id="项目地址">项目地址</h2>
+<p><a href="https://github.com/iiiusky/java_rasp_example">https://github.com/iiiusky/java_rasp_example</a></p>
+<h2 id="实现一个简易的rasp">实现一个简易的RASP</h2>
+<h3 id="创建入口类">创建入口类</h3>
+<p>在<code>cn.org.javaweb.agent</code>包下新建一个类。</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff6ac1">package</span> cn.org.javaweb.agent;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.lang.instrument.Instrumentation;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">class</span> <span style="color:#f3f99d">Agent</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">premain</span>(String agentArgs, Instrumentation inst) {
+</span></span><span style="display:flex;"><span>        inst.<span style="color:#57c7ff">addTransformer</span>(<span style="color:#ff6ac1">new</span> AgentTransform());
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="创建transform">创建Transform</h3>
+<p>然后我们再新建一个<code>AgentTransform</code>类，该类需要实现<code>ClassFileTransformer</code>的方法，内容如下:</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff6ac1">package</span> cn.org.javaweb.agent;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.lang.instrument.ClassFileTransformer;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.lang.instrument.IllegalClassFormatException;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.security.ProtectionDomain;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">class</span> <span style="color:#f3f99d">AgentTransform</span> <span style="color:#ff5c57">implements</span> ClassFileTransformer {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#78787e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#78787e">     * @param loader
+</span></span></span><span style="display:flex;"><span><span style="color:#78787e">     * @param className
+</span></span></span><span style="display:flex;"><span><span style="color:#78787e">     * @param classBeingRedefined
+</span></span></span><span style="display:flex;"><span><span style="color:#78787e">     * @param protectionDomain
+</span></span></span><span style="display:flex;"><span><span style="color:#78787e">     * @param classfileBuffer
+</span></span></span><span style="display:flex;"><span><span style="color:#78787e">     * @return
+</span></span></span><span style="display:flex;"><span><span style="color:#78787e">     * @throws IllegalClassFormatException
+</span></span></span><span style="display:flex;"><span><span style="color:#78787e">     */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff9f43">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[]</span> <span style="color:#57c7ff">transform</span>(ClassLoader loader, String className,
+</span></span><span style="display:flex;"><span>                            Class<span style="color:#ff6ac1">&lt;?&gt;</span> classBeingRedefined, ProtectionDomain protectionDomain,
+</span></span><span style="display:flex;"><span>                            <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[]</span> classfileBuffer) <span style="color:#ff5c57">throws</span> IllegalClassFormatException {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        className <span style="color:#ff6ac1">=</span> className.<span style="color:#57c7ff">replace</span>(<span style="color:#5af78e">&#34;/&#34;</span>, <span style="color:#5af78e">&#34;.&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        System.<span style="color:#57c7ff">out</span>.<span style="color:#57c7ff">println</span>(<span style="color:#5af78e">&#34;Load class:&#34;</span> <span style="color:#ff6ac1">+</span> className);
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span> classfileBuffer;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="build-agent配置">build Agent配置</h3>
+<p>点击右上角的<code>agent[clean,intall]</code>进行build。包的位置为：</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span> E:\CTF\JAVA_SEC\Learning_Project\RASP\snakin_rasp1\agent\target\agent.jar
+</span></span></code></pre></div><p>接下来配置tomcat：</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-Dfile.encoding=UTF-8
+</span></span><span style="display:flex;"><span>-noverify
+</span></span><span style="display:flex;"><span>-Xbootclasspath/p:E:\CTF\JAVA_SEC\Learning_Project\RASP\snakin_rasp1\agent\target\agent.jar
+</span></span><span style="display:flex;"><span>-javaagent:E:\CTF\JAVA_SEC\Learning_Project\RASP\snakin_rasp1\agent\target\agent.jar
+</span></span></code></pre></div><p>之后启动：</p>
+<p><img alt="image-20230223234417149" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20230223234417149.png"></p>
+<p>我们在<code>AgentTransform</code>中写的打印包名已经生效了，同时web端也正常启动</p>
+<h3 id="创建classvisitor类">创建ClassVisitor类</h3>
+<p>接下来新建一个TestClassVisitor类，需要继承ClassVisitor类并且实现Opcodes类，代码如下</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff6ac1">package</span> cn.org.javaweb.agent;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> org.objectweb.asm.ClassVisitor;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> org.objectweb.asm.MethodVisitor;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> org.objectweb.asm.Opcodes;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">class</span> <span style="color:#f3f99d">TestClassVisitor</span> <span style="color:#ff5c57">extends</span> ClassVisitor <span style="color:#ff5c57">implements</span> Opcodes {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#57c7ff">TestClassVisitor</span>(ClassVisitor cv) {
+</span></span><span style="display:flex;"><span>        <span style="color:#ff5c57">super</span>(Opcodes.<span style="color:#57c7ff">ASM5</span>, cv);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff9f43">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> MethodVisitor <span style="color:#57c7ff">visitMethod</span>(<span style="color:#9aedfe">int</span> access, String name, String desc, String signature, String<span style="color:#ff6ac1">[]</span> exceptions) {
+</span></span><span style="display:flex;"><span>        MethodVisitor mv <span style="color:#ff6ac1">=</span> <span style="color:#ff5c57">super</span>.<span style="color:#57c7ff">visitMethod</span>(access, name, desc, signature, exceptions);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        System.<span style="color:#57c7ff">out</span>.<span style="color:#57c7ff">println</span>(name <span style="color:#ff6ac1">+</span> <span style="color:#5af78e">&#34;方法的描述符是：&#34;</span> <span style="color:#ff6ac1">+</span> desc);
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span> mv;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="对processbuilder命令执行类进行hook用户执行的命令">对ProcessBuilder（命令执行）类进行hook用户执行的命令</h3>
+<h4 id="使用transform对类名进行过滤">使用transform对类名进行过滤</h4>
+<p>然后回到<code>AgentTransform</code>中，对<code>transform</code>方法的内容进行修改，transform方法代码如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[]</span> <span style="color:#57c7ff">transform</span>(ClassLoader loader, String className,
+</span></span><span style="display:flex;"><span>                            Class<span style="color:#ff6ac1">&lt;?&gt;</span> classBeingRedefined, ProtectionDomain protectionDomain,
+</span></span><span style="display:flex;"><span>                            <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[]</span> classfileBuffer) <span style="color:#ff5c57">throws</span> IllegalClassFormatException {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        className <span style="color:#ff6ac1">=</span> className.<span style="color:#57c7ff">replace</span>(<span style="color:#5af78e">&#34;/&#34;</span>, <span style="color:#5af78e">&#34;.&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">try</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">if</span> (className.<span style="color:#57c7ff">contains</span>(<span style="color:#5af78e">&#34;ProcessBuilder&#34;</span>)) {
+</span></span><span style="display:flex;"><span>                System.<span style="color:#57c7ff">out</span>.<span style="color:#57c7ff">println</span>(<span style="color:#5af78e">&#34;Load class: &#34;</span> <span style="color:#ff6ac1">+</span> className);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                ClassReader  classReader  <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> ClassReader(classfileBuffer);
+</span></span><span style="display:flex;"><span>                ClassWriter  classWriter  <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> ClassWriter(classReader, ClassWriter.<span style="color:#57c7ff">COMPUTE_MAXS</span>);
+</span></span><span style="display:flex;"><span>                ClassVisitor classVisitor <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> TestClassVisitor(classWriter);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                classReader.<span style="color:#57c7ff">accept</span>(classVisitor, ClassReader.<span style="color:#57c7ff">EXPAND_FRAMES</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                classfileBuffer <span style="color:#ff6ac1">=</span> classWriter.<span style="color:#57c7ff">toByteArray</span>();
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        } <span style="color:#ff6ac1">catch</span> (Exception e) {
+</span></span><span style="display:flex;"><span>            e.<span style="color:#57c7ff">printStackTrace</span>();
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span> classfileBuffer;
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>首先判断类名是否包含<code>ProcessBuilder</code>,如果包含则使用<code>ClassReader</code>对字节码进行读取，然后新建一个<code>ClassWriter</code>进行对<code>ClassReader</code>读取的字节码进行拼接，然后在新建一个我们自定义的<code>ClassVisitor</code>对类的触发事件进行hook，在然后调用<code>classReader</code>的<code>accept</code>方法,最后给<code>classfileBuffer</code>重新赋值修改后的字节码。</p>
+<p>ASM是一种通用Java字节码操作和分析框架，它可以直接以二进制形式修改一个现有的类或动态生成类文件。ASM的版本更新快（<code>ASM 9.0</code>已经支持<code>JDK 16</code>）、<a href="https://asm.ow2.io/performance.html">性能高</a>、功能全，学习成本也相对较高，ASM官方用户手册：<a href="https://asm.ow2.io/asm4-guide.pdf">ASM 4.0 A Java bytecode engineering library</a>。</p>
+<p>ASM提供了三个基于<code>ClassVisitor API</code>的核心API，用于生成和转换类：</p>
+<ol>
+<li><code>ClassReader</code>类用于解析class文件或二进制流；</li>
+<li><code>ClassWriter</code>类是<code>ClassVisitor</code>的子类，用于生成类二进制；</li>
+<li><code>ClassVisitor</code>是一个抽象类，自定义<code>ClassVisitor</code>重写<code>visitXXX</code>方法，可获取捕获ASM类结构访问的所有事件；</li>
+</ol>
+<h4 id="创建测试环境">创建测试环境</h4>
+<p>我们在tomcat中新建一个jsp，用来调用命令执行，代码如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff6ac1">&lt;%</span><span style="color:#ff5c57">@</span> page import<span style="color:#ff6ac1">=</span><span style="color:#5af78e">&#34;java.io.InputStream&#34;</span> <span style="color:#ff6ac1">%&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">&lt;%</span><span style="color:#ff5c57">@</span> page contentType<span style="color:#ff6ac1">=</span><span style="color:#5af78e">&#34;text/html;charset=UTF-8&#34;</span> language<span style="color:#ff6ac1">=</span><span style="color:#5af78e">&#34;java&#34;</span> <span style="color:#ff6ac1">%&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">&lt;</span>pre<span style="color:#ff6ac1">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">&lt;%</span>
+</span></span><span style="display:flex;"><span>    Process process <span style="color:#ff6ac1">=</span> Runtime.<span style="color:#57c7ff">getRuntime</span>().<span style="color:#57c7ff">exec</span>(request.<span style="color:#57c7ff">getParameter</span>(<span style="color:#5af78e">&#34;cmd&#34;</span>));
+</span></span><span style="display:flex;"><span>    InputStream in <span style="color:#ff6ac1">=</span> process.<span style="color:#57c7ff">getInputStream</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#9aedfe">int</span> a <span style="color:#ff6ac1">=</span> 0;
+</span></span><span style="display:flex;"><span>    <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[]</span> b <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[</span>1024<span style="color:#ff6ac1">]</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">while</span> ((a <span style="color:#ff6ac1">=</span> in.<span style="color:#57c7ff">read</span>(b)) <span style="color:#ff6ac1">!=</span> <span style="color:#ff6ac1">-</span>1) {
+</span></span><span style="display:flex;"><span>        out.<span style="color:#57c7ff">println</span>(<span style="color:#ff6ac1">new</span> String(b, 0, a));
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    in.<span style="color:#57c7ff">close</span>();
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">%&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">&lt;/</span>pre<span style="color:#ff6ac1">&gt;</span>
+</span></span></code></pre></div><p>接下来重新生成agent.jar并启动tomcat，访问</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>http://localhost:8080/cmd.jsp?cmd=whoami
+</span></span></code></pre></div><p>输出命令执行的调用链</p>
+<p><img alt="image-20230224165156424" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20230224165156424.png"></p>
+<h4 id="拿到用户所执行的命令">拿到用户所执行的命令</h4>
+<p>接下来我们看看尝试一下能否拿到所执行的命令</p>
+<p>新建一个名为<code>ProcessBuilderHook</code>的类，然后在类中新建一个名字为<code>start</code>的静态方法，完整代码如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff6ac1">package</span> cn.org.javaweb.agent;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.util.Arrays;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.util.List;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">class</span> <span style="color:#f3f99d">ProcessBuilderHook</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">start</span>(List<span style="color:#ff6ac1">&lt;</span>String<span style="color:#ff6ac1">&gt;</span> commands) {
+</span></span><span style="display:flex;"><span>        String<span style="color:#ff6ac1">[]</span> commandArr <span style="color:#ff6ac1">=</span> commands.<span style="color:#57c7ff">toArray</span>(<span style="color:#ff6ac1">new</span> String<span style="color:#ff6ac1">[</span>commands.<span style="color:#57c7ff">size</span>()<span style="color:#ff6ac1">]</span>);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#57c7ff">out</span>.<span style="color:#57c7ff">println</span>(Arrays.<span style="color:#57c7ff">toString</span>(commandArr));
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="复写visitmethod方法">复写visitMethod方法</h4>
+<p>打开<code>TestClassVisitor</code>，对<code>visitMethod</code>方法进行更改。具体代码如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff9f43">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> MethodVisitor <span style="color:#57c7ff">visitMethod</span>(<span style="color:#9aedfe">int</span> access, String name, String desc, String signature, String<span style="color:#ff6ac1">[]</span> exceptions) {
+</span></span><span style="display:flex;"><span>        MethodVisitor mv <span style="color:#ff6ac1">=</span> <span style="color:#ff5c57">super</span>.<span style="color:#57c7ff">visitMethod</span>(access, name, desc, signature, exceptions);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">if</span> (<span style="color:#5af78e">&#34;start&#34;</span>.<span style="color:#57c7ff">equals</span>(name) <span style="color:#ff6ac1">&amp;&amp;</span> <span style="color:#5af78e">&#34;()Ljava/lang/Process;&#34;</span>.<span style="color:#57c7ff">equals</span>(desc)) {
+</span></span><span style="display:flex;"><span>            System.<span style="color:#57c7ff">out</span>.<span style="color:#57c7ff">println</span>(name <span style="color:#ff6ac1">+</span> <span style="color:#5af78e">&#34;方法的描述符是：&#34;</span> <span style="color:#ff6ac1">+</span> desc);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">return</span> <span style="color:#ff6ac1">new</span> AdviceAdapter(Opcodes.<span style="color:#57c7ff">ASM5</span>, mv, access, name, desc) {
+</span></span><span style="display:flex;"><span>                <span style="color:#ff9f43">@Override</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#ff5c57">public</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">visitCode</span>() {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                    mv.<span style="color:#57c7ff">visitVarInsn</span>(ALOAD, 0);
+</span></span><span style="display:flex;"><span>                    mv.<span style="color:#57c7ff">visitFieldInsn</span>(GETFIELD, <span style="color:#5af78e">&#34;java/lang/ProcessBuilder&#34;</span>, <span style="color:#5af78e">&#34;command&#34;</span>, <span style="color:#5af78e">&#34;Ljava/util/List;&#34;</span>);
+</span></span><span style="display:flex;"><span>                    mv.<span style="color:#57c7ff">visitMethodInsn</span>(INVOKESTATIC, <span style="color:#5af78e">&#34;cn/org/javaweb/agent/ProcessBuilderHook&#34;</span>, <span style="color:#5af78e">&#34;start&#34;</span>, <span style="color:#5af78e">&#34;(Ljava/util/List;)V&#34;</span>, <span style="color:#ff6ac1">false</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#ff5c57">super</span>.<span style="color:#57c7ff">visitCode</span>();
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            };
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span> mv;
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>先补充一点基础：</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>visitFieldInsn <span style="color:#ff5c57">：</span> 访问某个成员变量的指令<span style="color:#ff5c57">，</span>支持GETSTATIC, PUTSTATIC, GETFIELD or PUTFIELD.
+</span></span><span style="display:flex;"><span>visitFrame <span style="color:#ff5c57">：</span>访问当前局部变量表和操作数栈中元素的状态<span style="color:#ff5c57">，</span>参数就是局部变量表和操作数栈的内容
+</span></span><span style="display:flex;"><span>visitIincInsn <span style="color:#ff5c57">：</span> 访问自增指令
+</span></span><span style="display:flex;"><span>visitVarInsn <span style="color:#ff5c57">：</span>访问局部变量指令<span style="color:#ff5c57">，</span>就是取局部变量变的值放入操作数栈
+</span></span><span style="display:flex;"><span>visitMethodInsn <span style="color:#ff5c57">：</span>访问方法指令<span style="color:#ff5c57">，</span>就是调用某个方法<span style="color:#ff5c57">，</span>支持INVOKEVIRTUAL, INVOKESPECIAL, INVOKESTATIC or INVOKEINTERFACE.
+</span></span><span style="display:flex;"><span>visitInsn <span style="color:#ff5c57">：</span> 访问无操作数的指令<span style="color:#ff5c57">，</span>例如nop<span style="color:#ff5c57">，</span>duo等等
+</span></span></code></pre></div><p>首先判断传入进来的方法名是否为<code>start</code>以及方法描述符是否为<code>()Ljava/lang/Process;</code>,如果是的话就新建一个<code>AdviceAdapter</code>方法，并且复写<code>visitCode</code>方法，对其字节码进行修改，拿到栈顶上的<code>this</code>，这里取0</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>mv.<span style="color:#57c7ff">visitVarInsn</span>(ALOAD, 0);
+</span></span></code></pre></div><p>拿到<code>this</code>里面的<code>command</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>mv.<span style="color:#57c7ff">visitFieldInsn</span>(GETFIELD, <span style="color:#5af78e">&#34;java/lang/ProcessBuilder&#34;</span>, <span style="color:#5af78e">&#34;command&#34;</span>, <span style="color:#5af78e">&#34;Ljava/util/List;&#34;</span>);
+</span></span></code></pre></div><p>调用我们上面新建的<code>ProcessBuilderHook</code>类中的<code>start</code>方法,将上面拿到的<code>this.command</code>压入我们方法。</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>mv.<span style="color:#57c7ff">visitMethodInsn</span>(INVOKESTATIC, <span style="color:#5af78e">&#34;cn/org/javaweb/agent/ProcessBuilderHook&#34;</span>, <span style="color:#5af78e">&#34;start&#34;</span>, <span style="color:#5af78e">&#34;(Ljava/util/List;)V&#34;</span>, <span style="color:#ff6ac1">false</span>);
+</span></span></code></pre></div><p>我们再次编译一下，然后启动tomcat，访问<code>cmd.jsp</code>看.</p>
+<h4 id="测试hook用户执行的命令参数是否拿到">测试hook用户执行的命令参数是否拿到</h4>
+<p>访问</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>http://localhost:8080/cmd.jsp?cmd=whoami
+</span></span></code></pre></div><p>控制台：</p>
+<p><img alt="image-20230224213110874" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20230224213110874.png"></p>
+<p>成功获取到执行的命令，可以进行下一步操作，根据需要拦截还是替换还是告警。当然，如果要实现拦截功能，还需要注意要获取当前请求中的的response，不然无法对response进行复写，也无法对其进行拦截。这边给大家提供一个思路，对应拦截功能，大家可以去hook请求相关的类，然后在危险hook点结合http请求上下文进行拦截请求。</p>
+<h3 id="防御方式">防御方式</h3>
+<h4 id="简单粗暴---抛出异常">简单粗暴 - 抛出异常</h4>
+<p><code>ProcessBuilderHook.java</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">log</span>(List<span style="color:#ff6ac1">&lt;</span>String<span style="color:#ff6ac1">&gt;</span> commands) {
+</span></span><span style="display:flex;"><span>        System.<span style="color:#57c7ff">out</span>.<span style="color:#57c7ff">println</span>(<span style="color:#5af78e">&#34;Malicious code!&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">throw</span> <span style="color:#ff6ac1">new</span> RuntimeException(<span style="color:#5af78e">&#34;RASP&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p><code>TestClassVisitor.java</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>mv.<span style="color:#57c7ff">visitMethodInsn</span>(INVOKESTATIC, <span style="color:#5af78e">&#34;cn/org/javaweb/agent/ProcessBuilderHook&#34;</span>, <span style="color:#5af78e">&#34;log&#34;</span>, <span style="color:#5af78e">&#34;(Ljava/util/List;)V&#34;</span>, <span style="color:#ff6ac1">false</span>);
+</span></span></code></pre></div><p>参考：</p>
+<p><a href="https://mp.weixin.qq.com/s/vu9JsVMzFSPUXUmD4JRe0Q">https://mp.weixin.qq.com/s/vu9JsVMzFSPUXUmD4JRe0Q</a></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+        
+        <div class="site-footer">
+  
+  
+
+  
+    <script src="/js/clipboard.js"></script>
+  
+
+  
+  
+
+    
+      
+      
+      <div class="site-footer">
+        <div class="busuanzi-footer">
+          <span id="busuanzi_container_site_pv">
+            本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+          </span>
+          <span class="separator">|</span> 
+          <span id="busuanzi_container_site_uv">
+            本站访客数 <span id="busuanzi_value_site_uv"></span> 人次
+          </span>
+        </div>
+        <p class="footer-beian"> 
+          <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">
+            蜀ICP备2021024344号-1
+          </a>
+        </p>
+      </div>
+
+      
+    </div>
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

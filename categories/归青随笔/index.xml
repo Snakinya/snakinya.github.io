@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>归青随笔 on Snakinya-明烛天南</title>
+    <link>https://www.snakin.top/categories/%E5%BD%92%E9%9D%92%E9%9A%8F%E7%AC%94/</link>
+    <description>Recent content in 归青随笔 on Snakinya-明烛天南</description>
+    <generator>Hugo</generator>
+    <language>cn</language>
+    <lastBuildDate>Fri, 30 Aug 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://www.snakin.top/categories/%E5%BD%92%E9%9D%92%E9%9A%8F%E7%AC%94/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>莱斯定理</title>
+      <link>https://www.snakin.top/posts/risetheorem/</link>
+      <pubDate>Fri, 30 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>https://www.snakin.top/posts/risetheorem/</guid>
+      <description>&lt;p&gt;莱斯定理（Rice’s Theorem） 是计算理论中的一个重要定理，它揭示了所有非平凡的语义属性在图灵完备的编程语言中都不可判定。换句话说，对于任何程序的语义性质，如果该性质不是“平凡”的，那么就无法构造一个通用的算法来决定所有程序是否具有这一性质。&lt;/p&gt;&#xA;&lt;h2 id=&#34;莱斯定理的内容&#34;&gt;莱斯定理的内容&lt;/h2&gt;&#xA;&lt;p&gt;莱斯定理的正式表述如下：&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;设P是图灵机程序集合的一个非平凡属性（即，既存在满足该属性的程序，也存在不满足该属性的程序），则不存在一个算法可以决定一个给定的图灵机程序M是否具有属性P 。&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;p&gt;简化来说，莱斯定理指出：&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;对于任何非平凡的语义属性，决定一个给定程序是否具有该属性是不可判定的。&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;解释&#34;&gt;解释&lt;/h2&gt;&#xA;&lt;p&gt;非平凡属性：属性不是所有程序都满足，也不是所有程序都不满足。例如：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;“程序是否会停机？” 是一个非平凡的属性。&lt;/li&gt;&#xA;&lt;li&gt;“程序是否输出 0？” 也是一个非平凡的属性，因为一些程序输出 0，而另一些程序不输出 0。&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;不可判定性：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;莱斯定理告诉我们，无法编写一个通用算法来判定任何给定程序是否具有某个特定的语义属性。换句话说，任何涉及程序的语义特征的通用判定问题都是不可判定的。&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;举例&#34;&gt;举例&lt;/h2&gt;&#xA;&lt;p&gt;给定一个程序或程序片段，是否存在漏洞？这是一个非平凡的属性，因为：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;存在一些程序是安全的（没有漏洞）。&lt;/li&gt;&#xA;&lt;li&gt;存在一些程序是不安全的（有漏洞）。&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;同时，漏洞是程序行为的一种特定性质，通常涉及程序执行过程中的特定条件（如内存泄漏、缓冲区溢出、SQL注入等）。这些性质通常不能仅通过语法分析（即单纯查看代码的文本结构）来确定，而需要理解程序的语义（即程序在运行时如何表现，执行时的状态如何变化）。&lt;/p&gt;&#xA;&lt;p&gt;根据莱斯定理，由于漏洞检测是一个非平凡的语义属性，所以没有通用算法可以在所有情况下决定任意程序片段是否存在漏洞。因此，漏洞检测是不可判定的。&lt;/p&gt;&#xA;&lt;p&gt;尽管漏洞检测在理论上是不可判定的，但在实际应用中，通常采用启发式方法、静态分析、动态分析和机器学习等技术来检测程序中的潜在漏洞。虽然这些方法不能保证对所有情况都给出正确的答案，但它们在实际场景中仍能有效地发现大量常见的安全问题。&lt;/p&gt;&#xA;&lt;h2 id=&#34;莱斯定理的意义&#34;&gt;莱斯定理的意义&lt;/h2&gt;&#xA;&lt;p&gt;莱斯定理的意义在于，它揭示了计算理论中的一个基本限制：在一般情况下，关于程序行为的许多有趣问题都是不可判定的。这一结果在理论计算机科学中非常重要，它限制了我们能用算法解决的问题类型，并指导我们在哪里使用启发式方法或半算法（如静态分析、模型检查等）来近似解决这些问题。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

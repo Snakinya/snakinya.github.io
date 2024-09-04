@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.134.0">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Snakinya" />
+  <meta property="og:url" content="https://www.snakin.top/posts/a-comprehensive-study-of-dns-over-https-downgrade-attack/" />
+  <link rel="canonical" href="https://www.snakin.top/posts/a-comprehensive-study-of-dns-over-https-downgrade-attack/" /><link rel="apple-touch-icon" href="https://www.snakin.top/favicon.ico" />
+  <link rel="icon" href="https://www.snakin.top/favicon.ico" />
+  <link rel="shortcut" href="https://www.snakin.top/favicon.ico" /><link rel="alternate" type="application/atom+xml" href="https://www.snakin.top/index.xml" title="Snakinya-明烛天南">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/www.snakin.top\/"
+      },
+      "articleSection" : "posts",
+      "name" : "Paper | A Comprehensive Study of DNS-over-HTTPS Downgrade Attack",
+      "headline" : "Paper | A Comprehensive Study of DNS-over-HTTPS Downgrade Attack",
+      "description" : "00 摘要 DNS-over-HTTPS (DoH)是保护 DNS 机密性和完整性的主要措施之一，已被大多数流行的浏览器部署。然而，这种措施可能会受到降级攻击的影响，该攻击会将 DNS 通信的内容暴露给攻击者。具体来说，作者使用了4个与攻击模型相关的攻击向量来检测了6个浏览器，发现了所有能够导致成功攻击的组合。其根本原因是，所有浏览器默认启用Opportunistic Privacy profile，当DoH不可用时，允许DoH退回到 DNS 时，然而，当发生这种变化时，没有一个浏览器会通知用户，而一些浏览器需要很长时间才能恢复到 DoH。在本文的最后，作者提出了一些对策，并呼吁互联网社区进行讨论，重新审视有关 DoH 和使用配置文件的标准和实现。\n01 背景介绍 Domain name system (DNS) DNS将域名转换为相应的IP地址。更具体地说，客户端软件存根解析器收集用户应用程序请求的域名。然后将DNS查询发送给递归解析器( RR )。RR在DNS解析中充当代理。如果查询域不在其缓存中，它将递归地向权威域服务器发送查询。RR收到响应后，会将响应发回客户端。到目前为止，大部分的DNS查询和响应都是以明文的形式进行传输的，这使得DNS容易被篡改。存根解析器和递归解析器之间的DNS数据包是攻击者的主要攻击目标，已有研究表明用户的DNS查询可以用来追踪或者审查。\nDNS-over-HTTPS (DoH) 为了缓解DNS的隐私问题，DoH被提出来保护终端用户和递归解析器之间的连接。它使用HTTPS加密DNS查询。DoH与普通HTTPS一样，运行在TCP端口443上。DNS请求以URI模板(例如, https:\/\/dns.google\/dns-query {?dns}是Google公共DNS)的格式发送。URI中的域名不仅用于查找DoH解析器(通过明文DNS解析)的IP地址，还用于验证其身份(通过SSL证书验证)。DoH常作为一个集成模块由浏览器提供。因此，DoH通信对操作系统是不透明的。\nProcess of DoH Communication 通常来讲，该过程分为两个阶段，第一阶段发生在DoH连接之前，浏览器向DNS服务器发送报文查询DoH服务器的ip，该过程与传统DNS解析相同，这意味着任何能够嗅探网络流量的攻击者都可以查看DNS数据包中的纯文本内容并对其进行篡改。\n第二阶段则是浏览器通过TLS协议与DoH服务器建立安全连接。之后通过该传输隧道传输DNS报文，能够破坏此阶段的攻击者可以强制浏览器回退到明文 DNS。\n此外，对于 Chrome 等浏览器，在 Phase 1 之前，使用映射表将操作系统中配置的 DNS 解析器转换为其等效的 DoH 解析器 URI，称之为 Phase 0。Phase 0 通常硬编码在浏览器软件中，因此作者不认为这个阶段会受到攻击。\n02 威胁模型 攻击者的目标是强制加密的 DoH 退回到明文。在本文中，作者根据攻击者操纵网络数据包的能力假设了两种类型的威胁模型。\n",
+      "inLanguage" : "en-US",
+      "author" : "Snakinya",
+      "creator" : "Snakinya",
+      "publisher": "Snakinya",
+      "accountablePerson" : "Snakinya",
+      "copyrightHolder" : "Snakinya",
+      "copyrightYear" : "2024",
+      "datePublished": "2024-01-10 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2024-01-10 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/www.snakin.top\/posts\/a-comprehensive-study-of-dns-over-https-downgrade-attack\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>Paper | A Comprehensive Study of DNS-over-HTTPS Downgrade Attack</title>
+  <meta property="og:title" content="Paper | A Comprehensive Study of DNS-over-HTTPS Downgrade Attack" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="00 摘要 DNS-over-HTTPS (DoH)是保护 DNS 机密性和完整性的主要措施之一，已被大多数流行的浏览器部署。然而，这种措施可能会受到降级攻击的影响，该攻击会将 DNS 通信的内容暴露给攻击者。具体来说，作者使用了4个与攻击模型相关的攻击向量来检测了6个浏览器，发现了所有能够导致成功攻击的组合。其根本原因是，所有浏览器默认启用Opportunistic Privacy profile，当DoH不可用时，允许DoH退回到 DNS 时，然而，当发生这种变化时，没有一个浏览器会通知用户，而一些浏览器需要很长时间才能恢复到 DoH。在本文的最后，作者提出了一些对策，并呼吁互联网社区进行讨论，重新审视有关 DoH 和使用配置文件的标准和实现。
+01 背景介绍 Domain name system (DNS) DNS将域名转换为相应的IP地址。更具体地说，客户端软件存根解析器收集用户应用程序请求的域名。然后将DNS查询发送给递归解析器( RR )。RR在DNS解析中充当代理。如果查询域不在其缓存中，它将递归地向权威域服务器发送查询。RR收到响应后，会将响应发回客户端。到目前为止，大部分的DNS查询和响应都是以明文的形式进行传输的，这使得DNS容易被篡改。存根解析器和递归解析器之间的DNS数据包是攻击者的主要攻击目标，已有研究表明用户的DNS查询可以用来追踪或者审查。
+DNS-over-HTTPS (DoH) 为了缓解DNS的隐私问题，DoH被提出来保护终端用户和递归解析器之间的连接。它使用HTTPS加密DNS查询。DoH与普通HTTPS一样，运行在TCP端口443上。DNS请求以URI模板(例如, https://dns.google/dns-query {?dns}是Google公共DNS)的格式发送。URI中的域名不仅用于查找DoH解析器(通过明文DNS解析)的IP地址，还用于验证其身份(通过SSL证书验证)。DoH常作为一个集成模块由浏览器提供。因此，DoH通信对操作系统是不透明的。
+Process of DoH Communication 通常来讲，该过程分为两个阶段，第一阶段发生在DoH连接之前，浏览器向DNS服务器发送报文查询DoH服务器的ip，该过程与传统DNS解析相同，这意味着任何能够嗅探网络流量的攻击者都可以查看DNS数据包中的纯文本内容并对其进行篡改。
+第二阶段则是浏览器通过TLS协议与DoH服务器建立安全连接。之后通过该传输隧道传输DNS报文，能够破坏此阶段的攻击者可以强制浏览器回退到明文 DNS。
+此外，对于 Chrome 等浏览器，在 Phase 1 之前，使用映射表将操作系统中配置的 DNS 解析器转换为其等效的 DoH 解析器 URI，称之为 Phase 0。Phase 0 通常硬编码在浏览器软件中，因此作者不认为这个阶段会受到攻击。
+02 威胁模型 攻击者的目标是强制加密的 DoH 退回到明文。在本文中，作者根据攻击者操纵网络数据包的能力假设了两种类型的威胁模型。
+" />
+  <meta name="description" content="00 摘要 DNS-over-HTTPS (DoH)是保护 DNS 机密性和完整性的主要措施之一，已被大多数流行的浏览器部署。然而，这种措施可能会受到降级攻击的影响，该攻击会将 DNS 通信的内容暴露给攻击者。具体来说，作者使用了4个与攻击模型相关的攻击向量来检测了6个浏览器，发现了所有能够导致成功攻击的组合。其根本原因是，所有浏览器默认启用Opportunistic Privacy profile，当DoH不可用时，允许DoH退回到 DNS 时，然而，当发生这种变化时，没有一个浏览器会通知用户，而一些浏览器需要很长时间才能恢复到 DoH。在本文的最后，作者提出了一些对策，并呼吁互联网社区进行讨论，重新审视有关 DoH 和使用配置文件的标准和实现。
+01 背景介绍 Domain name system (DNS) DNS将域名转换为相应的IP地址。更具体地说，客户端软件存根解析器收集用户应用程序请求的域名。然后将DNS查询发送给递归解析器( RR )。RR在DNS解析中充当代理。如果查询域不在其缓存中，它将递归地向权威域服务器发送查询。RR收到响应后，会将响应发回客户端。到目前为止，大部分的DNS查询和响应都是以明文的形式进行传输的，这使得DNS容易被篡改。存根解析器和递归解析器之间的DNS数据包是攻击者的主要攻击目标，已有研究表明用户的DNS查询可以用来追踪或者审查。
+DNS-over-HTTPS (DoH) 为了缓解DNS的隐私问题，DoH被提出来保护终端用户和递归解析器之间的连接。它使用HTTPS加密DNS查询。DoH与普通HTTPS一样，运行在TCP端口443上。DNS请求以URI模板(例如, https://dns.google/dns-query {?dns}是Google公共DNS)的格式发送。URI中的域名不仅用于查找DoH解析器(通过明文DNS解析)的IP地址，还用于验证其身份(通过SSL证书验证)。DoH常作为一个集成模块由浏览器提供。因此，DoH通信对操作系统是不透明的。
+Process of DoH Communication 通常来讲，该过程分为两个阶段，第一阶段发生在DoH连接之前，浏览器向DNS服务器发送报文查询DoH服务器的ip，该过程与传统DNS解析相同，这意味着任何能够嗅探网络流量的攻击者都可以查看DNS数据包中的纯文本内容并对其进行篡改。
+第二阶段则是浏览器通过TLS协议与DoH服务器建立安全连接。之后通过该传输隧道传输DNS报文，能够破坏此阶段的攻击者可以强制浏览器回退到明文 DNS。
+此外，对于 Chrome 等浏览器，在 Phase 1 之前，使用映射表将操作系统中配置的 DNS 解析器转换为其等效的 DoH 解析器 URI，称之为 Phase 0。Phase 0 通常硬编码在浏览器软件中，因此作者不认为这个阶段会受到攻击。
+02 威胁模型 攻击者的目标是强制加密的 DoH 退回到明文。在本文中，作者根据攻击者操纵网络数据包的能力假设了两种类型的威胁模型。
+" />
+  <meta property="og:locale" content="cn" /><meta property="og:image" content="https://www.snakin.top/favicon.ico" />
+  
+
+  
+    <style>.highlight{position:relative}.clipboard-button{color:var(--white);background-color:rgba(255,255,255,.786);border:none;border-radius:6px;padding:3px 5px 2px;font-size:1rem;position:absolute;z-index:1;right:0;top:0;margin:10px;transition:.1s;opacity:.5}.clipboard-button>svg{fill:var(--white)}.clipboard-button:hover,.clipboard-button:focus,pre:active~.clipboard-button,pre:focus~.clipboard-button,div.highlight:active>.clipboard-button,div.highlight:focus>.clipboard-button{cursor:pointer;opacity:1}</style>
+  
+  
+    <style>@import "https://cdnjs.cloudflare.com/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/lxgwwenkaiscreenr.css";.busuanzi-footer{font-size:14px;color:#666;display:inline-block;gap:10px;align-items:center}.busuanzi-footer .separator{margin:0 5px;color:#999}.footer-beian{font-size:12px;color:#999;margin-top:5px;text-align:center}.footer-beian a{color:#0073e6;text-decoration:none}.footer-beian a:hover{text-decoration:underline}body{font-family:lxgw wenkai screen r,bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:40%;min-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none;word-break:break-all}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body blockquote{margin:0;padding:0 1em;color:#57606a;border-left:.25em solid #d0d7de}.markdown-body pre{padding:1px;font-size:16px;font-weight:550;font-family:Consolas,Monaco,Menlo,Consolas,monospace;word-break:break-all;word-wrap:break-word;overflow-y:auto;max-height:300px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px;text-size-adjust:100%;-ms-text-size-adjust:100%;-moz-text-size-adjust:100%;-webkit-text-size-adjust:100%}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:150%}.site-date-catalog{font-size:2rem}.header-title{font-size:1.5rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px;font-weight:700}.header-item a:hover{font-weight:700;color:#8a2be2}.header-item a:visited{font-weight:700}.header-item a:active{font-weight:700}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px;text-align:center}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){article{max-width:100%;min-width:300px}.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}table{width:100%;color:#333;border-width:1px;border-color:#666;border-collapse:collapse}table th{border-width:1px;padding:8px;border-style:solid;border-color:#666;background-color:#dedede}table td{border-width:1px;padding:8px;border-style:solid;border-color:#666;background-color:#fff}.post-content a{color:#0969da;box-shadow:none;text-decoration:none}a:hover{font-weight:400}.post-content a:hover{text-decoration:underline}.footnotes{> hr { display: none; }}.footnotes ol{line-height:1.4;margin-bottom:20px}.footnotes li{margin-bottom:5px}.footnotes ol li p{margin:0;padding:0;line-height:1.4}.donation{display:block;margin-left:auto;margin-right:auto}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+  
+    <style>.toc{background-color:#f5f5f5;margin:0 auto;width:90%;border-radius:8px;padding:20px;box-shadow:0 4px 6px rgba(0,0,0,.1)}.toc ul{padding-left:20px}.toc li{line-height:1.6;margin-bottom:0}.toc li a{color:#333}.toc li a:hover{color:#000}.toc details{cursor:pointer}.toc summary{font-weight:700}.toc .inner{margin:0 0 0 20px;padding:0 15px 15px 20px;padding-bottom:0;font-size:16px;max-height:83vh;overflow-y:auto}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="Snakinya-明烛天南">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+
+
+
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  
+  <div class="header-title">
+    <a href="/"
+      >Snakinya</a
+    >
+  </div>
+  <div class="header-subtitle" style="color:blueviolet;">苍山负雪，明烛天南</div>
+</header>
+
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="https://github.com/Snakinya" target="_self">Github</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/categories" target="_self">Categories</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/about/" target="_self">About</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/books/" target="_self">Books</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/friends/" target="_self">Friends</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/posts/" target="_self">Posts</a>
+  </div>
+  
+</div>
+
+<div class="header-line"></div>
+
+        </div>
+
+        <header class="post-header">
+          <h1 class="post-title">Paper | A Comprehensive Study of DNS-over-HTTPS Downgrade Attack</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2024-01-10 00:00:00 UTC">
+                10 Jan 2024
+              </time>
+              
+            </div>
+            
+            <div class="col-xs-6">
+
+              
+              <div class="post-author">
+              <span id="busuanzi_container_page_pv">@本文阅读量<span id="busuanzi_value_page_pv"></span>次</span>
+                
+            </div>
+          </div>
+          
+        </header>
+        
+
+        <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#00-%e6%91%98%e8%a6%81" aria-label="00 摘要">00 摘要</a></li>
+                <li>
+                    <a href="#01-%e8%83%8c%e6%99%af%e4%bb%8b%e7%bb%8d" aria-label="01 背景介绍">01 背景介绍</a><ul>
+                        <ul>
+                        
+                <li>
+                    <a href="#domain-name-system-dns" aria-label="Domain name system (DNS)">Domain name system (DNS)</a></li>
+                <li>
+                    <a href="#dns-over-https-doh" aria-label="DNS-over-HTTPS (DoH)">DNS-over-HTTPS (DoH)</a></li>
+                <li>
+                    <a href="#process-of-doh-communication" aria-label="Process of DoH Communication">Process of DoH Communication</a></li></ul>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#02-%e5%a8%81%e8%83%81%e6%a8%a1%e5%9e%8b" aria-label="02 威胁模型">02 威胁模型</a><ul>
+                        <ul>
+                        
+                <li>
+                    <a href="#in-path-attackers" aria-label="In-path Attackers">In-path Attackers</a></li>
+                <li>
+                    <a href="#on-path-attackers" aria-label="On-path Attackers">On-path Attackers</a></li></ul>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#03-%e6%94%bb%e5%87%bb%e6%96%b9%e5%bc%8f" aria-label="03 攻击方式">03 攻击方式</a><ul>
+                        <ul>
+                        
+                <li>
+                    <a href="#dns-traffic-interception" aria-label="DNS Traffic Interception">DNS Traffic Interception</a></li>
+                <li>
+                    <a href="#tcp-traffic-interception" aria-label="TCP Traffic Interception">TCP Traffic Interception</a></li>
+                <li>
+                    <a href="#dns-cache-poisoning" aria-label="DNS Cache Poisoning.">DNS Cache Poisoning.</a></li>
+                <li>
+                    <a href="#tcp-reset-injection" aria-label="TCP Reset Injection">TCP Reset Injection</a></li></ul>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#04-%e5%ae%9e%e9%aa%8c%e8%af%84%e4%bc%b0" aria-label="04 实验评估">04 实验评估</a><ul>
+                        <ul>
+                        
+                <li>
+                    <a href="#experiment-setup" aria-label="Experiment Setup">Experiment Setup</a></li>
+                <li>
+                    <a href="#browser-reaction-under-attack" aria-label="Browser Reaction under Attack">Browser Reaction under Attack</a></li>
+                <li>
+                    <a href="#continuous-request-period-crp" aria-label="Continuous Request Period (CRP)">Continuous Request Period (CRP)</a></li>
+                <li>
+                    <a href="#interval-growth-ig" aria-label="Interval Growth (IG)">Interval Growth (IG)</a></li>
+                <li>
+                    <a href="#max-interval-mi" aria-label="Max Interval (MI)">Max Interval (MI)</a></li>
+                <li>
+                    <a href="#analysis-of-browser-reactions" aria-label="Analysis of Browser Reactions">Analysis of Browser Reactions</a></li></ul>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#05-%e5%8f%8d%e9%a6%88" aria-label="05 反馈">05 反馈</a></li>
+                <li>
+                    <a href="#06-%e5%af%b9%e7%ad%96" aria-label="06 对策">06 对策</a></li>
+                <li>
+                    <a href="#07-%e6%80%bb%e7%bb%93%e4%b8%8e%e5%bb%ba%e8%ae%ae" aria-label="07 总结与建议">07 总结与建议</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+        
+
+
+
+        <div class="post-content markdown-body">
+          
+          <h1 id="00-摘要">00 摘要</h1>
+<p>DNS-over-HTTPS (DoH)是保护 DNS 机密性和完整性的主要措施之一，已被大多数流行的浏览器部署。然而，这种措施可能会受到降级攻击的影响，该攻击会将 DNS 通信的内容暴露给攻击者。具体来说，作者使用了4个与攻击模型相关的攻击向量来检测了6个浏览器，发现了所有能够导致成功攻击的组合。其根本原因是，所有浏览器默认启用Opportunistic Privacy profile，当DoH不可用时，允许DoH退回到 DNS 时，然而，当发生这种变化时，没有一个浏览器会通知用户，而一些浏览器需要很长时间才能恢复到 DoH。在本文的最后，作者提出了一些对策，并呼吁互联网社区进行讨论，重新审视有关 DoH 和使用配置文件的标准和实现。</p>
+<h1 id="01-背景介绍">01 背景介绍</h1>
+<h3 id="domain-name-system-dns">Domain name system (DNS)</h3>
+<p>DNS将域名转换为相应的IP地址。更具体地说，客户端软件存根解析器收集用户应用程序请求的域名。然后将DNS查询发送给递归解析器( RR )。RR在DNS解析中充当代理。如果查询域不在其缓存中，它将递归地向权威域服务器发送查询。RR收到响应后，会将响应发回客户端。到目前为止，大部分的DNS查询和响应都是以明文的形式进行传输的，这使得DNS容易被篡改。存根解析器和递归解析器之间的DNS数据包是攻击者的主要攻击目标，已有研究表明用户的DNS查询可以用来追踪或者审查。</p>
+<h3 id="dns-over-https-doh">DNS-over-HTTPS (DoH)</h3>
+<p>为了缓解DNS的隐私问题，DoH被提出来保护终端用户和递归解析器之间的连接。它使用HTTPS加密DNS查询。DoH与普通HTTPS一样，运行在TCP端口443上。DNS请求以URI模板(例如, <code>https://dns.google/dns-query {?dns}</code>是Google公共DNS)的格式发送。URI中的域名不仅用于查找DoH解析器(通过明文DNS解析)的IP地址，还用于验证其身份(通过SSL证书验证)。DoH常作为一个集成模块由浏览器提供。因此，DoH通信对操作系统是不透明的。</p>
+<h3 id="process-of-doh-communication">Process of DoH Communication</h3>
+<p>通常来讲，该过程分为两个阶段，第一阶段发生在DoH连接之前，浏览器向DNS服务器发送报文查询DoH服务器的ip，该过程与传统DNS解析相同，这意味着任何能够嗅探网络流量的攻击者都可以查看DNS数据包中的纯文本内容并对其进行篡改。</p>
+<p>第二阶段则是浏览器通过TLS协议与DoH服务器建立安全连接。之后通过该传输隧道传输DNS报文，能够破坏此阶段的攻击者可以强制浏览器回退到明文 DNS。</p>
+<p>此外，对于 Chrome 等浏览器，在 Phase 1 之前，使用映射表将操作系统中配置的 DNS 解析器转换为其等效的 DoH 解析器 URI，称之为 Phase 0。Phase 0 通常硬编码在浏览器软件中，因此作者不认为这个阶段会受到攻击。</p>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1685938990581-f07efd40-cb54-4ff2-852c-d21081b38d01.png"></p>
+<h1 id="02-威胁模型">02 威胁模型</h1>
+<p>攻击者的目标是强制加密的 DoH 退回到明文。在本文中，作者根据攻击者操纵网络数据包的能力假设了两种类型的威胁模型。</p>
+<h3 id="in-path-attackers">In-path Attackers</h3>
+<p>他们可以检查受害者的流量，并有能力修改来自和发往受害者的所有数据包。一个例子是网络网关，它通常由公司的网络管理员或公共 WiFi 的所有者控制。另一个例子是本地网络中的攻击者，他们可以执行 ARP 缓存中毒攻击 以将受害者流量重定向到攻击者的机器并充当恶意中间人。</p>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1685951026882-f0908ea8-0947-40a3-9505-90e906a05f26.png"></p>
+<h3 id="on-path-attackers">On-path Attackers</h3>
+<p>他们可以检查受害者的流量并注入新数据包。但与路径内攻击者不同的是，他们无法拦截或修改通过的数据包。</p>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1685952412368-1ee5455f-a066-4c70-a6ca-696e2cedc78d.png"></p>
+<p>综合两种威胁模型，都需要攻击者能够从客户端嗅探 DoH 流量。In-path attackers需要拦截受害者数据包的能力，而On-path attackers只需要注入新数据包的能力。</p>
+<h1 id="03-攻击方式">03 攻击方式</h1>
+<p>作者提出4中攻击方式，攻击者可以针对DoH解析的不同阶段进行利用。</p>
+<h3 id="dns-traffic-interception">DNS Traffic Interception</h3>
+<p><code>In-path attackers target Phase 1</code></p>
+<p>如果攻击者能够修改通过他自己设备的网络数据包，那么攻击者可以通过阻止受害者发送的特定 DNS 流量来获取 DoH 服务器的 IP 地址来攻击DoH的URI解析阶段。这些特定的流量可以通过DNS请求中的URI来进行过滤。下表是一些DoH服务器的域名：</p>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1685953303557-100bfd3e-28c3-428f-9ab8-b05b30400ea5.png"></p>
+<h3 id="tcp-traffic-interception">TCP Traffic Interception</h3>
+<p><code>In-path attacker targets Phase 2</code></p>
+<p>与DNS流量拦截相似，只是这种方法通过阻止第二阶段的TCP流量来强制DoH退回到明文DNS阶段。该方法只能被In-path attacker利用，因为其需要修改网络数据包。</p>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1685954037666-3b898bc2-4e0a-4b97-97ea-04e5e92f042b.png"></p>
+<h3 id="dns-cache-poisoning">DNS Cache Poisoning.</h3>
+<p><code>On-path attackers target Phase 1</code></p>
+<p>DNS 缓存中毒是指通过使用虚假或无法访问的 IP 地址向受害者发送响应 DNS 数据包来欺骗 DNS 缓存。这种情况下请求连接将会重定向到错误的IP地址。因此浏览器无法建立与DoH服务器的连接，理论上会回退到明文DNS传输。</p>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1685954662002-3662e80b-a935-4a59-a941-a64d2e1a52c6.png"></p>
+<h3 id="tcp-reset-injection">TCP Reset Injection</h3>
+<p><code>On-path attackers target Phase 1</code></p>
+<p>on-path attacker 能够在连接/通信阶段篡改TCP流量。攻击者嗅探受害者和 DoH 解析器之间交换的网络流量。之后攻击者获得TCP头的seq和ack，并向受害者和/或 DoH 解析器发送伪造的 TCP 重置数据包以诱使他们切断 TCP 连接。与DNS缓存中毒相似，这种攻击方式不需要拦截或者修改现有的数据包。</p>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1685955895993-842e2f72-b0f7-4ee4-9444-5d35d9efcb62.png"></p>
+<h1 id="04-实验评估">04 实验评估</h1>
+<h3 id="experiment-setup">Experiment Setup</h3>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1685957639178-9744a1b5-a4e2-41d7-9cd6-83bf76c8eb56.png"></p>
+<p><strong>Evaluation Settings</strong></p>
+<p>所有的评估任务关注浏览器在面对不同攻击方式时的反应。作者选取了下表所列的6款浏览器，都是比较流行并且支持DoH的。测试环境设置了3台机器(Windows 和 MAC笔记本作为受害者，一台Debian Linux作为攻击者)连接至无线路由器(AT&amp;T WiFi 网关)。攻击者使用Wireshark 3.0.3来窃听受害者流量，使用Scapy2.4.3来制作攻击数据包。对于in-path attack 场景，作者更改了路由器的防火墙策略来阻止与DoH相关的TCP/DNS流量包，或者通过 ARP 欺骗将用户的流量重定向到攻击者的机器并拦截受害者的数据包。我们让受害者先配置一个 DoH 服务器，然后访问几个随机网站。第 1 阶段（URI 解析）和第 2 阶段（DoH 连接和通信）都经过测试。虽然我们检查了表1中列出的不同 DoH 服务器，但我们发现攻击是否成功与这个因素无关。因此，我们将重点放在浏览器端进行剩余的评估。</p>
+<p><strong>Browser DoH Settings</strong>：表2列出了每个浏览器的DoH配置详情。Chrome、Firefox 和 Opera 允许用户在安全设置面板中指定 DoH 解析器的 URI，而所有其他的都执行阶段 0 来获取 URI。Chrome 默认使用操作系统中配置的 DNS provider，所有其他浏览器（Edge、Brave、Vivaldi）仅使用操作系统中配置的 DNS provider作为其 DoH provider。作者还发现浏览器对降级攻击的反应取决于默认或用户启用的使用配置文件。与 RFC 8310 中描述的 DoT 使用配置文件类似，有两个选项：严格隐私(Strict Privacy)配置文件和选择隐私(Opportunistic Privacy)配置文件。对于第一个选项，当无法建立DoH通信时，例如无法通过 DoH 连接解析器，将发生“硬故障”，客户端将不会将明文 DNS 视为备份计划。对于第二个选项，客户端将在 DoH 通信失败后尝试与 DNS 解析器建立连接并使用明文 DNS。显然，当启用 Opportunistic Privacy 配置文件时，降级攻击有可能成功。有趣的是，作者发现所有浏览器都默认启用后者。切换到严格模式是可行的，但并非在每个浏览器上都适用。</p>
+<h3 id="browser-reaction-under-attack">Browser Reaction under Attack</h3>
+<p>作者使用选择隐私(Opportunistic Privacy)配置评估了6种浏览器在面对四种不同攻击向量的反应。结果发现无论浏览器面对什么样的攻击向量，只要该攻击阻碍了 DoH 服务的网络流量，浏览器的响应行为将会遵循一种模式，该模式可以用三个属性描述：连续请求周期(CRP)、间隔增长(IG)和最大间隔(MI)。这三个属性反映了浏览器在受到攻击时如何重新连接到 DoH 服务器。</p>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1686021336667-9e6355da-d5b5-4b0e-b4e2-b906c8b69b2f.png"></p>
+<h3 id="continuous-request-period-crp">Continuous Request Period (CRP)</h3>
+<p>当浏览器发现连接失败时，它将在一段时间内不断尝试发送多个重连请求。作者把这个时期定义为 CRP。从攻击者的角度来看，在 CRP 期间，他们必须继续攻击 DoH 流量，以确保 DoH 可以成功地降级为明文 DNS。另一方面，CRP 的时间越长，DoH的服务就越难受到攻击。</p>
+<h3 id="interval-growth-ig">Interval Growth (IG)</h3>
+<p>在每两个连续的 CRP 之间，存在一段时间，在此期间浏览器不会发送任何与 DoH 相关的重新连接请求。知道确切的时间间隔后，攻击者可以暂停攻击并嗅探明文 DNS 数据包。同时通过阻止明文 DNS 解析 DoH 服务器域名，攻击者能够让用户始终使用明文 DNS。对于攻击者来说，间隔时间越长，攻击就越隐秘(需要发送的降级数据包越少)。作者还发现，有些浏览器使用常数间隔，但有些浏览器使用线性增长间隔。我们用 IG 来区分这两种情况。</p>
+<h3 id="max-interval-mi">Max Interval (MI)</h3>
+<p>当区间线性增加时，MI 是所有区间中的最大值。当区间一定时，MI 就是区间的值。</p>
+<h3 id="analysis-of-browser-reactions">Analysis of Browser Reactions</h3>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1686023476375-c5d42df7-75ec-42e6-afb7-3dff957f2098.png"></p>
+<p>通过测试，作者发现当 DoH 降级为明文 DNS 时，没有浏览器提示用户，并且在重试 DoH 时，访问网站的额外延迟并不明显。因此，用户很难发现这些攻击。同时在关于各种时间间隔上，利用测量结果，攻击者可以根据受害者的资源和受害者的环境，灵活地决定攻击 DoH 的频率、使用哪种攻击方法。</p>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1686023977163-02225022-b4f6-4a46-9e49-26a2314efa48.png"></p>
+<h1 id="05-反馈">05 反馈</h1>
+<p>作者向浏览器厂商报告了测试结果，但回复都认为没有必要进行修复。根据 Firefox 的回复，DoH 在降级攻击下易受攻击是 Opportunistic Privacy profile 的预期特征。 Firefox 认为该设置在大多数时候仍然可以保护用户免受被动攻击。 Chrome 声称该问题是当前 Chrome DoH 的“预期、设计和记录的行为”。</p>
+<p>虽然所有浏览器都遵循 RFC 8310，其中提到了攻击的可能性，但没有一个浏览器会采取措施来解决降级攻击。这可能是出于用户体验的考虑，但由于降级攻击门槛相对较低，作者还是呼吁互联网社区能够关注这件事情。</p>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1686024587493-7bbe6cf6-78b7-4494-bbf1-1b9ef1903fb8.png"></p>
+<h1 id="06-对策">06 对策</h1>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1686024844999-5d8dc0bb-8a64-46f2-a168-cfbec4908b29.png"></p>
+<h1 id="07-总结与建议">07 总结与建议</h1>
+<p>在本文中，作者通过对浏览器进行降级攻击的测试，发现了浏览器容易受到该类攻击的影响并且用户很难发现。虽然该问题并不是浏览器的明显问题，但鉴于浏览器遵循的RFC配置规定，作者希望厂商能够仔细评估使用配置文件的安全隐患。同时作者也提出了一些对策，例如保护DoH通信第一阶段。</p>
+<p>本文贡献如下：</p>
+<ul>
+<li>作者通过系统地枚举攻击面和检查攻击向量，对 DoH 降级攻击进行了首次研究。</li>
+<li>作者在真实的实验室环境中评估了这些攻击，发现降级攻击不仅可行，而且对所有浏览器都有效。还发现受到攻击的浏览器的反应令人堪忧。</li>
+<li>作者在实现和协议层面讨论可能的对策。</li>
+</ul>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+        
+        <div class="site-footer">
+  
+  
+
+  
+    <script src="/js/clipboard.js"></script>
+  
+
+  
+  
+
+    
+      
+      
+      <div class="site-footer">
+        <div class="busuanzi-footer">
+          <span id="busuanzi_container_site_pv">
+            本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+          </span>
+          <span class="separator">|</span> 
+          <span id="busuanzi_container_site_uv">
+            本站访客数 <span id="busuanzi_value_site_uv"></span> 人次
+          </span>
+        </div>
+        <p class="footer-beian"> 
+          <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">
+            蜀ICP备2021024344号-1
+          </a>
+        </p>
+      </div>
+
+      
+    </div>
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

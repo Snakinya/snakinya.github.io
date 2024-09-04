@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.134.0">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Snakinya" />
+  <meta property="og:url" content="https://www.snakin.top/posts/02-intermediate-representation/" />
+  <link rel="canonical" href="https://www.snakin.top/posts/02-intermediate-representation/" /><link rel="apple-touch-icon" href="https://www.snakin.top/favicon.ico" />
+  <link rel="icon" href="https://www.snakin.top/favicon.ico" />
+  <link rel="shortcut" href="https://www.snakin.top/favicon.ico" /><link rel="alternate" type="application/atom+xml" href="https://www.snakin.top/index.xml" title="Snakinya-明烛天南">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/www.snakin.top\/"
+      },
+      "articleSection" : "posts",
+      "name" : "南大软分笔记 ｜ 02 Intermediate Representation（IR）",
+      "headline" : "南大软分笔记 ｜ 02 Intermediate Representation（IR）",
+      "description" : "Intermediate Representation（IR） Compliers and static analyzers 编译过程:\nsource code ↓↓↓ scanner(lexical analysis 词法分析)---\u0026gt;regular expression ↓↓↓ ---\u0026gt;Tokens Parser(Syntax Analysis 语法分析)---\u0026gt;context-free grammar上下文不敏感语法 ↓↓↓ ---\u0026gt;AST 抽象语法树 Type Checker 类型检查(Semantic Analysis 语义分析)---\u0026gt;attribute grammar ↓↓↓ ---\u0026gt; Decorated AST Translator ↓↓↓ ---\u0026gt;IR ---\u0026gt;Static Analysis Code Generator ↓↓↓ machine code 编译器将源代码（Source code） 转换为机器代码（Machine Code）。其中的流程框架是：\n",
+      "inLanguage" : "en-US",
+      "author" : "Snakinya",
+      "creator" : "Snakinya",
+      "publisher": "Snakinya",
+      "accountablePerson" : "Snakinya",
+      "copyrightHolder" : "Snakinya",
+      "copyrightYear" : "2023",
+      "datePublished": "2023-02-23 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2023-02-23 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/www.snakin.top\/posts\/02-intermediate-representation\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>南大软分笔记 ｜ 02 Intermediate Representation（IR）</title>
+  <meta property="og:title" content="南大软分笔记 ｜ 02 Intermediate Representation（IR）" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="Intermediate Representation（IR） Compliers and static analyzers 编译过程:
+source code ↓↓↓ scanner(lexical analysis 词法分析)---&gt;regular expression ↓↓↓ ---&gt;Tokens Parser(Syntax Analysis 语法分析)---&gt;context-free grammar上下文不敏感语法 ↓↓↓ ---&gt;AST 抽象语法树 Type Checker 类型检查(Semantic Analysis 语义分析)---&gt;attribute grammar ↓↓↓ ---&gt; Decorated AST Translator ↓↓↓ ---&gt;IR ---&gt;Static Analysis Code Generator ↓↓↓ machine code 编译器将源代码（Source code） 转换为机器代码（Machine Code）。其中的流程框架是：
+" />
+  <meta name="description" content="Intermediate Representation（IR） Compliers and static analyzers 编译过程:
+source code ↓↓↓ scanner(lexical analysis 词法分析)---&gt;regular expression ↓↓↓ ---&gt;Tokens Parser(Syntax Analysis 语法分析)---&gt;context-free grammar上下文不敏感语法 ↓↓↓ ---&gt;AST 抽象语法树 Type Checker 类型检查(Semantic Analysis 语义分析)---&gt;attribute grammar ↓↓↓ ---&gt; Decorated AST Translator ↓↓↓ ---&gt;IR ---&gt;Static Analysis Code Generator ↓↓↓ machine code 编译器将源代码（Source code） 转换为机器代码（Machine Code）。其中的流程框架是：
+" />
+  <meta property="og:locale" content="cn" /><meta property="og:image" content="https://www.snakin.top/favicon.ico" />
+  
+
+  
+    <style>.highlight{position:relative}.clipboard-button{color:var(--white);background-color:rgba(255,255,255,.786);border:none;border-radius:6px;padding:3px 5px 2px;font-size:1rem;position:absolute;z-index:1;right:0;top:0;margin:10px;transition:.1s;opacity:.5}.clipboard-button>svg{fill:var(--white)}.clipboard-button:hover,.clipboard-button:focus,pre:active~.clipboard-button,pre:focus~.clipboard-button,div.highlight:active>.clipboard-button,div.highlight:focus>.clipboard-button{cursor:pointer;opacity:1}</style>
+  
+  
+    <style>@import "https://cdnjs.cloudflare.com/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/lxgwwenkaiscreenr.css";.busuanzi-footer{font-size:14px;color:#666;display:inline-block;gap:10px;align-items:center}.busuanzi-footer .separator{margin:0 5px;color:#999}.footer-beian{font-size:12px;color:#999;margin-top:5px;text-align:center}.footer-beian a{color:#0073e6;text-decoration:none}.footer-beian a:hover{text-decoration:underline}body{font-family:lxgw wenkai screen r,bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:40%;min-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none;word-break:break-all}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body blockquote{margin:0;padding:0 1em;color:#57606a;border-left:.25em solid #d0d7de}.markdown-body pre{padding:1px;font-size:16px;font-weight:550;font-family:Consolas,Monaco,Menlo,Consolas,monospace;word-break:break-all;word-wrap:break-word;overflow-y:auto;max-height:300px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px;text-size-adjust:100%;-ms-text-size-adjust:100%;-moz-text-size-adjust:100%;-webkit-text-size-adjust:100%}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:150%}.site-date-catalog{font-size:2rem}.header-title{font-size:1.5rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px;font-weight:700}.header-item a:hover{font-weight:700;color:#8a2be2}.header-item a:visited{font-weight:700}.header-item a:active{font-weight:700}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px;text-align:center}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){article{max-width:100%;min-width:300px}.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}table{width:100%;color:#333;border-width:1px;border-color:#666;border-collapse:collapse}table th{border-width:1px;padding:8px;border-style:solid;border-color:#666;background-color:#dedede}table td{border-width:1px;padding:8px;border-style:solid;border-color:#666;background-color:#fff}.post-content a{color:#0969da;box-shadow:none;text-decoration:none}a:hover{font-weight:400}.post-content a:hover{text-decoration:underline}.footnotes{> hr { display: none; }}.footnotes ol{line-height:1.4;margin-bottom:20px}.footnotes li{margin-bottom:5px}.footnotes ol li p{margin:0;padding:0;line-height:1.4}.donation{display:block;margin-left:auto;margin-right:auto}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+  
+    <style>.toc{background-color:#f5f5f5;margin:0 auto;width:90%;border-radius:8px;padding:20px;box-shadow:0 4px 6px rgba(0,0,0,.1)}.toc ul{padding-left:20px}.toc li{line-height:1.6;margin-bottom:0}.toc li a{color:#333}.toc li a:hover{color:#000}.toc details{cursor:pointer}.toc summary{font-weight:700}.toc .inner{margin:0 0 0 20px;padding:0 15px 15px 20px;padding-bottom:0;font-size:16px;max-height:83vh;overflow-y:auto}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="Snakinya-明烛天南">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+
+
+
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  
+  <div class="header-title">
+    <a href="/"
+      >Snakinya</a
+    >
+  </div>
+  <div class="header-subtitle" style="color:blueviolet;">苍山负雪，明烛天南</div>
+</header>
+
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="https://github.com/Snakinya" target="_self">Github</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/categories" target="_self">Categories</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/about/" target="_self">About</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/books/" target="_self">Books</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/friends/" target="_self">Friends</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/posts/" target="_self">Posts</a>
+  </div>
+  
+</div>
+
+<div class="header-line"></div>
+
+        </div>
+
+        <header class="post-header">
+          <h1 class="post-title">南大软分笔记 ｜ 02 Intermediate Representation（IR）</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2023-02-23 00:00:00 UTC">
+                23 Feb 2023
+              </time>
+              
+            </div>
+            
+            <div class="col-xs-6">
+
+              
+              <div class="post-author">
+              <span id="busuanzi_container_page_pv">@本文阅读量<span id="busuanzi_value_page_pv"></span>次</span>
+                
+            </div>
+          </div>
+          
+        </header>
+        
+
+        <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#intermediate-representationir" aria-label="Intermediate Representation（IR）">Intermediate Representation（IR）</a><ul>
+                        
+                <li>
+                    <a href="#compliers-and-static-analyzers" aria-label="Compliers and static analyzers">Compliers and static analyzers</a></li>
+                <li>
+                    <a href="#ast-vs-ir" aria-label="AST vs. IR">AST vs. IR</a></li>
+                <li>
+                    <a href="#irthree-address-code3ac" aria-label="IR：Three-Address Code(3AC)">IR：Three-Address Code(3AC)</a><ul>
+                        
+                <li>
+                    <a href="#three-address-code3ac" aria-label="Three-Address Code(3AC)">Three-Address Code(3AC)</a></li>
+                <li>
+                    <a href="#why-called-3-address" aria-label="why called 3-address">why called 3-address</a></li>
+                <li>
+                    <a href="#some-common-3ac-forms" aria-label="Some common 3AC forms">Some common 3AC forms</a></li></ul>
+                </li>
+                <li>
+                    <a href="#3ac-in-real-static-analyzerssoot" aria-label="3AC in real static analyzers:Soot">3AC in real static analyzers:Soot</a><ul>
+                        
+                <li>
+                    <a href="#soot" aria-label="Soot">Soot</a></li>
+                <li>
+                    <a href="#examples" aria-label="examples">examples</a></li></ul>
+                </li>
+                <li>
+                    <a href="#static-single-assignmentssa---optional" aria-label="Static single assignment(SSA) &ndash;optional">Static single assignment(SSA) &ndash;optional</a></li>
+                <li>
+                    <a href="#basic-blocks-bb" aria-label="Basic Blocks (BB)">Basic Blocks (BB)</a><ul>
+                        
+                <li>
+                    <a href="#control-flow-analysis" aria-label="Control flow analysis">Control flow analysis</a></li>
+                <li>
+                    <a href="#basic-blocks-bb-1" aria-label="Basic Blocks (BB)">Basic Blocks (BB)</a></li>
+                <li>
+                    <a href="#build-bbs" aria-label="Build BBs">Build BBs</a></li></ul>
+                </li>
+                <li>
+                    <a href="#control-flow-graphs-cfg" aria-label="Control Flow Graphs (CFG)">Control Flow Graphs (CFG)</a></li>
+                <li>
+                    <a href="#self-test" aria-label="Self test">Self test</a></li>
+                <li>
+                    <a href="#conclusion" aria-label="Conclusion">Conclusion</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+        
+
+
+
+        <div class="post-content markdown-body">
+          
+          <h2 id="intermediate-representationir">Intermediate Representation（IR）</h2>
+<h3 id="compliers-and-static-analyzers">Compliers and static analyzers</h3>
+<p>编译过程:</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>source code
+</span></span><span style="display:flex;"><span>↓↓↓
+</span></span><span style="display:flex;"><span>scanner(lexical analysis 词法分析)---&gt;regular expression
+</span></span><span style="display:flex;"><span>↓↓↓ ---&gt;Tokens
+</span></span><span style="display:flex;"><span>Parser(Syntax Analysis 语法分析)---&gt;context-free grammar上下文不敏感语法
+</span></span><span style="display:flex;"><span>↓↓↓ ---&gt;AST 抽象语法树
+</span></span><span style="display:flex;"><span>Type Checker 类型检查(Semantic Analysis 语义分析)---&gt;attribute grammar 
+</span></span><span style="display:flex;"><span>↓↓↓ ---&gt; Decorated AST
+</span></span><span style="display:flex;"><span>Translator
+</span></span><span style="display:flex;"><span>↓↓↓ ---&gt;IR ---&gt;Static Analysis
+</span></span><span style="display:flex;"><span>Code Generator
+</span></span><span style="display:flex;"><span>↓↓↓
+</span></span><span style="display:flex;"><span>machine code
+</span></span></code></pre></div><p><img alt="image-20230221125911472" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20230221125911472.png"></p>
+<p>编译器将源代码（Source code） 转换为机器代码（Machine Code）。其中的流程框架是：</p>
+<ul>
+<li>词法分析器（Scanner），结合正则表达式，通过词法分析（Lexical Analysis）将 source code 翻译为 token。</li>
+<li>语法分析器（Parser），结合上下文无关文法（Context-Free Grammar），通过语法分析（Syntax Analysis），将 token 解析为抽象语法树（Abstract Syntax Tree, AST）</li>
+<li>语义分析器（Type Checker），结合属性文法（Attribute Grammar），通过语义分析（Semantic Analysis），将 AST 解析为 decorated AST</li>
+<li>Translator，将 decorated AST 翻译为生成三地址码这样的中间表示形式（Intermediate Representation, IR），并<strong>基于 IR 做静态分析</strong>（例如代码优化这样的工作）。</li>
+<li>Code Generator，将 IR 转换为机器代码。</li>
+</ul>
+<h3 id="ast-vs-ir">AST vs. IR</h3>
+<p>AST</p>
+<ul>
+<li>high-level and closed to grammar structure</li>
+<li>usually language dependent （取决于不同语言）</li>
+<li>suitable for fast type checking</li>
+<li>lack of contorl flow information</li>
+</ul>
+<p>IR</p>
+<ul>
+<li>low-level and closed to machine code</li>
+<li>usually language independent</li>
+<li>compact and uniform</li>
+<li>contains control flow information</li>
+<li><strong>usually considerd as the basis for static analysis</strong></li>
+</ul>
+<p>对比：</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">AST</th>
+          <th style="text-align: left">IR</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">层次更高，和语法结构更接近</td>
+          <td style="text-align: left">低层次，和机器代码相接近</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">通常是依赖于具体的语言类的</td>
+          <td style="text-align: left">通常和具体的语言无关，主要和运行语言的机器（物理机或虚拟机）有关</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">适合快速的类型检查</td>
+          <td style="text-align: left">简单通用</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">缺少和程序控制流相关的信息</td>
+          <td style="text-align: left">包含程序的控制流信息</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"></td>
+          <td style="text-align: left">通常作为静态分析的基础</td>
+      </tr>
+  </tbody>
+</table>
+<p>IR冗余信息更少，包含控制流的表达，更利于静态分析</p>
+<p><img alt="image-20230221125946307" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20230221125946307.png"></p>
+<h3 id="irthree-address-code3ac">IR：Three-Address Code(3AC)</h3>
+<h4 id="three-address-code3ac">Three-Address Code(3AC)</h4>
+<ul>
+<li>
+<p>There is at most one operator on the right side of an instruction</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>a+b+3 --&gt; t1 = a+b
+</span></span><span style="display:flex;"><span>		  t2 = t1+3
+</span></span></code></pre></div></li>
+</ul>
+<h4 id="why-called-3-address">why called 3-address</h4>
+<ul>
+<li>
+<p>adress can be one of the following:</p>
+<ul>
+<li>Name: a,b</li>
+<li>Constant: 3</li>
+<li>Compiler-generated temporary(编译器生成的临时量): t1,t2</li>
+</ul>
+<p>each type of instructions has its own 3AC form</p>
+</li>
+</ul>
+<h4 id="some-common-3ac-forms">Some common 3AC forms</h4>
+<p><img alt="image-20230221130038227" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20230221130038227.png"></p>
+<h3 id="3ac-in-real-static-analyzerssoot">3AC in real static analyzers:Soot</h3>
+<h4 id="soot">Soot</h4>
+<ul>
+<li>Most popular static analysis framework for Java</li>
+<li>Soot&rsquo;s IR is Jimple: typed(类型的) 3-address code</li>
+</ul>
+<h4 id="examples">examples</h4>
+<p>For loop:</p>
+<p><code>ForLoop3AC.class</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff6ac1">package</span> sa.examples;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">class</span> <span style="color:#f3f99d">ForLoop3AC</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">main</span>(String<span style="color:#ff6ac1">[]</span> args) {
+</span></span><span style="display:flex;"><span>        <span style="color:#9aedfe">int</span> x <span style="color:#ff6ac1">=</span> 0;
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">for</span>(<span style="color:#9aedfe">int</span> i <span style="color:#ff6ac1">=</span> 0; i<span style="color:#ff6ac1">&lt;</span>10; i<span style="color:#ff6ac1">++</span>){
+</span></span><span style="display:flex;"><span>            x <span style="color:#ff6ac1">=</span> x <span style="color:#ff6ac1">+</span> 1;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>生成<code>ForLoop3AC.jimple</code>：</p>
+<p><img alt="image-20230221135201643" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20230221135201643.png"></p>
+<p>(x在之前步骤被优化掉，属于不合理优化，需要查看soot的实现)</p>
+<p>Do-while loop:</p>
+<p><code>DoWhileLoop3AC.class</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff6ac1">package</span> sa.examples;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">class</span> <span style="color:#f3f99d">DoWhileLoop3AC</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">main</span>(String<span style="color:#ff6ac1">[]</span> args){
+</span></span><span style="display:flex;"><span>        <span style="color:#9aedfe">int</span><span style="color:#ff6ac1">[]</span> arr <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> <span style="color:#9aedfe">int</span><span style="color:#ff6ac1">[</span>10<span style="color:#ff6ac1">]</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#9aedfe">int</span> i <span style="color:#ff6ac1">=</span> 0;
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">do</span> {
+</span></span><span style="display:flex;"><span>            i <span style="color:#ff6ac1">=</span> i <span style="color:#ff6ac1">+</span> 1;
+</span></span><span style="display:flex;"><span>        } <span style="color:#ff6ac1">while</span>(arr<span style="color:#ff6ac1">[</span>i<span style="color:#ff6ac1">]</span> <span style="color:#ff6ac1">==</span> 10);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>生成jimple：</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">main</span>(java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">String</span><span style="color:#ff6ac1">[]</span>)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#9aedfe">int</span><span style="color:#ff6ac1">[]</span> r0;
+</span></span><span style="display:flex;"><span>        <span style="color:#9aedfe">int</span> $i0, i1;
+</span></span><span style="display:flex;"><span>        java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">String</span><span style="color:#ff6ac1">[]</span> r1;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        r1 :<span style="color:#ff6ac1">=</span> <span style="color:#ff9f43">@parameter0</span>: java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">String</span><span style="color:#ff6ac1">[]</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        r0 <span style="color:#ff6ac1">=</span> newarray (<span style="color:#9aedfe">int</span>)<span style="color:#ff6ac1">[</span>10<span style="color:#ff6ac1">]</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        i1 <span style="color:#ff6ac1">=</span> 0;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>     <span style="color:#ff5c57">label1</span>:
+</span></span><span style="display:flex;"><span>        i1 <span style="color:#ff6ac1">=</span> i1 <span style="color:#ff6ac1">+</span> 1;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        $i0 <span style="color:#ff6ac1">=</span> r0<span style="color:#ff6ac1">[</span>i1<span style="color:#ff6ac1">]</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">if</span> $i0 <span style="color:#ff6ac1">==</span> 10 <span style="color:#ff6ac1">goto</span> label1;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>Method call:</p>
+<p><code>MethodCall.class</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">class</span> <span style="color:#f3f99d">MethodCall</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    String <span style="color:#57c7ff">foo</span>(String para1, String para2) {
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span>  para1 <span style="color:#ff6ac1">+</span> <span style="color:#5af78e">&#34; &#34;</span> <span style="color:#ff6ac1">+</span> para2;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">main</span>(String<span style="color:#ff6ac1">[]</span> args) {
+</span></span><span style="display:flex;"><span>        MethodCall mc <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> MethodCall();
+</span></span><span style="display:flex;"><span>        String result <span style="color:#ff6ac1">=</span> mc.<span style="color:#57c7ff">foo</span>(<span style="color:#5af78e">&#34;hello&#34;</span>, <span style="color:#5af78e">&#34;world&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>生成：</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">String</span> <span style="color:#57c7ff">foo</span>(java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">String</span>, java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">String</span>)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">StringBuilder</span> $r0, $r2, $r3, $r5;
+</span></span><span style="display:flex;"><span>        java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">String</span> r1, r4, $r6;
+</span></span><span style="display:flex;"><span>        MethodCall r7;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        r7 :<span style="color:#ff6ac1">=</span> <span style="color:#ff9f43">@this</span>: MethodCall;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        r1 :<span style="color:#ff6ac1">=</span> <span style="color:#ff9f43">@parameter0</span>: java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">String</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        r4 :<span style="color:#ff6ac1">=</span> <span style="color:#ff9f43">@parameter1</span>: java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">String</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        $r0 <span style="color:#ff6ac1">=</span> <span style="color:#ff6ac1">new</span> java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">StringBuilder</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        specialinvoke $r0.<span style="color:#ff6ac1">&lt;</span>java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">StringBuilder</span>: <span style="color:#9aedfe">void</span> <span style="color:#ff6ac1">&lt;</span>init<span style="color:#ff6ac1">&gt;</span>()<span style="color:#ff6ac1">&gt;</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        $r2 <span style="color:#ff6ac1">=</span> virtualinvoke $r0.<span style="color:#ff6ac1">&lt;</span>java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">StringBuilder</span>: java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">StringBuilder</span> <span style="color:#57c7ff">append</span>(java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">String</span>)<span style="color:#ff6ac1">&gt;</span>(r1);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        $r3 <span style="color:#ff6ac1">=</span> virtualinvoke $r2.<span style="color:#ff6ac1">&lt;</span>java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">StringBuilder</span>: java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">StringBuilder</span> <span style="color:#57c7ff">append</span>(java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">String</span>)<span style="color:#ff6ac1">&gt;</span>(<span style="color:#5af78e">&#34; &#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        $r5 <span style="color:#ff6ac1">=</span> virtualinvoke $r3.<span style="color:#ff6ac1">&lt;</span>java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">StringBuilder</span>: java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">StringBuilder</span> <span style="color:#57c7ff">append</span>(java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">String</span>)<span style="color:#ff6ac1">&gt;</span>(r4);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        $r6 <span style="color:#ff6ac1">=</span> virtualinvoke $r5.<span style="color:#ff6ac1">&lt;</span>java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">StringBuilder</span>: java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">String</span> <span style="color:#57c7ff">toString</span>()<span style="color:#ff6ac1">&gt;</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span> $r6;
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p><img alt="image-20230221150256655" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20230221150256655.png"></p>
+<p>补充：</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>invokespecial<span style="color:#ff5c57">：</span>call constructor, call superclass methods, call <span style="color:#ff5c57">private</span> methods
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">invokevirtual</span>: instance methods <span style="color:#57c7ff">call</span> (virtual dispatch)
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">invokeinterface</span>: cannot optimization, checking <span style="color:#ff5c57">interface</span> <span style="color:#f3f99d">implementation</span>
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">invokestation</span>:call <span style="color:#ff5c57">static</span> methods
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Java 7: invokedynamic <span style="color:#ff6ac1">-&gt;</span> Java <span style="color:#ff5c57">static</span> typing, dynamic language runs on JVM
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>尖括号中的内容<span style="color:#ff5c57">：</span>
+</span></span><span style="display:flex;"><span>method signature: <span style="color:#ff5c57">class</span> <span style="color:#f3f99d">name</span>, <span style="color:#ff6ac1">return</span> type, method <span style="color:#57c7ff">name</span>(parameter1 type, parameter2 type)
+</span></span></code></pre></div><p>class:</p>
+<p><code>Class3AC.class</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff6ac1">package</span> sa.examples;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">class</span> <span style="color:#f3f99d">Class3AC</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#ff5c57">final</span> <span style="color:#9aedfe">double</span> pi <span style="color:#ff6ac1">=</span> 3.<span style="color:#57c7ff">14</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">main</span>(String<span style="color:#ff6ac1">[]</span> args) {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>生成：</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#ff5c57">public</span> <span style="color:#ff5c57">class</span> <span style="color:#f3f99d">Class3AC</span> <span style="color:#ff5c57">extends</span> java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">Object</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#ff5c57">final</span> <span style="color:#9aedfe">double</span> pi;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#9aedfe">void</span> <span style="color:#ff6ac1">&lt;</span>init<span style="color:#ff6ac1">&gt;</span>()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        Class3AC r0;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        r0 :<span style="color:#ff6ac1">=</span> <span style="color:#ff9f43">@this</span>: Class3AC;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        specialinvoke r0.<span style="color:#ff6ac1">&lt;</span>java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">Object</span>: <span style="color:#9aedfe">void</span> <span style="color:#ff6ac1">&lt;</span>init<span style="color:#ff6ac1">&gt;</span>()<span style="color:#ff6ac1">&gt;</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">void</span> <span style="color:#57c7ff">main</span>(java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">String</span><span style="color:#ff6ac1">[]</span>)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">String</span><span style="color:#ff6ac1">[]</span> r0;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        r0 :<span style="color:#ff6ac1">=</span> <span style="color:#ff9f43">@parameter0</span>: java.<span style="color:#57c7ff">lang</span>.<span style="color:#57c7ff">String</span><span style="color:#ff6ac1">[]</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">public</span> <span style="color:#ff5c57">static</span> <span style="color:#9aedfe">void</span> <span style="color:#ff6ac1">&lt;</span>clinit<span style="color:#ff6ac1">&gt;</span>()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">&lt;</span>Class3AC: <span style="color:#9aedfe">double</span> pi<span style="color:#ff6ac1">&gt;</span> <span style="color:#ff6ac1">=</span> 3.<span style="color:#57c7ff">14</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff6ac1">return</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>clinit：class类构造器对静态变量，静态代码块进行初始化，在jvm进行类<strong>加载—–验证—-解析—–初始化</strong>，中的初始化阶段jvm会调用clinit方法</p>
+<h3 id="static-single-assignmentssa---optional">Static single assignment(SSA) &ndash;optional</h3>
+<p>每次对变量x赋值都重新使用一个新的变量xi，并在后续使用中选择最新的变量</p>
+<p><img alt="image-20230221151302139" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20230221151302139.png"></p>
+<p>但是这样一来，肯定会因为不同控制流汇入到一个块，导致多个变量备选的问题：</p>
+<p><img alt="image-20230221151404893" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20230221151404893.png"></p>
+<p>why SSA?</p>
+<ul>
+<li>
+<p>Flow information is indirectly incorporated into the unique variable names 控制流信息间接地集成到了独特变量名中</p>
+<blockquote>
+<p>May help deliver some simpler analyses, e.g., flow-insensitive analysis gains partial precision of flow-sensitive analysis via SSA</p>
+</blockquote>
+</li>
+<li>
+<p>Define-and-Use pairs are explicit 定义与使用是显式的</p>
+<blockquote>
+<p>Enable more effective data facts storage and propagation in some on-demand tasks
+Some optimization tasks perform better on SSA (e.g.,conditional constant propagation, global value numbering)</p>
+</blockquote>
+</li>
+</ul>
+<p>Why not SSA?</p>
+<ul>
+<li>SSA may introduce too many variables and phi-functions</li>
+<li>May introduce inefficiency problem when translating to machine code (due to copy operations)</li>
+</ul>
+<h3 id="basic-blocks-bb">Basic Blocks (BB)</h3>
+<h4 id="control-flow-analysis">Control flow analysis</h4>
+<p>控制流分析（Control Flow Analysis）通常指的是构建控制流图（Control Flow Graph, CFG），并以 CFG 作为基础结构进行静态分析的过程。</p>
+<ul>
+<li>usually refer to building Control Flow Graphs (CFG)</li>
+<li>CFG serves as the basic structure for static analysis</li>
+<li>The node in CFG can be an individual 3-address instruction,or (usually) a Basic Block(BB)</li>
+</ul>
+<p><img alt="cfg-demo.png" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/cfg-demo.2a9e5799.png"></p>
+<h4 id="basic-blocks-bb-1">Basic Blocks (BB)</h4>
+<ul>
+<li>Basic blocks(BB) are maximal sequences of consecutive three-address instructions with the properties that
+<ul>
+<li>It can be entered only at the beginning,i.e.,the first instruction in the block</li>
+<li>It can be exited only at the end,i.e.,the last instruction in the block</li>
+</ul>
+</li>
+</ul>
+<p><img alt="image-20230221153808366" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20230221153808366.png"></p>
+<blockquote>
+<p>所谓基本块，就是满足以下性质的连续 3AC：</p>
+<ul>
+<li>只能从块的第一条指令进入。</li>
+<li>只能从块的最后一条指令离开。</li>
+</ul>
+</blockquote>
+<h4 id="build-bbs">Build BBs</h4>
+<ul>
+<li>
+<p>input: a sequence of three-address instructions of P</p>
+</li>
+<li>
+<p>output: a list of basic blocks of P</p>
+</li>
+<li>
+<p>method:</p>
+<ul>
+<li>
+<p>determine the leaders in P</p>
+<ul>
+<li>the first instruction in P is a leader</li>
+<li>any target instruction of a conditional or unconditional jump is a leader</li>
+<li>any instruction that immediately follows a conditional or unconditional jump is a leader</li>
+</ul>
+</li>
+<li>
+<p>build BBs for P</p>
+<ul>
+<li>a BB consists of a leader and all its subsequent instructions until the next leader</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img alt="image-20230221155057980" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20230221155057980.png"></p>
+<h3 id="control-flow-graphs-cfg">Control Flow Graphs (CFG)</h3>
+<ul>
+<li>
+<p>The nodes of CFG are basic blocks</p>
+</li>
+<li>
+<p>There is an edge from block A to block B and only if</p>
+<ul>
+<li>There is a conditional or unconditional jump from the end of A to the beginning of B</li>
+<li>B immediately follows A in the original order of instructions and A does not in an unconditional jump</li>
+</ul>
+</li>
+<li>
+<p>It is normal to replace the jumps to instruction labels by jumps to basic blocks</p>
+</li>
+</ul>
+<p><img alt="image-20230221190318246" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20230221190318246.png"></p>
+<p>example:</p>
+<p><img alt="image-20230221191603579" src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/image-20230221191603579.png"></p>
+<ul>
+<li>若 A -&gt; B，则我们说 A 是 B 的前驱（predecessor），B 是 A 的后继（successor）</li>
+<li>除了构建好的基本块，我们还会额外添加两个结点，「入口（Entry）」和「出口（Exit）」
+<ul>
+<li>这两个结点不对应任何 IR</li>
+<li>入口有一条边指向 IR 中的第一条指令</li>
+<li>如果一个基本块的最后一条指令会让程序离开这段 IR，那么这个基本块就会有一条边指向出口。</li>
+</ul>
+</li>
+</ul>
+<h3 id="self-test">Self test</h3>
+<ul>
+<li>
+<p>The relation between compilers and static analyzers</p>
+<p>静态分析器基于编译器处理好的IR进行分析</p>
+</li>
+<li>
+<p>Understand 3AC and its common forms</p>
+<p>三地址码，在每个指令的右边至多有一个操作符。</p>
+<p>常见形式：</p>
+<ul>
+<li>x = y bop z：双目运算并赋值，bop = binary operator</li>
+<li>x = uop z：单目运算并赋值，uop = unary operator</li>
+<li>x = y：直接赋值</li>
+<li>goto L：无条件跳转，L = label</li>
+<li>if x goto L：条件跳转</li>
+<li>if x rop y goto L：包含了关系运算的条件跳转，rop = relational operator</li>
+</ul>
+</li>
+<li>
+<p>How to build basic blocks on top of IR</p>
+<ul>
+<li>输入：程序 P 的一系列 3AC</li>
+<li>输出：程序 P 的基本块</li>
+<li>方法
+<ol>
+<li>决定 P 的 leaders
+<ul>
+<li>P 的第一条指令就是一个 leader</li>
+<li>跳转的目标指令是一个 leader</li>
+<li>跳转指令的后一条指令，也是一个 leader</li>
+</ul>
+</li>
+<li>构建 P 的基本块
+<ul>
+<li>一个基本块就是一个 leader 及其后续直到下一个 leader 前的所有指令。</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+</li>
+<li>
+<p>How to construct control flow graphs on top of BBs?</p>
+<ul>
+<li>
+<p>加边，块 A 和块 B 之间有一条边，当且仅当：</p>
+<ul>
+<li>A 的末尾有一条指向了 B 开头的跳转指令。</li>
+<li>A 的末尾紧接着 B 的开头，且 A 的末尾不是一条无条件跳转指令。</li>
+</ul>
+</li>
+<li>
+<p>添加入口和出口</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="conclusion">Conclusion</h3>
+<p>本节课学习了IR的定义以及CFG的构建，即</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>AST--&gt;IR(3AC)--&gt;BBs--&gt;CFG
+</span></span></code></pre></div><p>之后我们基于CFG进行进一步的静态分析</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+        
+        <div class="site-footer">
+  
+  
+
+  
+    <script src="/js/clipboard.js"></script>
+  
+
+  
+  
+
+    
+      
+      
+      <div class="site-footer">
+        <div class="busuanzi-footer">
+          <span id="busuanzi_container_site_pv">
+            本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+          </span>
+          <span class="separator">|</span> 
+          <span id="busuanzi_container_site_uv">
+            本站访客数 <span id="busuanzi_value_site_uv"></span> 人次
+          </span>
+        </div>
+        <p class="footer-beian"> 
+          <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">
+            蜀ICP备2021024344号-1
+          </a>
+        </p>
+      </div>
+
+      
+    </div>
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.134.0">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Snakinya" />
+  <meta property="og:url" content="https://www.snakin.top/posts/03-data-flow-analysis-i/" />
+  <link rel="canonical" href="https://www.snakin.top/posts/03-data-flow-analysis-i/" /><link rel="apple-touch-icon" href="https://www.snakin.top/favicon.ico" />
+  <link rel="icon" href="https://www.snakin.top/favicon.ico" />
+  <link rel="shortcut" href="https://www.snakin.top/favicon.ico" /><link rel="alternate" type="application/atom+xml" href="https://www.snakin.top/index.xml" title="Snakinya-明烛天南">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/www.snakin.top\/"
+      },
+      "articleSection" : "posts",
+      "name" : "南大软分笔记 ｜ 03 Data Flow Analysis I",
+      "headline" : "南大软分笔记 ｜ 03 Data Flow Analysis I",
+      "description" : "Data Flow Analysis I Overview of Data Flow Analysis 核心：how data flows on CFG? 展开： how application-specific data \u0026ndash;\u0026gt; abstraction flows through the \u0026ndash;\u0026gt;safe approximation nodes(BBs\/statements) and \u0026ndash;\u0026gt;transfer function edges(control flows) of \u0026ndash;\u0026gt;control-flow handling CFG(a program)? 对于大多数静态分析来讲都是may analysis： may analysis:\noutputs information that may be true(over-approximation) must analysis:\noutputs information that must be true(under-approximation) Over-and under-approximations are both for safety of analysis about safe approximation ： may analysis：safe = over must analysis: safe = under 不同的数据流分析，有着不同的data abstraction, flow safe-approximation策略，transfer functions\u0026amp;control-flow handlings。\n",
+      "inLanguage" : "en-US",
+      "author" : "Snakinya",
+      "creator" : "Snakinya",
+      "publisher": "Snakinya",
+      "accountablePerson" : "Snakinya",
+      "copyrightHolder" : "Snakinya",
+      "copyrightYear" : "2023",
+      "datePublished": "2023-02-23 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2023-02-23 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/www.snakin.top\/posts\/03-data-flow-analysis-i\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>南大软分笔记 ｜ 03 Data Flow Analysis I</title>
+  <meta property="og:title" content="南大软分笔记 ｜ 03 Data Flow Analysis I" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="Data Flow Analysis I Overview of Data Flow Analysis 核心：how data flows on CFG? 展开： how application-specific data &ndash;&gt; abstraction flows through the &ndash;&gt;safe approximation nodes(BBs/statements) and &ndash;&gt;transfer function edges(control flows) of &ndash;&gt;control-flow handling CFG(a program)? 对于大多数静态分析来讲都是may analysis： may analysis:
+outputs information that may be true(over-approximation) must analysis:
+outputs information that must be true(under-approximation) Over-and under-approximations are both for safety of analysis about safe approximation ： may analysis：safe = over must analysis: safe = under 不同的数据流分析，有着不同的data abstraction, flow safe-approximation策略，transfer functions&amp;control-flow handlings。
+" />
+  <meta name="description" content="Data Flow Analysis I Overview of Data Flow Analysis 核心：how data flows on CFG? 展开： how application-specific data &ndash;&gt; abstraction flows through the &ndash;&gt;safe approximation nodes(BBs/statements) and &ndash;&gt;transfer function edges(control flows) of &ndash;&gt;control-flow handling CFG(a program)? 对于大多数静态分析来讲都是may analysis： may analysis:
+outputs information that may be true(over-approximation) must analysis:
+outputs information that must be true(under-approximation) Over-and under-approximations are both for safety of analysis about safe approximation ： may analysis：safe = over must analysis: safe = under 不同的数据流分析，有着不同的data abstraction, flow safe-approximation策略，transfer functions&amp;control-flow handlings。
+" />
+  <meta property="og:locale" content="cn" /><meta property="og:image" content="https://www.snakin.top/favicon.ico" />
+  
+
+  
+    <style>.highlight{position:relative}.clipboard-button{color:var(--white);background-color:rgba(255,255,255,.786);border:none;border-radius:6px;padding:3px 5px 2px;font-size:1rem;position:absolute;z-index:1;right:0;top:0;margin:10px;transition:.1s;opacity:.5}.clipboard-button>svg{fill:var(--white)}.clipboard-button:hover,.clipboard-button:focus,pre:active~.clipboard-button,pre:focus~.clipboard-button,div.highlight:active>.clipboard-button,div.highlight:focus>.clipboard-button{cursor:pointer;opacity:1}</style>
+  
+  
+    <style>@import "https://cdnjs.cloudflare.com/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/lxgwwenkaiscreenr.css";.busuanzi-footer{font-size:14px;color:#666;display:inline-block;gap:10px;align-items:center}.busuanzi-footer .separator{margin:0 5px;color:#999}.footer-beian{font-size:12px;color:#999;margin-top:5px;text-align:center}.footer-beian a{color:#0073e6;text-decoration:none}.footer-beian a:hover{text-decoration:underline}body{font-family:lxgw wenkai screen r,bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:40%;min-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none;word-break:break-all}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body blockquote{margin:0;padding:0 1em;color:#57606a;border-left:.25em solid #d0d7de}.markdown-body pre{padding:1px;font-size:16px;font-weight:550;font-family:Consolas,Monaco,Menlo,Consolas,monospace;word-break:break-all;word-wrap:break-word;overflow-y:auto;max-height:300px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px;text-size-adjust:100%;-ms-text-size-adjust:100%;-moz-text-size-adjust:100%;-webkit-text-size-adjust:100%}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:150%}.site-date-catalog{font-size:2rem}.header-title{font-size:1.5rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px;font-weight:700}.header-item a:hover{font-weight:700;color:#8a2be2}.header-item a:visited{font-weight:700}.header-item a:active{font-weight:700}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px;text-align:center}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){article{max-width:100%;min-width:300px}.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}table{width:100%;color:#333;border-width:1px;border-color:#666;border-collapse:collapse}table th{border-width:1px;padding:8px;border-style:solid;border-color:#666;background-color:#dedede}table td{border-width:1px;padding:8px;border-style:solid;border-color:#666;background-color:#fff}.post-content a{color:#0969da;box-shadow:none;text-decoration:none}a:hover{font-weight:400}.post-content a:hover{text-decoration:underline}.footnotes{> hr { display: none; }}.footnotes ol{line-height:1.4;margin-bottom:20px}.footnotes li{margin-bottom:5px}.footnotes ol li p{margin:0;padding:0;line-height:1.4}.donation{display:block;margin-left:auto;margin-right:auto}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+  
+    <style>.toc{background-color:#f5f5f5;margin:0 auto;width:90%;border-radius:8px;padding:20px;box-shadow:0 4px 6px rgba(0,0,0,.1)}.toc ul{padding-left:20px}.toc li{line-height:1.6;margin-bottom:0}.toc li a{color:#333}.toc li a:hover{color:#000}.toc details{cursor:pointer}.toc summary{font-weight:700}.toc .inner{margin:0 0 0 20px;padding:0 15px 15px 20px;padding-bottom:0;font-size:16px;max-height:83vh;overflow-y:auto}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="Snakinya-明烛天南">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+
+
+
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  
+  <div class="header-title">
+    <a href="/"
+      >Snakinya</a
+    >
+  </div>
+  <div class="header-subtitle" style="color:blueviolet;">苍山负雪，明烛天南</div>
+</header>
+
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="https://github.com/Snakinya" target="_self">Github</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/categories" target="_self">Categories</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/about/" target="_self">About</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/books/" target="_self">Books</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/friends/" target="_self">Friends</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="/posts/" target="_self">Posts</a>
+  </div>
+  
+</div>
+
+<div class="header-line"></div>
+
+        </div>
+
+        <header class="post-header">
+          <h1 class="post-title">南大软分笔记 ｜ 03 Data Flow Analysis I</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2023-02-23 00:00:00 UTC">
+                23 Feb 2023
+              </time>
+              
+            </div>
+            
+            <div class="col-xs-6">
+
+              
+              <div class="post-author">
+              <span id="busuanzi_container_page_pv">@本文阅读量<span id="busuanzi_value_page_pv"></span>次</span>
+                
+            </div>
+          </div>
+          
+        </header>
+        
+
+        <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#data-flow-analysis-i" aria-label="Data Flow Analysis I">Data Flow Analysis I</a><ul>
+                        
+                <li>
+                    <a href="#overview-of-data-flow-analysis" aria-label="Overview of Data Flow Analysis">Overview of Data Flow Analysis</a></li>
+                <li>
+                    <a href="#preliminareis-of-data-flow-analysis" aria-label="Preliminareis of Data Flow Analysis">Preliminareis of Data Flow Analysis</a><ul>
+                        
+                <li>
+                    <a href="#input-and-output-states" aria-label="input and output states">input and output states</a></li>
+                <li>
+                    <a href="#notations-for-transfer-functions-constraints" aria-label="Notations for transfer function&rsquo;s constraints">Notations for transfer function&rsquo;s constraints</a></li>
+                <li>
+                    <a href="#notations-for-control-flows-constraints%e6%8e%a7%e5%88%b6%e6%b5%81%e7%ba%a6%e6%9d%9f" aria-label="Notations for control flow&rsquo;s constraints(控制流约束)">Notations for control flow&rsquo;s constraints(控制流约束)</a></li>
+                <li>
+                    <a href="#%e4%b8%8d%e4%bc%9a%e6%b6%89%e5%8f%8a%e5%88%b0%e7%9a%84%e6%a6%82%e5%bf%b5" aria-label="不会涉及到的概念">不会涉及到的概念</a></li></ul>
+                </li>
+                <li>
+                    <a href="#reaching-definitions-analysis%e5%ae%9a%e4%b9%89%e5%8f%af%e8%be%be%e6%80%a7%e5%88%86%e6%9e%90" aria-label="Reaching Definitions Analysis（定义可达性分析）">Reaching Definitions Analysis（定义可达性分析）</a><ul>
+                        
+                <li>
+                    <a href="#understanding-reaching-definitions" aria-label="understanding reaching definitions">understanding reaching definitions</a></li>
+                <li>
+                    <a href="#algorithm-of-reaching-definitions-analysis" aria-label="Algorithm of Reaching Definitions Analysis">Algorithm of Reaching Definitions Analysis</a></li>
+                <li>
+                    <a href="#an-example" aria-label="An example">An example</a></li></ul>
+                </li>
+                <li>
+                    <a href="#live-variables-analysis" aria-label="Live Variables Analysis">Live Variables Analysis</a><ul>
+                        
+                <li>
+                    <a href="#%e6%b4%bb%e8%b7%83%e5%8f%98%e9%87%8f%e4%b8%ad%e7%9a%84%e6%95%b0%e6%8d%ae%e6%b5%81%e5%80%bc%e6%95%b0%e6%8d%ae%e6%8a%bd%e8%b1%a1" aria-label="活跃变量中的数据流值(数据抽象)">活跃变量中的数据流值(数据抽象)</a></li>
+                <li>
+                    <a href="#backward-analysis" aria-label="Backward analysis">Backward analysis</a></li>
+                <li>
+                    <a href="#transfer-function" aria-label="Transfer function">Transfer function</a></li>
+                <li>
+                    <a href="#algorithm" aria-label="Algorithm">Algorithm</a></li></ul>
+                </li>
+                <li>
+                    <a href="#avaliable-expressions-analysis" aria-label="Avaliable Expressions Analysis">Avaliable Expressions Analysis</a><ul>
+                        
+                <li>
+                    <a href="#%e5%9f%ba%e6%9c%ac%e6%a6%82%e5%bf%b5" aria-label="基本概念">基本概念</a></li>
+                <li>
+                    <a href="#%e5%8f%af%e7%94%a8%e8%a1%a8%e8%be%be%e5%bc%8f%e5%88%86%e6%9e%90%e4%b8%ad%e7%9a%84%e6%95%b0%e6%8d%ae%e6%b5%81%e5%80%bc" aria-label="可用表达式分析中的数据流值">可用表达式分析中的数据流值</a></li>
+                <li>
+                    <a href="#algorithm-1" aria-label="Algorithm">Algorithm</a></li>
+                <li>
+                    <a href="#%e4%b8%be%e4%be%8b" aria-label="举例">举例</a></li></ul>
+                </li>
+                <li>
+                    <a href="#conlusion" aria-label="Conlusion">Conlusion</a></li>
+                <li>
+                    <a href="#%e5%88%92%e9%87%8d%e7%82%b9" aria-label="划重点">划重点</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+        
+
+
+
+        <div class="post-content markdown-body">
+          
+          <h2 id="data-flow-analysis-i">Data Flow Analysis I</h2>
+<h3 id="overview-of-data-flow-analysis">Overview of Data Flow Analysis</h3>
+<p>核心：how data flows on CFG?
+展开：
+how <strong>application-specific data</strong> &ndash;&gt; abstraction
+<strong>flows</strong> through the &ndash;&gt;safe approximation
+<strong>nodes</strong>(BBs/statements) and &ndash;&gt;transfer function
+<strong>edges</strong>(control flows) of &ndash;&gt;control-flow handling
+<strong>CFG</strong>(a program)?
+对于大多数静态分析来讲都是may analysis：
+may analysis:</p>
+<ul>
+<li>outputs information that may be true(over-approximation)</li>
+</ul>
+<p>must analysis:</p>
+<ul>
+<li>outputs information that must be true(under-approximation)</li>
+</ul>
+<p>Over-and under-approximations are <strong>both for safety of analysis</strong>
+about safe approximation ：
+may analysis：safe = over
+must analysis: safe = under
+不同的数据流分析，有着不同的data abstraction, flow safe-approximation策略，transfer functions&amp;control-flow handlings。</p>
+<h3 id="preliminareis-of-data-flow-analysis">Preliminareis of Data Flow Analysis</h3>
+<h4 id="input-and-output-states">input and output states</h4>
+<ul>
+<li>each execution of an IR statement transforms an input state to a new output state</li>
+<li>the input(output) state is associated with the program point before(after) the statement</li>
+</ul>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682598358958-f0e90648-01d0-445b-b282-6385af9d888d.png">
+In each data-flow analysis application, we associate with every program point <strong>a data-flow value</strong> that represents <strong>an abstraction</strong> of the set of all possible <strong>program states</strong> that can be observed for that point
+<strong>在数据流分析中，我们会把每一个PP关联一个数据流值，代表在该点中可观察到的抽象的程序状态。</strong>
+<img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682598359040-361273ac-236c-4354-b854-7b0dadfab68b.png">
+<strong>data-flow analysis is to find a solution to a set of safe-approximation-directed constraints(约束规则) on the IN[s]&rsquo;s and OUT[s]&rsquo;s,for all statements s.</strong></p>
+<ul>
+<li>constraints based on semantics of statements(transfer functions)</li>
+<li>constraints based on the flows of control</li>
+</ul>
+<h4 id="notations-for-transfer-functions-constraints">Notations for transfer function&rsquo;s constraints</h4>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682598359120-6622f6cf-d619-4ab5-a430-ae389c527be8.png"></p>
+<h4 id="notations-for-control-flows-constraints控制流约束">Notations for control flow&rsquo;s constraints(控制流约束)</h4>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682598359203-6df72375-a253-4c67-92fb-73a5599b0ac7.png">
+The meet operator ^ is used to summarize the contributions from different paths at the confluence of those paths</p>
+<h4 id="不会涉及到的概念">不会涉及到的概念</h4>
+<ul>
+<li>函数调用 Method Calls
+<ul>
+<li>我们将分析的是过程本身中的事情，即 Intra-procedural。而过程之间的分析，将在 Inter-procedural Analysis 中介绍</li>
+</ul>
+</li>
+<li>变量别名 Aliases
+<ul>
+<li>变量不能有别名。有关问题将在指针分析中介绍。</li>
+</ul>
+</li>
+</ul>
+<h3 id="reaching-definitions-analysis定义可达性分析">Reaching Definitions Analysis（定义可达性分析）</h3>
+<p>A definition d at program point p reaches a point q if there is a path from p to q such that d is not “killed” along that path</p>
+<ul>
+<li>A definition of a variable v is a statement that assigns a value to v</li>
+<li>Translated as: definition of variable v at program point p reaches point q if there is a path from p to q such that no new definition of v appears on that path</li>
+</ul>
+<p>程序中变量 v 的一个 <strong>定义（Definition）</strong> 是指一条给 v 赋值的语句，我们称在程序点 p 处的一个定义 d <strong>到达（Reach）</strong> 了程序点 q ，如果存在一条从 p 到 q 的“路径”（控制流），在这条路径上，定义 d 未被 <strong>覆盖（Kill）</strong> 。称分析每个程序点处能够到达的定义的过程为 <strong>定义可达性分析（Reaching Definition Analysis）</strong> 。
+<img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682598359316-6bfc9d7f-daa5-4554-8617-c85ad9f572bb.png">
+Reaching definitions can be used to detect possible undefined variables. e.g., introduce a dummy definition for each variable v at the entry of CFG, and if the dummy definition of v reaches a point p where v is used, then v may be used before definition (as undefined reaches v)
+到达定值可以用来分析未定义的变量。例如，我们在程序入口为各变量引入一个 dummy 定值。当程序出口的某变量定值依然为 dummy，则我们可以认为该变量未被定义。</p>
+<h4 id="understanding-reaching-definitions">understanding reaching definitions</h4>
+<ul>
+<li>data flow values/facts 到达定值中的数据流值
+<ul>
+<li>the definations of all the variables in a program</li>
+<li>can be represented by bit vectors</li>
+<li><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682598359393-f0d1e47a-c195-430a-a882-db86a76e58cb.png"></li>
+</ul>
+</li>
+<li>D: v = x op ythis statement &ldquo;generates&rdquo; a definition D of variable v and &ldquo;kills&rdquo; all the other definitions in the program that define variable v,while leaving the remaining incoming definitions unaffected.
+<ul>
+<li>transfer function
+<img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682598359468-8b86076e-31d9-471d-bdd0-576aa0fd76a5.png">
+<ul>
+<li>从入口状态删除 kill 掉的定值，并加入新生成的定值。</li>
+<li>v = x op y，gen v, kill 其它所有的 v</li>
+</ul>
+</li>
+<li>control flow
+<img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682598359566-27ebcfcc-6f40-4247-b5c9-9533969c3d2f.png">A definition reaches a program point as long as there exists at least one path along which the definition reaches.任何一个前驱的变量定值都表明，该变量得到了定义。</li>
+</ul>
+</li>
+</ul>
+<h4 id="algorithm-of-reaching-definitions-analysis">Algorithm of Reaching Definitions Analysis</h4>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682598359641-8fe76e38-d08c-4fa8-846d-232b4e9d5bb6.png">
+这是一个经典的迭代算法。</p>
+<ul>
+<li>首先让所有BB和入口的OUT为空。因为你不知道 BB 中有哪些定值被生成。</li>
+<li>当任意 OUT 发生变化，则分析出的定值可能需要继续往下流动，所需要修改各 BB 的 IN 和 OUT。</li>
+<li>先处理 IN，然后再根据转移完成更新 OUT。</li>
+</ul>
+<p><strong>为什么程序能够停止？</strong>
+<img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682598359735-5232bac4-69fa-4eab-8acf-1f71d6be190a.png"></p>
+<ul>
+<li>一个程序中，gen和kill是固定的。在 gen U (IN - kill) 中，kill 与 gen 相关的 bit 不会因为 IN 的改变而发生改变。</li>
+<li>OUT不会减少。其它 bit 又是通过对前驱 OUT 取并得到的，因此其它 bit 不会发生 1 -&gt; 0 的情况。所以，OUT 是不断增长的，而且有上界，因此算法最后必然会停止。</li>
+<li>因为 OUT 没有变化，不会导致任何的 IN 发生变化，因此 OUT 不变可以作为终止条件。我们称之为程序到达了不动点（Fixed Point）</li>
+</ul>
+<h4 id="an-example">An example</h4>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682598359841-2719a25d-f0a4-4189-905a-ef606144abd5.png">
+定义可达分析的结果：
+<img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682598359927-ea1d1723-3871-47f8-8545-4d990c9af754.png"></p>
+<h3 id="live-variables-analysis">Live Variables Analysis</h3>
+<p>Live variables analysis tells whether the value of variable v at program point p could be used along some path in CFG starting at p.If so,v is live at p;otherwise,v is dead at p.</p>
+<ul>
+<li>变量 x 在程序点 p 上的值是否会在某条从 p 出发的路径中使用</li>
+<li>变量 x 在 p 上活跃，当 且仅存在一条从 p 开始的路径，该路径的末端使用了 x，且路径上没有对 x进行覆盖。</li>
+<li>隐藏了这样一个含义：在被使用前，v 没有被重新定义过，即没有被 kill 过。</li>
+</ul>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682598360054-34590a43-74e9-41b0-9dda-7c515a92653b.png">
+这个算法可以用于寄存器分配，当一个变量不会再被使用，那么此变量就可以从寄存器中腾空，用于新值的存储。
+注意这是一个 may analysis</p>
+<h4 id="活跃变量中的数据流值数据抽象">活跃变量中的数据流值(数据抽象)</h4>
+<ul>
+<li>程序中的所有变量</li>
+<li>依然可以用 bit vector 来表示，每个 bit 代表一个变量</li>
+</ul>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682598360132-a5368609-7a6b-4ead-aba3-3deadcf30727.png"></p>
+<h4 id="backward-analysis">Backward analysis</h4>
+<p>更直观，发现利用&ndash;&gt;向前传播</p>
+<h4 id="transfer-function">Transfer function</h4>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682598360214-7b3059e8-748c-4e82-a6ef-3997d2cb7188.png"></p>
+<ul>
+<li>一个基本块内，若 v = exp, 则 def v。若 exp = exp op v，那么 use v。一个变量要么是 use，要么是 def，根据 def 和 use 的先后顺序来决定。</li>
+<li>考虑基本块 B 及其后继 S。若 S 中，变量 v 被使用，那么我们就把 v 放到 S 的 IN 中，交给 B 来分析。</li>
+<li>因此对于活跃变量分析，其控制流处理是 OUT[B] = IN[S]。</li>
+<li>在一个块中，若变量 v 被使用，那么我们需要添加到我们的 IN 里。而如果 v 被定义，那么在其之上的语句中，v 都是一个非活跃变量，因为没有语句再需要使用它。</li>
+<li>因此对于转移方程，IN 是从 OUT 中删去重新定值的变量，然后并上使用过的变量。需要注意，如果同一个块中，变量 v 的 def 先于 use ，那么实际上效果和没有 use 是一样的。</li>
+</ul>
+<h4 id="algorithm">Algorithm</h4>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682598360296-00e32e03-dcf2-4565-b948-32e4cb5c56b7.png"></p>
+<ul>
+<li>我们不知道块中有哪些活跃变量，而且我们的目标是知道在一个块开始时哪些变量活跃，因此把 IN 初始化为空。</li>
+<li>初始化的判断技巧：may analysis 是空，must analysis 是 top。</li>
+</ul>
+<p>关键点：已知out去求in，先use后define</p>
+<h3 id="avaliable-expressions-analysis">Avaliable Expressions Analysis</h3>
+<p>可用表达式分析 must analysis</p>
+<h4 id="基本概念">基本概念</h4>
+<ul>
+<li>x + y 在 p 点可用的条件：从流图入口结点到达 p 的每条路径都对 x + y 求了值，且在最后一次求值之后再没有对 x 或 y 赋值</li>
+</ul>
+<p>可用表达式可以用于全局公共子表达式的计算。也就是说，如果一个表达式上次计算的值到这次仍然可用，我们就能直接利用其中值，而不用进行再次的计算。
+<img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682598360384-478edd50-5989-46c2-8a0d-d7503a706b72.png"></p>
+<h4 id="可用表达式分析中的数据流值">可用表达式分析中的数据流值</h4>
+<ul>
+<li>程序中的所有表达式</li>
+<li>bit vector 中，一个 bit 就是一个表达式</li>
+</ul>
+<h4 id="algorithm-1">Algorithm</h4>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682598360478-df9f84c9-9234-455c-851c-b60c3b7a0c51.png"></p>
+<ul>
+<li>注意此时的初始化：一开始确实无任何表达式可用，因此OUT[entry]被初始化为空集是自然的。但是，其它基本块的 OUT 被初始化为全集，这是因为当 CFG 存在环时，一个空的初始化值，会让取交集阶段直接把第一次迭代的 IN 设置成 0，无法进行正确的判定了。</li>
+<li>如果一个表达式从来都不可用，那么OUT[entry]的全 0 值会通过交操作将其置为 0，因此不用担心初始化为全 1 会否导致算法不正确。</li>
+</ul>
+<h4 id="举例">举例</h4>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682598360583-e14f1bfc-ae8f-4c1e-b962-739b66d19eab.png"></p>
+<h3 id="conlusion">Conlusion</h3>
+<p><img src="https://cosmoslin.oss-cn-chengdu.aliyuncs.com/img2/1682598360658-b578320f-58d1-4c7f-b982-3a3983dd9d4f.png"></p>
+<h3 id="划重点">划重点</h3>
+<ul>
+<li>三种数据流分析
+<ul>
+<li>到达定值</li>
+<li>活跃变量</li>
+<li>可用表达式</li>
+</ul>
+</li>
+<li>三种数据流分析的区别和联系</li>
+<li>知道迭代算法，以及算法能停机的原因</li>
+</ul>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+        
+        <div class="site-footer">
+  
+  
+
+  
+
+  
+  
+
+    
+      
+      
+      <div class="site-footer">
+        <div class="busuanzi-footer">
+          <span id="busuanzi_container_site_pv">
+            本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+          </span>
+          <span class="separator">|</span> 
+          <span id="busuanzi_container_site_uv">
+            本站访客数 <span id="busuanzi_value_site_uv"></span> 人次
+          </span>
+        </div>
+        <p class="footer-beian"> 
+          <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">
+            蜀ICP备2021024344号-1
+          </a>
+        </p>
+      </div>
+
+      
+    </div>
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>
