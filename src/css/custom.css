@@ -1,5 +1,5 @@
-/* 原站 vibe：霞鹜文楷字体 + 黑白极简（yinyang） */
-@import url("https://cdnjs.cloudflare.com/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/lxgwwenkaiscreenr.css");
+/* 原站 vibe：霞鹜文楷字体 + 黑白极简（yinyang）。字体自托管，避免 cdnjs 在国内不稳定 */
+@import '~lxgw-wenkai-screen-webfont/lxgwwenkaiscreenr.css';
 
 :root {
   --ifm-font-family-base: "LXGW WenKai Screen R", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
