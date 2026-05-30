@@ -1,0 +1,53 @@
+/* 原站 vibe：霞鹜文楷字体 + 黑白极简（yinyang） */
+@import url("https://cdnjs.cloudflare.com/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/lxgwwenkaiscreenr.css");
+
+:root {
+  --ifm-font-family-base: "LXGW WenKai Screen R", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --ifm-heading-font-family: var(--ifm-font-family-base);
+  --ifm-font-size-base: 15px;
+  --ifm-line-height-base: 1.75;
+  --ifm-heading-font-weight: 600;
+  --ifm-h1-font-size: 1.7rem;
+  --ifm-h2-font-size: 1.35rem;
+  --ifm-h3-font-size: 1.15rem;
+  --ifm-code-font-size: 90%;
+  --ifm-color-primary: #1c1e21;
+  --ifm-color-primary-dark: #19191a;
+  --ifm-color-primary-darker: #141414;
+  --ifm-color-primary-darkest: #000000;
+  --ifm-color-primary-light: #3a3d40;
+  --ifm-color-primary-lighter: #4a4d50;
+  --ifm-color-primary-lightest: #6a6d70;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #f5f5f5;
+  --ifm-color-primary-dark: #e0e0e0;
+  --ifm-color-primary-darker: #d0d0d0;
+  --ifm-color-primary-darkest: #b0b0b0;
+  --ifm-color-primary-light: #ffffff;
+  --ifm-color-primary-lighter: #ffffff;
+  --ifm-color-primary-lightest: #ffffff;
+  --ifm-background-color: #121212;
+  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.1);
+}
+
+/* 侧边栏、正文更紧凑优雅 */
+.menu {
+  font-size: 0.875rem;
+}
+.markdown > h1:first-child {
+  --ifm-h1-font-size: 1.8rem;
+}
+
+/* 首页 hero 收敛，不要太大 */
+.hero__title {
+  font-size: 2rem;
+  font-weight: 600;
+}
+.hero__subtitle {
+  font-size: 1.05rem;
+  font-weight: 400;
+  opacity: 0.75;
+}
