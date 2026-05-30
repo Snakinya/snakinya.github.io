@@ -4,8 +4,10 @@
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
-    "start": "docusaurus start",
-    "build": "docusaurus build",
+    "gen": "node scripts/gen-index.mjs",
+    "localize": "node scripts/localize-images.mjs",
+    "start": "node scripts/gen-index.mjs && docusaurus start",
+    "build": "node scripts/gen-index.mjs && docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",

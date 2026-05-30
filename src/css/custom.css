@@ -51,3 +51,10 @@
   font-weight: 400;
   opacity: 0.75;
 }
+
+/* 独立页面（关于/友链）：窄栏居中，不撑满全宽 */
+[class*='mdxPageWrapper'] {
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+}

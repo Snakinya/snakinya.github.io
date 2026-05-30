@@ -1,7 +1,9 @@
 ---
-title: "DNS | DNS Zone Transfers (AXFR) Vulnerability"
-sidebar_position: 1
+title: "DNS Zone Transfers (AXFR) Vulnerability"
+date: "2023-08-21"
 slug: /dns-zone-transfer
+last_update:
+  date: 2023-08-21
 ---
 
 ## DNS Zone Transfers (AXFR) Vulnerability
@@ -32,11 +34,11 @@ Once the environment is running, it will listen on port 53 of TCP and UDP, and t
 
 Under Linux, we can use the dig command to send dns requests. For example, we can use `dig @1.117.171.248 www.vulhub.org` to get the `A` record of the domain name on the target dns server.
 
-![](./DNS域传输漏洞.assets/2023-08-22-09.59.51.png)
+![](./dns-zone-transfer.assets/2023-08-22-09.59.51.png)
 
 Then we can send AXFR record requests:`dig @1.117.171.248 -t axfr vulhub.org`
 
-![](./DNS域传输漏洞.assets/2023-08-22-10.03.11.png)
+![](./dns-zone-transfer.assets/2023-08-22-10.03.11.png)
 
 We got all the subdomain records of `vulhub.org`, and there is a DNS zone transfers vulnerability here.
 
@@ -44,7 +46,7 @@ We got all the subdomain records of `vulhub.org`, and there is a DNS zone transf
 
 We can also use the Nmap script to scan for this vulnerability: `nmap --script dns-zone-transfer.nse --script-args "dns-zone-transfer.domain=vulhub.org" -Pn -p 53 1.117.171.248`
 
-![](./DNS域传输漏洞.assets/2023-08-22-10.05.32.png)
+![](./dns-zone-transfer.assets/2023-08-22-10.05.32.png)
 
 ### AXFR Vulnerability and Prevention
 

@@ -1,6 +1,17 @@
 // @ts-check
 import {themes as prismThemes} from 'prism-react-renderer';
 
+// 分类内按 front matter 的 date 倒序排序（新→旧）
+const ts = (v) => (v ? new Date(v).getTime() : 0);
+function sortByDate(items, dates) {
+  return items.map((it) =>
+    it.type === 'category'
+      ? {...it, items: sortByDate([...it.items].sort((a, b) =>
+          (b.type === 'doc' ? dates[b.id] : 0) - (a.type === 'doc' ? dates[a.id] : 0)), dates)}
+      : it,
+  );
+}
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Snakinya-明烛天南',
@@ -39,8 +50,14 @@ const config = {
         docs: {
           routeBasePath: '/',
           sidebarPath: './sidebars.js',
-          editUrl: 'https://github.com/Snakinya/snakinya-blog/tree/main/docusaurus/',
+          editUrl: 'https://github.com/Snakinya/snakinya-blog/tree/main/',
           showLastUpdateTime: true,
+          sidebarItemsGenerator: async (args) => {
+            const items = await args.defaultSidebarItemsGenerator(args);
+            const dates = {};
+            for (const d of args.docs) dates[d.id] = ts(d.frontMatter?.date);
+            return sortByDate(items, dates);
+          },
         },
         blog: false,
         theme: {
@@ -79,16 +96,8 @@ const config = {
         ],
       },
       footer: {
-        style: 'dark',
-        links: [
-          {
-            items: [
-              {label: 'GitHub', href: 'https://github.com/Snakinya'},
-              {label: '学术主页', href: 'https://profile.snakin.top'},
-            ],
-          },
-        ],
-        copyright: `Copyright © ${new Date().getFullYear()} Snakinya. Built with Docusaurus.`,
+        style: 'light',
+        copyright: `© ${new Date().getFullYear()} Snakinya · 苍山负雪，明烛天南`,
       },
       prism: {
         theme: prismThemes.github,

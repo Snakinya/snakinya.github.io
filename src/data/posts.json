@@ -1,0 +1,57 @@
+{
+  "posts": [
+    {
+      "title": "从漏洞挖掘到风险治理：AI 闭环下的代码安全范式变迁与从业者转型",
+      "date": "2026-03-09",
+      "slug": "/ai-code-security-paradigm",
+      "category": "随笔"
+    },
+    {
+      "title": "如何在计算机应用领域寻找研究想法",
+      "date": "2025-06-24",
+      "slug": "/research-ideas",
+      "category": "随笔"
+    },
+    {
+      "title": "莱斯定理",
+      "date": "2024-08-30",
+      "slug": "/rice-theorem",
+      "category": "随笔"
+    },
+    {
+      "title": "A Comprehensive Study of DNS-over-HTTPS Downgrade Attack",
+      "date": "2024-01-10",
+      "slug": "/doh-downgrade-attack",
+      "category": "论文笔记"
+    },
+    {
+      "title": "DNS Zone Transfers (AXFR) Vulnerability",
+      "date": "2023-08-21",
+      "slug": "/dns-zone-transfer",
+      "category": "协议安全"
+    },
+    {
+      "title": "Reproduction of SADDNS",
+      "date": "2023-06-19",
+      "slug": "/sad-dns",
+      "category": "协议安全"
+    }
+  ],
+  "categories": [
+    {
+      "label": "协议安全",
+      "slug": "/protocol-security",
+      "position": 4
+    },
+    {
+      "label": "论文笔记",
+      "slug": "/paper-notes",
+      "position": 5
+    },
+    {
+      "label": "随笔",
+      "slug": "/essays",
+      "position": 7
+    }
+  ]
+}

@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 const RE = /https?:\/\/[^\s)"'<>]+\.(?:png|jpe?g|gif|webp)/gi;
-const SKIP = /intranetproxy\.alipay\.com|yuque/i; // 蚂蚁内网，保留原样
+const SKIP = /intranetproxy\.alipay\.com|yuque\.antfin\.com/i; // 仅跳过内网图床
 
 function walk(dir) {
   return fs.readdirSync(dir, {withFileTypes: true}).flatMap(d => {

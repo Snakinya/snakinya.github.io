@@ -21,3 +21,56 @@
   align-items: center;
   justify-content: center;
 }
+
+.home {
+  max-width: 720px;
+  padding: 1rem 1rem 3rem;
+}
+
+.section {
+  margin-top: 2.5rem;
+}
+
+.section h2 {
+  font-size: 1.1rem;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  padding-bottom: 0.4rem;
+}
+
+.postList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.postList li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+.meta {
+  color: var(--ifm-color-emphasis-500);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.cat {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 999px;
+  padding: 0.25rem 0.9rem;
+  font-size: 0.9rem;
+}
+
+.cat:hover {
+  text-decoration: none;
+  background: var(--ifm-color-emphasis-100);
+}
