@@ -11,6 +11,7 @@
   --ifm-h2-font-size: 1.35rem;
   --ifm-h3-font-size: 1.15rem;
   --ifm-code-font-size: 90%;
+  --hero-glow: rgba(0, 0, 0, 0.06);
   --ifm-color-primary: #1c1e21;
   --ifm-color-primary-dark: #19191a;
   --ifm-color-primary-darker: #141414;
@@ -30,6 +31,7 @@
   --ifm-color-primary-lighter: #ffffff;
   --ifm-color-primary-lightest: #ffffff;
   --ifm-background-color: #121212;
+  --hero-glow: rgba(255, 255, 255, 0.07);
   --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.1);
 }
 

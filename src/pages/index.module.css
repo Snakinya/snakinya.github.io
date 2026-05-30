@@ -4,15 +4,39 @@
  */
 
 .heroBanner {
-  padding: 4rem 0;
+  padding: 6rem 0 3.5rem;
   text-align: center;
   position: relative;
   overflow: hidden;
 }
 
+.heroBanner :global(.container) {
+  position: relative;
+  z-index: 1;
+}
+
+.heroBanner::before {
+  content: '';
+  position: absolute;
+  inset: -25%;
+  background:
+    radial-gradient(40% 40% at 28% 32%, var(--hero-glow), transparent 70%),
+    radial-gradient(38% 38% at 72% 68%, var(--hero-glow), transparent 70%);
+  animation: heroDrift 22s ease-in-out infinite alternate;
+}
+
+@keyframes heroDrift {
+  from { transform: translate3d(-3%, -2%, 0) scale(1); }
+  to   { transform: translate3d(3%, 2%, 0) scale(1.15); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heroBanner::before { animation: none; }
+}
+
 @media screen and (max-width: 996px) {
   .heroBanner {
-    padding: 2rem;
+    padding: 3rem 1rem 2rem;
   }
 }
 

@@ -14,7 +14,7 @@ function sortByDate(items, dates) {
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Snakinya-明烛天南',
+  title: 'Snakinya',
   tagline: '苍山负雪，明烛天南',
   favicon: 'img/favicon.ico',
 
